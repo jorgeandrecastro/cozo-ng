@@ -13,9 +13,10 @@ Notable changes to Cozo-NG are documented here. Cozo-NG is an independent commun
 ### Changed
 
 - Renamed the published core package to `cozo-ng`; the library target remains `cozo`.
+- Prefixed the RocksDB and binding/server Cargo packages with `cozo-ng-` to avoid publishing under upstream crate names, while preserving native library names where practical.
 - Moved the maintained Rust workspace to edition 2024.
 - Refreshed the lockfile to current versions compatible with the declared dependency ranges, including updates across Serde, Tokio, Pest, UUID, Rayon, SQLite, and WASM tooling.
-- Bumped the local RocksDB binding package to `cozorocks 0.2.0` and aligned the core's dependency requirement.
+- Renamed the RocksDB binding package to `cozo-ng-rocks 0.2.0` and retained its Rust library name `cozorocks`.
 
 ### Compatibility
 

@@ -14,7 +14,7 @@ Keep reading only if the prebuilt binaries provided by these libraries do not su
 
 With the Rust toolchain installed,
 ```bash
-cargo build --release -p cozo_java -F storage-rocksdb
+cargo build --release -p cozo-ng-java -F storage-rocksdb
 ```
 
 ## Building for Android
@@ -36,7 +36,7 @@ When everything is set up correctly, the following command show complete without
 
 ```bash
 for TARGET in aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android; do
-  cross build -p cozo_java --release --target=$TARGET
+  cross build -p cozo-ng-java --release --target=$TARGET
 done
 ```
 

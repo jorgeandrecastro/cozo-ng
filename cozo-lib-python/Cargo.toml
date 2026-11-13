@@ -1,5 +1,5 @@
 [package]
-name = "cozo_py"
+name = "cozo-ng-python"
 version = "0.8.0"
 edition = "2024"
 description = "Cozo database for python"

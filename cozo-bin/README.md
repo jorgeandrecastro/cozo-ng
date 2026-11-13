@@ -107,5 +107,5 @@ The following are experimental:
 Building `cozo` requires a [Rust toolchain](https://rustup.rs). Run
 
 ```bash
-cargo build --release -p cozo-bin -F compact -F storage-rocksdb
+cargo build --release -p cozo-ng-bin -F compact -F storage-rocksdb
 ```

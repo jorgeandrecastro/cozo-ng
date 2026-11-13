@@ -1,5 +1,5 @@
 [package]
-name = "cozo-lib-wasm"
+name = "cozo-ng-wasm"
 version = "0.8.0"
 edition = "2024"
 description = "Cozo database for WASM"
@@ -10,6 +10,7 @@ repository = "https://github.com/cozodb/cozo"
 documentation = "https://docs.cozodb.org"
 
 [lib]
+name = "cozo_lib_wasm"
 crate-type = ["cdylib", "rlib"]
 
 [features]

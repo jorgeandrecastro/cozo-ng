@@ -123,7 +123,7 @@ document-features = "0.2"
 rayon = { version = "1.12", optional = true }
 minreq = { version = "3.0", features = ["https-rustls"], optional = true }
 tikv-jemallocator-global = { version = "0.7", optional = true }
-cozorocks = { path = "../cozorocks", version = "0.2.0", optional = true }
+cozorocks = { package = "cozo-ng-rocks", path = "../cozorocks", version = "0.2.0", optional = true }
 rocksdb = { version = "0.25", optional = true }
 sled = { version = "0.34", optional = true }
 tikv-client = { version = "0.4", optional = true }

@@ -6,6 +6,6 @@
 # You can obtain one at https://mozilla.org/MPL/2.0/.
 #
 
-cargo build -p cozo-node -F compact -F storage-rocksdb
+cargo build -p cozo-ng-node -F compact -F storage-rocksdb
 mv ../target/debug/libcozo_node.dylib native/6/cozo_node_prebuilt.node
 node example.js

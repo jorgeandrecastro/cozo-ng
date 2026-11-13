@@ -24,5 +24,5 @@ gcc -L../target/release/ -lcozo_c example.c -o example && ./example
 You need to install the [Rust toolchain](https://www.rust-lang.org/tools/install) on your system. Then:
 
 ```bash
-cargo build --release -p cozo_c -F compact -F storage-rocksdb
+cargo build --release -p cozo-ng-c -F compact -F storage-rocksdb
 ```

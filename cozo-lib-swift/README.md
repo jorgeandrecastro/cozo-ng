@@ -157,13 +157,13 @@ When everything goes well, you should find the compiled Swift package in a direc
 
 If you want to use the RocksDB engine on Desktop, in the build script change the two lines
 ```bash
-cargo build -p cozo-swift -F compact --target x86_64-apple-darwin --release
-cargo build -p cozo-swift -F compact --target aarch64-apple-darwin --release
+cargo build -p cozo-ng-swift -F compact --target x86_64-apple-darwin --release
+cargo build -p cozo-ng-swift -F compact --target aarch64-apple-darwin --release
 ```
 to
 ```bash
-cargo build -p cozo-swift -F compact -F storage-rocksdb --target x86_64-apple-darwin --release
-cargo build -p cozo-swift -F compact -F storage-rocksdb --target aarch64-apple-darwin --release
+cargo build -p cozo-ng-swift -F compact -F storage-rocksdb --target x86_64-apple-darwin --release
+cargo build -p cozo-ng-swift -F compact -F storage-rocksdb --target aarch64-apple-darwin --release
 ```
 
 Then you also need to link your executable with `libc++`: in XCode, click on your project

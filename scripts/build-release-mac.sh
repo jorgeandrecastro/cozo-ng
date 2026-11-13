@@ -10,7 +10,7 @@ mkdir -p release
 
 for TARGET in aarch64-apple-darwin x86_64-apple-darwin; do
   # standalone, c, java, nodejs
-  CARGO_PROFILE_RELEASE_LTO=fat cargo build --release -p cozo-bin -p cozo_c -p cozo_java -p cozo-node -F compact -F storage-rocksdb --target $TARGET
+  CARGO_PROFILE_RELEASE_LTO=fat cargo build --release -p cozo-ng-bin -p cozo-ng-c -p cozo-ng-java -p cozo-ng-node -F compact -F storage-rocksdb --target $TARGET
   cp target/$TARGET/release/cozo-bin release/cozo-$VERSION-$TARGET # standalone
   cp target/$TARGET/release/libcozo_c.a release/libcozo_c-$VERSION-$TARGET.a # c static
   cp target/$TARGET/release/libcozo_c.dylib release/libcozo_c-$VERSION-$TARGET.dylib # c dynamic
@@ -33,7 +33,7 @@ cd ..
 
 # with TiKV
 #for TARGET in aarch64-apple-darwin x86_64-apple-darwin; do
-#  CARGO_PROFILE_RELEASE_LTO=fat cargo build --release -p cozo-bin \
+#  CARGO_PROFILE_RELEASE_LTO=fat cargo build --release -p cozo-ng-bin \
 #    -F compact -F storage-rocksdb -F storage-tikv -F storage-sled --target $TARGET
 #  cp target/$TARGET/release/cozo-bin release/cozo_all-$VERSION-$TARGET # standalone
 #done

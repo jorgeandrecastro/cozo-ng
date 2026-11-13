@@ -17,5 +17,5 @@ members = [
 lto = true
 debug = true
 
-[profile.dev.package."cozorocks"]
+[profile.dev.package."cozo-ng-rocks"]
 opt-level = 3

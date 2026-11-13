@@ -125,7 +125,7 @@ look at this [example](./example.js).
 Building `cozo-node` requires a [Rust toolchain](https://rustup.rs). Run
 
 ```bash
-cargo build --release -p cozo-node -F compact -F storage-rocksdb
+cargo build --release -p cozo-ng-node -F compact -F storage-rocksdb
 ```
 
 and then find the dynamic library (names can vary a lot, the file extension is `.so` on Linux, `.dylib` on Mac,

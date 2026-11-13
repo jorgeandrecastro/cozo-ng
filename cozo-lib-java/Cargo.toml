@@ -1,5 +1,5 @@
 [package]
-name = "cozo_java"
+name = "cozo-ng-java"
 version = "0.8.0"
 edition = "2024"
 license = "MPL-2.0"
@@ -9,6 +9,7 @@ documentation = "https://docs.cozodb.org"
 description = "Java bindings for CozoDB"
 
 [lib]
+name = "cozo_java"
 crate-type = ["cdylib"]
 
 [features]

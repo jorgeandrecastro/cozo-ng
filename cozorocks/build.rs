@@ -13,6 +13,7 @@ use std::{env, fs, process::Command};
 fn main() {
     let target = env::var("TARGET").unwrap();
 
+    cxx_build::CFG.include_prefix = "cozorocks";
     let mut builder = cxx_build::bridge("src/bridge/mod.rs");
     builder
         .files(["bridge/status.cpp", "bridge/db.cpp", "bridge/tx.cpp"])

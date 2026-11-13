@@ -848,51 +848,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f8f80099a98041a3d1622845c271458a2d73e688351bf3cb999266764b81d48"
 
 [[package]]
-name = "cozo-bin"
-version = "0.8.0"
-dependencies = [
- "async-stream",
- "axum 0.8.9",
- "axum-macros",
- "chrono",
- "clap",
- "cozo-ng",
- "crossbeam",
- "ctrlc",
- "env_logger",
- "eventsource-client",
- "futures",
- "itertools 0.15.0",
- "log",
- "miette",
- "minreq",
- "prettytable",
- "rand 0.8.8",
- "rayon",
- "rustyline",
- "serde",
- "serde_derive",
- "serde_json",
- "tokio",
- "tower-http 0.7.1",
-]
-
-[[package]]
 name = "cozo-core-examples"
 version = "0.2.0"
 dependencies = [
  "cozo-ng",
-]
-
-[[package]]
-name = "cozo-lib-wasm"
-version = "0.8.0"
-dependencies = [
- "console_error_panic_hook",
- "cozo-ng",
- "wasm-bindgen",
- "wasm-bindgen-test",
- "wee_alloc",
 ]
 
 [[package]]
@@ -906,7 +865,7 @@ dependencies = [
  "casey",
  "chrono",
  "chrono-tz",
- "cozorocks",
+ "cozo-ng-rocks",
  "crossbeam",
  "csv",
  "document-features",
@@ -959,7 +918,55 @@ dependencies = [
 ]
 
 [[package]]
-name = "cozo-node"
+name = "cozo-ng-bin"
+version = "0.8.0"
+dependencies = [
+ "async-stream",
+ "axum 0.8.9",
+ "axum-macros",
+ "chrono",
+ "clap",
+ "cozo-ng",
+ "crossbeam",
+ "ctrlc",
+ "env_logger",
+ "eventsource-client",
+ "futures",
+ "itertools 0.15.0",
+ "log",
+ "miette",
+ "minreq",
+ "prettytable",
+ "rand 0.8.8",
+ "rayon",
+ "rustyline",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "tokio",
+ "tower-http 0.7.1",
+]
+
+[[package]]
+name = "cozo-ng-c"
+version = "0.8.0"
+dependencies = [
+ "cbindgen",
+ "cozo-ng",
+ "lazy_static",
+]
+
+[[package]]
+name = "cozo-ng-java"
+version = "0.8.0"
+dependencies = [
+ "cozo-ng",
+ "jni",
+ "lazy_static",
+]
+
+[[package]]
+name = "cozo-ng-node"
 version = "0.8.0"
 dependencies = [
  "cozo-ng",
@@ -972,34 +979,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cozo-swift"
-version = "0.8.0"
-dependencies = [
- "cozo-ng",
- "swift-bridge",
- "swift-bridge-build",
-]
-
-[[package]]
-name = "cozo_c"
-version = "0.8.0"
-dependencies = [
- "cbindgen",
- "cozo-ng",
- "lazy_static",
-]
-
-[[package]]
-name = "cozo_java"
-version = "0.8.0"
-dependencies = [
- "cozo-ng",
- "jni",
- "lazy_static",
-]
-
-[[package]]
-name = "cozo_py"
+name = "cozo-ng-python"
 version = "0.8.0"
 dependencies = [
  "cozo-ng",
@@ -1010,7 +990,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cozorocks"
+name = "cozo-ng-rocks"
 version = "0.2.0"
 dependencies = [
  "cc",
@@ -1022,6 +1002,26 @@ dependencies = [
  "pkg-config",
  "tikv-jemalloc-sys",
  "zstd-sys",
+]
+
+[[package]]
+name = "cozo-ng-swift"
+version = "0.8.0"
+dependencies = [
+ "cozo-ng",
+ "swift-bridge",
+ "swift-bridge-build",
+]
+
+[[package]]
+name = "cozo-ng-wasm"
+version = "0.8.0"
+dependencies = [
+ "console_error_panic_hook",
+ "cozo-ng",
+ "wasm-bindgen",
+ "wasm-bindgen-test",
+ "wee_alloc",
 ]
 
 [[package]]

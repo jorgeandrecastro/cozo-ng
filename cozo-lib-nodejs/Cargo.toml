@@ -1,5 +1,5 @@
 [package]
-name = "cozo-node"
+name = "cozo-ng-node"
 version = "0.8.0"
 description = "Cozo database for NodeJS"
 authors = ["Ziyang Hu"]
@@ -11,6 +11,7 @@ edition = "2024"
 exclude = ["index.node"]
 
 [lib]
+name = "cozo_node"
 crate-type = ["cdylib"]
 
 [features]

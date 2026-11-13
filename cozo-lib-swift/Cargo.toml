@@ -1,5 +1,5 @@
 [package]
-name = "cozo-swift"
+name = "cozo-ng-swift"
 version = "0.8.0"
 edition = "2024"
 description = "Cozo database for Swift"
@@ -10,6 +10,7 @@ repository = "https://github.com/cozodb/cozo"
 documentation = "https://docs.cozodb.org"
 
 [lib]
+name = "cozo_swift"
 crate-type = ["staticlib"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

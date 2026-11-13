@@ -11,7 +11,7 @@ cd cozo-lib-python
 maturin build -F compact -F storage-rocksdb --release --strip --target $TARGET
 cd ..
 
-cargo build --release -p cozo-bin -p cozo_c -p cozo_java -p cozo-node -F compact -F storage-rocksdb --target $TARGET
+cargo build --release -p cozo-ng-bin -p cozo-ng-c -p cozo-ng-java -p cozo-ng-node -F compact -F storage-rocksdb --target $TARGET
 cp target/$TARGET/release/cozo-bin.exe release/cozo-$VERSION-$TARGET.exe # standalone
 cp target/$TARGET/release/cozo_c.lib release/libcozo_c-$VERSION-$TARGET.lib # c static
 cp target/$TARGET/release/cozo_c.dll release/libcozo_c-$VERSION-$TARGET.dll # c dynamic
@@ -21,7 +21,7 @@ cp target/$TARGET/release/cozo_node.dll release/libcozo_node-$VERSION-$TARGET.dl
 cp target/wheels/*.whl release/
 
 # $TARGET = "x86_64-pc-windows-gnu"
-# cargo build --release -p cozo-bin -p cozo_c -p cozo_java -p cozo-node -F compact -F storage-rocksdb --target $TARGET
+# cargo build --release -p cozo-ng-bin -p cozo-ng-c -p cozo-ng-java -p cozo-ng-node -F compact -F storage-rocksdb --target $TARGET
 # cp target/$TARGET/release/cozo-bin.exe release/cozo-$VERSION-$TARGET.exe # standalone
 # cp target/$TARGET/release/libcozo_c.a release/libcozo_c-$VERSION-$TARGET.a # c static
 # cp target/$TARGET/release/cozo_c.dll release/libcozo_c-$VERSION-$TARGET.dll # c dynamic

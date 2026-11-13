@@ -1,10 +1,31 @@
 # Publier Cozo-NG sur crates.io
 
-Ce guide décrit l'ordre de publication Rust pour la version `0.8.0`. La crate principale s'appelle `cozo-ng`, mais son nom de bibliothèque reste `cozo` : le code Rust des utilisateurs peut donc continuer à faire `use cozo::*`.
+Les noms de packages de cette reprise utilisent le préfixe `cozo-ng-` pour ne pas publier sous les noms de crates de l'amont. Le package principal reste `cozo-ng`, avec le nom de bibliothèque `cozo`, afin de préserver les imports Rust existants (`use cozo::*`). Les bindings gardent également leurs noms de bibliothèques et artefacts natifs lorsque nécessaire.
+
+## Noms des packages
+
+| Rôle | Package crates.io | Bibliothèque ou exécutable conservé |
+|---|---|---|
+| Moteur Rust | `cozo-ng` | bibliothèque `cozo` |
+| Backend RocksDB | `cozo-ng-rocks` | bibliothèque `cozorocks` |
+| Serveur autonome | `cozo-ng-bin` | exécutable `cozo-bin` |
+| Binding C | `cozo-ng-c` | bibliothèque `cozo_c` |
+| Binding Java/JNI | `cozo-ng-java` | bibliothèque `cozo_java` |
+| Binding Python | `cozo-ng-python` | bibliothèque `cozo_embedded` |
+| Binding Node.js | `cozo-ng-node` | bibliothèque native `cozo_node` |
+| Binding Swift | `cozo-ng-swift` | bibliothèque `cozo_swift` |
+| Binding WebAssembly | `cozo-ng-wasm` | bibliothèque `cozo_lib_wasm` |
+
+Le nom du package et celui de sa bibliothèque Cargo sont distincts. Pour le moteur, par exemple, une dépendance peut garder l'alias `cozo` :
+
+```toml
+[dependencies]
+cozo = { package = "cozo-ng", version = "0.8.0" }
+```
 
 ## Avant la publication
 
-1. Vérifier que les versions, le changelog, les README et les fichiers inclus dans les paquets sont définitifs. Une version publiée sur crates.io ne peut pas être remplacée ni republiée avec le même numéro.
+1. Vérifier les versions, le changelog, les README et les fichiers inclus dans les paquets. Une version publiée sur crates.io ne peut pas être remplacée ni republiée avec le même numéro.
 2. Vérifier que les contrôles passent :
 
    ```sh
@@ -14,78 +35,77 @@ Ce guide décrit l'ordre de publication Rust pour la version `0.8.0`. La crate p
    ```
 
    La compilation avec toutes les fonctionnalités peut demander des bibliothèques système supplémentaires, notamment `liburing` pour `io-uring`.
-3. Créer un compte crates.io, vérifier l'adresse e-mail, puis créer un jeton API sur <https://crates.io/settings/tokens>. Sur la machine qui publie, se connecter avec :
+
+3. Inspecter le contenu de chaque paquet et faire un dry-run :
 
    ```sh
-   cargo login
-   ```
-
-   Cargo demande alors le jeton. Ne le mettez jamais dans le dépôt, un fichier de configuration versionné ou une commande enregistrée dans l'historique du shell.
-4. Vérifier les paquets et leur contenu avant d'envoyer quoi que ce soit :
-
-   ```sh
-   cargo package -p cozorocks --list
+   cargo package -p cozo-ng-rocks --list
    cargo package -p cozo-ng --list
-   cargo publish -p cozorocks --dry-run
+   cargo publish -p cozo-ng-rocks --dry-run
    ```
 
-   Le dry-run de `cozorocks 0.2.0` a déjà réussi dans l'environnement de développement. Il incluait environ 24 Mo de fichiers avant compression : inspecter la liste, en particulier les sources RocksDB, avant la vraie publication.
+   Inspecter en particulier les sources RocksDB incluses par `cozo-ng-rocks`; le paquet est volumineux.
 
 ## Ordre de publication
 
-La dépendance `cozorocks` doit être publiée en premier. Même si elle est optionnelle dans le moteur, `cozo-ng 0.8.0` référence `cozorocks ^0.2.0`, et crates.io doit pouvoir résoudre cette version au moment de publier le moteur.
+Le moteur dépend optionnellement de `cozo-ng-rocks 0.2.0`. Cette dépendance doit néanmoins être disponible sur crates.io pour que le moteur puisse être publié et résolu depuis le registre.
 
-### 1. Publier `cozorocks`
-
-```sh
-cargo publish -p cozorocks --allow-dirty
-
-```
-
-Attendre que crates.io ait indexé la version. Vérifier ensuite qu'elle est visible :
+### 1. Publier le backend RocksDB
 
 ```sh
-cargo info cozorocks@0.2.0
+cargo publish -p cozo-ng-rocks --dry-run
+cargo publish -p cozo-ng-rocks
 ```
 
-### 2. Vérifier puis publier le moteur
+Attendre l'indexation de la version, puis vérifier sa disponibilité :
+
+```sh
+cargo info --registry crates-io cozo-ng-rocks@0.2.0
+```
+
+La tentative de publication de l'ancien nom `cozorocks` a été refusée par crates.io (403 : le compte ne possède pas cette crate). Cette tentative n'a pas publié `cozorocks 0.2.0`; le nouveau nom est `cozo-ng-rocks`.
+
+### 2. Publier le moteur
+
+Une fois `cozo-ng-rocks` indexé :
 
 ```sh
 cargo publish -p cozo-ng --dry-run
 cargo publish -p cozo-ng
 ```
 
-Le paquet publié s'appelle `cozo-ng`; le nom de bibliothèque `cozo` est conservé dans son manifeste.
+Le package est `cozo-ng`, mais son nom de bibliothèque reste `cozo`.
 
-### 3. Publier les autres crates Rust, si elles font partie de la livraison
+### 3. Publier les autres crates Rust
 
-Ces paquets dépendent de `cozo-ng = 0.8.0`. Attendre que le moteur soit indexé avant de les publier. Les publier un par un permet de repérer précisément une erreur :
+Ces packages dépendent de `cozo-ng 0.8.0`. Attendre l'indexation du moteur avant de les publier. Ne publier que les bindings prêts pour cette version :
 
 ```sh
-cargo publish -p cozo-bin
-cargo publish -p cozo_c
-cargo publish -p cozo_java
-cargo publish -p cozo_py
-cargo publish -p cozo-node
-cargo publish -p cozo-swift
-cargo publish -p cozo-lib-wasm
+cargo publish -p cozo-ng-bin
+cargo publish -p cozo-ng-c
+cargo publish -p cozo-ng-java
+cargo publish -p cozo-ng-python
+cargo publish -p cozo-ng-node
+cargo publish -p cozo-ng-swift
+cargo publish -p cozo-ng-wasm
 ```
 
-Ils peuvent être testés avant en remplaçant chaque commande par `cargo publish -p <nom> --dry-run`. Ne publiez que les bindings effectivement prêts et maintenus pour cette version. `cozo-core-examples` est un paquet d'exemples interne au workspace et n'est pas inclus dans la liste de publication.
+On peut d'abord remplacer chaque commande par `cargo publish -p <package> --dry-run`. `cozo-core-examples` est un paquet d'exemples interne au workspace et n'est pas proposé à la publication.
 
 ## Après publication
 
-Vérifier la présence des versions sur crates.io et tester une résolution depuis le registre, pas seulement depuis le workspace local. Par exemple :
+Vérifier la présence des versions sur crates.io et tester une résolution depuis le registre, pas seulement depuis le workspace local :
 
 ```sh
-cargo info cozo-ng@0.8.0
-cargo info cozorocks@0.2.0
+cargo info --registry crates-io cozo-ng@0.8.0
+cargo info --registry crates-io cozo-ng-rocks@0.2.0
 ```
 
-Mettre ensuite à jour les liens de release et annoncer les crates réellement publiées. La publication sur crates.io ne publie pas les paquets npm, Python/PyPI ni les artefacts Swift : ces distributions ont leurs propres procédures et doivent être traitées séparément.
+Mettre ensuite à jour les liens de release et annoncer les crates réellement publiées. La publication sur crates.io ne publie pas les paquets npm, Python/PyPI ni les artefacts Swift : ces distributions ont leurs propres procédures et noms.
 
 ## À retenir
 
-- Ne pas utiliser `--allow-dirty` pour la publication réelle. Cette option ne convient qu'à un dry-run local quand l'arbre de travail contient des changements non commités.
-- Ne pas lancer les publications avant d'avoir figé et relu le contenu des paquets : les versions envoyées sur crates.io sont immuables.
-- Si un dry-run du moteur échoue avec « no matching package named `cozorocks` », vérifier que `cozorocks 0.2.0` est publié et attendre l'indexation crates.io avant de réessayer.
+- Ne pas utiliser `--allow-dirty` pour une publication réelle. Pour publier, committer les changements et vérifier le paquet exact.
+- Un dry-run ne vérifie pas que le compte possède les droits sur un nom. Le 403 rencontré pour `cozorocks` était un refus de propriété, pas une erreur de compilation ou de packaging.
+- Les noms préfixés doivent être vérifiés sur crates.io avant publication; `cargo info --registry crates-io <nom>` permet de vérifier qu'un nom publié est visible.
+- Si crates.io indique qu'un nom est déjà pris, choisir un autre nom disponible avant de publier : un package publié ne peut pas être renommé.
