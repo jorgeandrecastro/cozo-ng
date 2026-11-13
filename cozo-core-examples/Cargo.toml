@@ -4,6 +4,6 @@ version = "0.2.0"
 edition = "2024"
 
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.9.0", path = "../cozo-core", default-features = false, features = [
+cozo = { package = "cozo-ng", version = "0.10.0", path = "../cozo-core", default-features = false, features = [
     "rayon",
 ] }
