@@ -5,6 +5,10 @@
 This document describes how to set up cozo (standalone executable).
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
 
+The standalone server is an optional way to run Cozo-NG. The project's primary
+maintenance target is the embedded Rust engine; the server is a Rust application
+built on that engine.
+
 ## Download
 
 The standalone executable for Cozo-NG, when published, will be available from the [Cozo-NG release page](https://github.com/jorgeandrecastro/cozo-ng/releases).

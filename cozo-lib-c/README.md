@@ -4,6 +4,11 @@
 
 This directory contains the source of the Cozo C API.
 
+Cozo-NG is maintained Rust-first, and the Rust crate is the primary supported
+interface. This C binding is a community integration surface; it may not have
+release parity with the Rust engine. Contributions to build, test, document, or
+maintain the binding are welcome.
+
 This document describes how to set up the C library.
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
 

@@ -4,19 +4,19 @@
 [![docs.rs](https://img.shields.io/docsrs/cozo-ng-rocks?label=docs.rs)](https://docs.rs/cozo-ng-rocks)
 [![License: MPL-2.0](https://img.shields.io/badge/license-MPL--2.0-blue.svg)](https://github.com/jorgeandrecastro/cozo-ng/blob/main/LICENSE.txt)
 
-`cozo-ng-rocks` is the low-level RocksDB storage adapter maintained for
-[Cozo-NG](https://github.com/jorgeandrecastro/cozo-ng). It wraps the RocksDB C++
-API with [`cxx`](https://cxx.rs/) and provides the database, transaction,
-iterator, and status types used by the Cozo-NG engine.
+`cozo-ng-rocks` is the low-level RocksDB storage adapter for the Rust-first
+[Cozo-NG](https://github.com/jorgeandrecastro/cozo-ng) embedded database. It
+wraps the RocksDB C++ API with [`cxx`](https://cxx.rs/) and provides the
+database, transaction, iterator, and status types used by the Cozo-NG engine.
 
 The crates.io package is named `cozo-ng-rocks`; its Rust library name remains
 `cozorocks`. This is an independently maintained Cozo-NG package, not an
 official release of the original CozoDB project.
 
-> **Most applications should depend on [`cozo-ng`](https://crates.io/crates/cozo-ng)
+> **Most Rust applications should depend on [`cozo-ng`](https://crates.io/crates/cozo-ng)
 > instead.** This crate exposes storage-engine internals, not CozoScript, the
-> Cozo query API, or a standalone database. Its API and storage behavior may
-> change as Cozo-NG is maintained.
+> Cozo query API, or a standalone database. It is an implementation component
+> of the Rust engine; its API and storage behavior may change as Cozo-NG is maintained.
 
 ## Add the dependency
 

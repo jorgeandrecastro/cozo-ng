@@ -5,9 +5,9 @@
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/build.yml?branch=main)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/build.yml)
 [![GitHub](https://img.shields.io/github/license/jorgeandrecastro/cozo-ng)](https://github.com/jorgeandrecastro/cozo-ng/blob/main/LICENSE.txt)
 
-# `Cozo-NG` *(Community-maintained fork of CozoDB)*
+# cozo-ng — The Embedded Graph + Vector Database for AI Agents & GraphRAG in Rust
 
-> **Maintenance notice:** The original [CozoDB repository](https://github.com/cozodb/cozo) has remained at `v0.7.6` without active maintenance for roughly two to three years. Maintenance resumes here with Cozo-NG `0.8.0`. This is an independent community fork, not an official upstream release.
+> **Cozo-NG** is an independent, community-maintained continuation of [CozoDB](https://github.com/cozodb/cozo), currently focused on the Rust engine. It is not an official upstream release.
 >
 > *If you are migrating from the original `cozo` crate, change the dependency package to `cozo-ng` while keeping the dependency key `cozo`; the library name remains `cozo`, so your Rust code does not need to change.*
 
@@ -21,16 +21,24 @@
 6. [Links](#Links)
 7. [Licensing and contributing](#Licensing-and-contributing)
 
-## 🚀 Fork & Maintenance Roadmap
+## 🚀 Roadmap: v0.9 (Current Focus)
 
-Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. The initial `0.8.0` release refreshes compatible Rust dependencies and moves the core workspace to Rust edition 2024 while retaining the `cozo` library name.
+Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name.
 
-Maintenance priorities:
-* **Core first:** Keep the Rust library and standalone server building, tested, and documented; keep the library name `cozo` for straightforward migration.
-* **Dependencies:** Review and refresh dependencies regularly, check RustSec advisories, and include compatibility fixes and notable upgrades in release notes.
-* **Storage safety:** Treat on-disk format and migration behavior as compatibility-sensitive. Test storage backends before changing their dependencies or behavior, and document any required migration.
-* **Bindings:** Maintain a binding when its build and tests can be exercised in CI; clearly label third-party packages that are still upstream-only.
-* **Community:** Triage issues and review contributions in this repository; no response-time guarantee is implied for a community-maintained project.
+The focus is a high-performance, transactional, embedded Rust database that brings together relational storage, Datalog-powered knowledge graphs, and HNSW vector search. It is designed to give Rust AI agents and GraphRAG applications a local, in-process data layer.
+
+Why Cozo-NG for AI and local-first applications?
+* **Embedded GraphRAG building block:** Compose vector similarity search, relational filters, and multi-hop graph traversal without requiring a separate graph or vector database service.
+* **Rust-native and transactional:** Run in the application's process and use Cozo-NG's MVCC transaction model directly from Rust.
+* **One local data layer:** Keep structured relationships and semantic embeddings close to the application, reducing operational components for local-first and agentic systems.
+
+The v0.9 roadmap:
+* [x] **Fork initialization:** Establish the independent project, licensing, crate namespace, and repository structure.
+* [ ] **Dependency modernization:** Finish validating updated dependencies across supported Rust toolchains, storage features, and platforms.
+* [x] **Rust-first scope:** Focus official maintenance on the Rust database engine and its Rust APIs. Keep `cozo` as the library name for migration compatibility.
+* [ ] **Core performance and DX:** Refine query execution and improve examples, diagnostics, and developer documentation.
+* [ ] **Storage safety:** Treat on-disk formats and migration behavior as compatibility-sensitive; test backend changes and document migrations.
+* **Community bindings:** Python, Node.js, WASM, Java, Swift, C, and other non-Rust bindings are welcome community efforts. Collaborations and pull requests to build, test, document, or maintain them are warmly welcome, but they are not currently part of the core maintenance commitment.
 
 See the [0.8.0 changelog](CHANGELOG.md) and [maintenance and contribution guidelines](CONTRIBUTING.md).
 
@@ -43,7 +51,9 @@ See the [0.8.0 changelog](CHANGELOG.md) and [maintenance and contribution guidel
 
 ## Introduction
 
-Cozo-NG (CozoDB) is a general-purpose, transactional, relational database that uses **Datalog** for query, is **embeddable** but can also handle huge amounts of data and concurrency, and focuses on **graph** data, **vector search**, and algorithms. It supports **time travel** and it is **performant**!
+Cozo-NG is an embedded, transactional database engine written in Rust. It combines relational data, **Datalog** queries and recursion for knowledge graphs, and **HNSW vector search**. Its in-process design makes it a building block for local-first applications, AI agents, and GraphRAG systems that need structured relationships and semantic retrieval together.
+
+Cozo-NG can also be run through a standalone HTTP server, but the Rust library is the project's primary interface and maintenance target.
 
 ### What does _embeddable_ mean here?
 
@@ -51,7 +61,7 @@ A database is almost surely embedded if you can use it on a device which _never_
 
 > A database is _embedded_ if it runs in the same process as your main program. This is in contradistinction to _client-server_ databases, where your program connects to a database server via a client library. Embedded databases generally require no setup and can be used in a much wider range of environments.
 >
-> Cozo-NG is _embeddable_ instead of merely _embedded_ since you can also run it as a standalone HTTP server in client-server mode, making better use of server resources and allowing higher concurrency.
+> Cozo-NG is embedded in your Rust process by default. A separate standalone HTTP server is also available for deployments that need a client-server interface; it is an optional way to run the engine, not a requirement.
 
 ### Why _graphs_?
 
@@ -193,6 +203,11 @@ use cozo::*;
 
 ### Supported Storage Backends & Targets
 
+The Rust crate is the primary supported target. The wrappers listed below are
+community-maintained surfaces: their presence in this repository does not imply
+release parity or a support commitment. Community contributions to any binding
+are welcome.
+
 | Target / Environment                                     | Platform support                                                                                                        | Storage |
 |----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|---------|
 | [Rust (`cozo-ng`)](https://docs.rs/cozo-ng/)             | Source only, usable on any [platform](https://doc.rust-lang.org/nightly/rustc/platform-support.html) with `std` support | MQRST   |
@@ -201,7 +216,7 @@ use cozo::*;
 | [WebAssembly (`cozo-lib-wasm`)](./cozo-lib-wasm)         | Modern browsers supporting [WebAssembly](https://developer.mozilla.org/en-US/docs/WebAssembly#browser_compatibility)    | M       |
 | [NodeJS (`cozo-lib-nodejs`)](./cozo-lib-nodejs)          | Linux (x86_64, ARM64), Mac (ARM64, x86_64), Windows (x86_64)                                                            | MQR     |
 
-*(Note: External language bindings from the original organization such as Python, Java, Clojure, Android, Swift, and Go are currently unmaintained upstream; community PRs to restore them in `cozo-ng` are welcome.)*
+Python, Java, Swift, Node.js, WebAssembly, C, and other non-Rust bindings are not current core-maintenance priorities. The original upstream packages may not contain Cozo-NG changes. Please coordinate with the project if you would like to contribute or take responsibility for one of these bindings.
 
 Storage legend:
 * **M**: In-memory, non-persistent backend
@@ -249,11 +264,11 @@ The query engine handles:
 
 ### Language/environment wrapper
 
-For Rust users, there is no wrapper—you call the query engine directly. For standalone server (`cozo-bin`), C FFI, or WASM targets, thin wrappers translate the synchronous Rust API into HTTP endpoints, C ABI calls, or JS bindings.
+For Rust users, there is no wrapper—you call the query engine directly. The standalone server and language bindings are separate integration surfaces around that core. Rust is the maintained first-class interface; non-Rust bindings welcome community maintainers and contributions.
 
 ## Status of the project
 
-Maintenance of Cozo-NG resumes with `0.8.0`. This community fork focuses first on the Rust core; support for each optional backend and language binding depends on CI coverage and available maintainers. The upstream `0.7.6` project has had no active maintenance for roughly two to three years.
+Cozo-NG is a Rust-first community continuation of CozoDB. Core maintenance focuses on the Rust database engine and its storage backends. Other language bindings are community-driven and do not have a guaranteed maintenance or release schedule; collaborators are welcome to contribute and maintain them.
 
 This project follows semantic versioning where practical. While the package is below `1.0`, minor releases may include breaking API or storage-format changes; such changes must be called out in the changelog with migration guidance. Bug fixes and security fixes should be released as patch updates when possible.
 

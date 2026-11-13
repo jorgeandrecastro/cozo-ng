@@ -2,13 +2,20 @@
 
 This crate provides the JNI bindings for using Cozo in Java/JVM languages/Android.
 
+Cozo-NG focuses its maintenance on the embedded Rust engine. This JNI binding
+is a community-maintained integration surface and may not have release parity
+with the Rust crate. Contributions to build, test, document, or maintain the
+Java/Android binding are welcome.
+
 You do not use this crate directly. Instead, use:
 
 * [Cozo Java](https://github.com/cozodb/cozo-lib-java) for Java or other JVM languages
 * [Cozo Clojure](https://github.com/cozodb/cozo-clj) for Clojure on JVM (you can also use the Java library, but this one is nicer)
 * [Cozo Android](https://github.com/cozodb/cozo-lib-android) for Android
 
-Keep reading only if the prebuilt binaries provided by these libraries do not suit your needs.
+These are upstream projects and binaries, not Cozo-NG releases. Keep reading
+if you want to build this repository's JNI binding against the Cozo-NG Rust
+engine or contribute to its maintenance.
 
 ## Building for JDK
 

@@ -4,6 +4,12 @@
 
 Embedded [CozoDB](https://www.cozodb.org) for NodeJS.
 
+Cozo-NG is a Rust-first project: the embedded Rust engine is its primary
+maintenance target. This Node.js binding is a community integration surface;
+the npm package linked below is the original upstream distribution, not a
+Cozo-NG release. Contributions to build, test, document, or maintain a
+Cozo-NG-compatible binding are welcome.
+
 This document describes how to set up the Cozo module for use in NodeJS.
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
 

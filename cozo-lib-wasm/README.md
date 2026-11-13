@@ -1,5 +1,11 @@
 # Cozo in web assembly
 
+Cozo-NG focuses maintenance on the embedded Rust engine. This WebAssembly
+binding is a community integration surface, not a primary support target. The
+npm package linked below is an upstream distribution, not a Cozo-NG release.
+Contributions to build, test, document, or maintain a Cozo-NG WebAssembly
+integration are welcome.
+
 This crate provides Cozo web assembly modules for browsers.
 If you are targeting NodeJS, use [this](../cozo-lib-nodejs) instead: 
 native code is still _much_ faster than WASM.

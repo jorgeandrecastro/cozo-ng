@@ -4,6 +4,11 @@
 
 > The CocoaPods package and prebuilt Swift archive described below are upstream distributions, not Cozo-NG releases. They may not contain changes from this fork.
 
+Cozo-NG focuses maintenance on the embedded Rust engine. Swift support is
+community-driven, with no guaranteed release or compatibility schedule.
+Contributions to build, test, document, or maintain a Swift integration are
+welcome.
+
 This document describes how to set up the Cozo module for use in Swift on Apple hardware.
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
 
