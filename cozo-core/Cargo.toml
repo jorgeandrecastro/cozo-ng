@@ -38,7 +38,7 @@ storage-sqlite-src = ["dep:sqlite3-src", "sqlite3-src/bundled"]
 storage-rocksdb = ["dep:cozorocks"]
 storage-new-rocksdb = ["dep:rocksdb"]
 ## Enables the graph algorithms.
-graph-algo = ["graph", "rayon"]
+graph-algo = ["graph"]
 ## Allows the utilities to make web requests to fetch data.
 requests = ["dep:minreq"]
 ## Uses jemalloc as the global allocator, can make a difference in performance.
@@ -61,6 +61,9 @@ storage-sled = ["dep:sled"]
 ## significant network overhead. Simple point-lookup queries are fine, though.
 ## The TiKV engine does not support time travel.
 storage-tikv = ["dep:tikv-client", "dep:tokio"]
+
+## Satisfies cozo-core-examples dependency request
+rayon = []
 
 #! # Recommendation for features to enable
 #!
@@ -120,7 +123,7 @@ thiserror = "1.0.59"
 uuid = { version = "1.29", features = ["v1", "v4", "serde"] }
 csv = "1.4"
 document-features = "0.2"
-rayon = { version = "1.12", optional = true }
+rayon = "1.12"
 minreq = { version = "3.0", features = ["https-rustls"], optional = true }
 tikv-jemallocator-global = { version = "0.7", optional = true }
 cozorocks = { package = "cozo-ng-rocks", path = "../cozorocks", version = "0.2.0", optional = true }
