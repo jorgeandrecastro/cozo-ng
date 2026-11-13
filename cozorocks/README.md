@@ -10,8 +10,11 @@ wraps the RocksDB C++ API with [`cxx`](https://cxx.rs/) and provides the
 database, transaction, iterator, and status types used by the Cozo-NG engine.
 
 The crates.io package is named `cozo-ng-rocks`; its Rust library name remains
-`cozorocks`. This is an independently maintained Cozo-NG package, not an
-official release of the original CozoDB project.
+`cozorocks`. Cozo-NG is an independent fork and community-maintained
+continuation of CozoDB, not an official upstream release. It follows its own
+Rust-first direction: an embedded data layer for AI agents and GraphRAG
+combining relational data, Datalog knowledge graphs, and vector search. This
+crate is maintained as a Rust engine component within that project.
 
 > **Most Rust applications should depend on [`cozo-ng`](https://crates.io/crates/cozo-ng)
 > instead.** This crate exposes storage-engine internals, not CozoScript, the

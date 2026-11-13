@@ -4,7 +4,11 @@
 
 > The CocoaPods package and prebuilt Swift archive described below are upstream distributions, not Cozo-NG releases. They may not contain changes from this fork.
 
-Cozo-NG focuses maintenance on the embedded Rust engine. Swift support is
+Cozo-NG is an independent fork and community-maintained continuation of
+[CozoDB](https://github.com/cozodb/cozo), not an official upstream release. It
+sets its own Rust-first direction: an embedded data layer for AI agents and
+GraphRAG combining relational data, Datalog knowledge graphs, and vector
+search. Maintenance focuses on the embedded Rust engine; Swift support is
 community-driven, with no guaranteed release or compatibility schedule.
 Contributions to build, test, document, or maintain a Swift integration are
 welcome.

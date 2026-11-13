@@ -1,6 +1,10 @@
 # Cozo in web assembly
 
-Cozo-NG focuses maintenance on the embedded Rust engine. This WebAssembly
+Cozo-NG is an independent fork and community-maintained continuation of
+[CozoDB](https://github.com/cozodb/cozo), not an official upstream release. It
+sets its own Rust-first direction: an embedded data layer for AI agents and
+GraphRAG combining relational data, Datalog knowledge graphs, and vector
+search. Maintenance focuses on the embedded Rust engine; this WebAssembly
 binding is a community integration surface, not a primary support target. The
 npm package linked below is an upstream distribution, not a Cozo-NG release.
 Contributions to build, test, document, or maintain a Cozo-NG WebAssembly

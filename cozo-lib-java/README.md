@@ -2,10 +2,13 @@
 
 This crate provides the JNI bindings for using Cozo in Java/JVM languages/Android.
 
-Cozo-NG focuses its maintenance on the embedded Rust engine. This JNI binding
-is a community-maintained integration surface and may not have release parity
-with the Rust crate. Contributions to build, test, document, or maintain the
-Java/Android binding are welcome.
+Cozo-NG is an independent fork and community-maintained continuation of
+[CozoDB](https://github.com/cozodb/cozo), not an official upstream release. It
+sets its own Rust-first direction: an embedded data layer for AI agents and
+GraphRAG combining relational data, Datalog knowledge graphs, and vector
+search. Maintenance focuses on the embedded Rust engine; this JNI binding is
+a community integration surface and may not have release parity with the Rust
+crate. Contributions to build, test, document, or maintain it are welcome.
 
 You do not use this crate directly. Instead, use:
 

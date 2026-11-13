@@ -5,6 +5,12 @@
 This document describes how to set up cozo (standalone executable).
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
 
+Cozo-NG is an independent fork and community-maintained continuation of
+[CozoDB](https://github.com/cozodb/cozo), not an official upstream release. It
+sets its own Rust-first direction: an embedded data layer for AI agents and
+GraphRAG combining relational data, Datalog knowledge graphs, and vector
+search.
+
 The standalone server is an optional way to run Cozo-NG. The project's primary
 maintenance target is the embedded Rust engine; the server is a Rust application
 built on that engine.

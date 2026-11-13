@@ -7,7 +7,7 @@
 
 # cozo-ng — The Embedded Graph + Vector Database for AI Agents & GraphRAG in Rust
 
-> **Cozo-NG** is an independent, community-maintained continuation of [CozoDB](https://github.com/cozodb/cozo), currently focused on the Rust engine. It is not an official upstream release.
+> **Cozo-NG** is an independent fork and community-maintained continuation of [CozoDB](https://github.com/cozodb/cozo), currently focused on the Rust engine. It is not an official upstream release. Cozo-NG sets its own direction: a Rust-first embedded database for AI agents and GraphRAG, combining relational data, Datalog knowledge graphs, and vector search.
 >
 > *If you are migrating from the original `cozo` crate, change the dependency package to `cozo-ng` while keeping the dependency key `cozo`; the library name remains `cozo`, so your Rust code does not need to change.*
 

@@ -5,7 +5,11 @@
 Native bindings for embedding [CozoDB](https://www.cozodb.org) in Python, providing the
 `cozo_embedded` package.
 
-Cozo-NG focuses maintenance on the embedded Rust engine. Python support is
+Cozo-NG is an independent fork and community-maintained continuation of
+[CozoDB](https://github.com/cozodb/cozo), not an official upstream release. It
+sets its own Rust-first direction: an embedded data layer for AI agents and
+GraphRAG combining relational data, Datalog knowledge graphs, and vector
+search. Maintenance focuses on the embedded Rust engine; Python support is
 community-driven, with no guaranteed release or compatibility schedule. The
 PyPI package linked below is an upstream distribution and is not a Cozo-NG
 release. Contributions to build, test, document, or maintain Python bindings
