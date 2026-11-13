@@ -2151,14 +2151,14 @@ pub(crate) fn op_rand_vec(args: &[DataValue]) -> Result<DataValue> {
         VecElementType::F32 => {
             let mut res_arr = ndarray::Array1::zeros(len);
             for mut row in res_arr.axis_iter_mut(ndarray::Axis(0)) {
-                row.fill(rng.gen::<f64>() as f32);
+                row.fill(rng.r#gen::<f64>() as f32);
             }
             Ok(DataValue::Vec(Vector::F32(res_arr)))
         }
         VecElementType::F64 => {
             let mut res_arr = ndarray::Array1::zeros(len);
             for mut row in res_arr.axis_iter_mut(ndarray::Axis(0)) {
-                row.fill(rng.gen::<f64>());
+                row.fill(rng.r#gen::<f64>());
             }
             Ok(DataValue::Vec(Vector::F64(res_arr)))
         }
@@ -2304,7 +2304,7 @@ pub(crate) fn op_int_range(args: &[DataValue]) -> Result<DataValue> {
 
 define_op!(OP_RAND_FLOAT, 0, false);
 pub(crate) fn op_rand_float(_args: &[DataValue]) -> Result<DataValue> {
-    Ok(thread_rng().gen::<f64>().into())
+    Ok(thread_rng().r#gen::<f64>().into())
 }
 
 define_op!(OP_RAND_BERNOULLI, 1, false);
@@ -2527,7 +2527,7 @@ pub(crate) fn str2vld(s: &str) -> Result<ValidityTs> {
 define_op!(OP_RAND_UUID_V1, 0, false);
 pub(crate) fn op_rand_uuid_v1(_args: &[DataValue]) -> Result<DataValue> {
     let mut rng = rand::thread_rng();
-    let uuid_ctx = uuid::v1::Context::new(rng.gen());
+    let uuid_ctx = uuid::v1::Context::new(rng.r#gen());
     #[cfg(target_arch = "wasm32")]
     let ts = {
         let since_epoch: f64 = Date::now();

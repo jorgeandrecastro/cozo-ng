@@ -39,12 +39,12 @@ impl RegularTempStore {
         self.inner.contains_key(key)
     }
 
-    fn range_iter(
-        &self,
+    fn range_iter<'a>(
+        &'a self,
         lower: &Tuple,
         upper: &Tuple,
         upper_inclusive: bool,
-    ) -> impl Iterator<Item = TupleInIter<'_>> {
+    ) -> impl Iterator<Item = TupleInIter<'a>> + use<'a> {
         let lower_bound = Included(lower.to_vec());
         let upper_bound = if upper_inclusive {
             Included(upper.to_vec())
@@ -138,12 +138,12 @@ impl MeetAggrStore {
             }
         }
     }
-    fn range_iter(
-        &self,
+    fn range_iter<'a>(
+        &'a self,
         lower: &Tuple,
         upper: &Tuple,
         upper_inclusive: bool,
-    ) -> impl Iterator<Item = TupleInIter<'_>> {
+    ) -> impl Iterator<Item = TupleInIter<'a>> + use<'a> {
         let lower_key = if lower.len() > self.grouping_len {
             lower[0..self.grouping_len].to_vec()
         } else {
@@ -226,12 +226,12 @@ impl TempStore {
             TempStore::MeetAggr(m) => m.exists(key),
         }
     }
-    fn range_iter(
-        &self,
+    fn range_iter<'a>(
+        &'a self,
         lower: &Tuple,
         upper: &Tuple,
         upper_inclusive: bool,
-    ) -> impl Iterator<Item = TupleInIter<'_>> {
+    ) -> impl Iterator<Item = TupleInIter<'a>> + use<'a> {
         match self {
             TempStore::Normal(n) => Left(n.range_iter(lower, upper, upper_inclusive)),
             TempStore::MeetAggr(m) => Right(m.range_iter(lower, upper, upper_inclusive)),
@@ -292,35 +292,35 @@ impl EpochStore {
             !self.delta.is_empty()
         }
     }
-    pub(crate) fn range_iter(
-        &self,
+    pub(crate) fn range_iter<'a>(
+        &'a self,
         lower: &Tuple,
         upper: &Tuple,
         upper_inclusive: bool,
-    ) -> impl Iterator<Item = TupleInIter<'_>> {
+    ) -> impl Iterator<Item = TupleInIter<'a>> + use<'a> {
         self.total.range_iter(lower, upper, upper_inclusive)
     }
-    pub(crate) fn delta_range_iter(
-        &self,
+    pub(crate) fn delta_range_iter<'a>(
+        &'a self,
         lower: &Tuple,
         upper: &Tuple,
         upper_inclusive: bool,
-    ) -> impl Iterator<Item = TupleInIter<'_>> {
+    ) -> impl Iterator<Item = TupleInIter<'a>> + use<'a> {
         if self.use_total_for_delta {
             self.total.range_iter(lower, upper, upper_inclusive)
         } else {
             self.delta.range_iter(lower, upper, upper_inclusive)
         }
     }
-    pub(crate) fn prefix_iter(&self, prefix: &Tuple) -> impl Iterator<Item = TupleInIter<'_>> {
+    pub(crate) fn prefix_iter<'a>(&'a self, prefix: &Tuple) -> impl Iterator<Item = TupleInIter<'a>> + use<'a> {
         let mut upper = prefix.to_vec();
         upper.push(DataValue::Bot);
         self.range_iter(prefix, &upper, true)
     }
-    pub(crate) fn delta_prefix_iter(
-        &self,
+    pub(crate) fn delta_prefix_iter<'a>(
+        &'a self,
         prefix: &Tuple,
-    ) -> impl Iterator<Item = TupleInIter<'_>> {
+    ) -> impl Iterator<Item = TupleInIter<'a>> + use<'a> {
         let mut upper = prefix.to_vec();
         upper.push(DataValue::Bot);
         self.delta_range_iter(prefix, &upper, true)

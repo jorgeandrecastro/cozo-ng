@@ -131,8 +131,8 @@ impl InputAtom {
 
     pub(crate) fn disjunctive_normal_form(self, tx: &SessionTx<'_>) -> Result<Disjunction> {
         let neg_form = self.negation_normal_form()?;
-        let mut gen = TempSymbGen::default();
-        neg_form.do_disjunctive_normal_form(&mut gen, tx)
+        let mut r#gen = TempSymbGen::default();
+        neg_form.do_disjunctive_normal_form(&mut r#gen, tx)
     }
 
     fn convert_named_field_relation(
@@ -142,7 +142,7 @@ impl InputAtom {
             valid_at,
             span,
         }: InputNamedFieldRelationApplyAtom,
-        gen: &mut TempSymbGen,
+        r#gen: &mut TempSymbGen,
         tx: &SessionTx<'_>,
     ) -> Result<InputRelationApplyAtom> {
         let stored = tx.get_relation(&name, false)?;
@@ -167,7 +167,7 @@ impl InputAtom {
             .chain(stored.metadata.non_keys.iter())
         {
             let arg = args.remove(&col_def.name).unwrap_or_else(|| Expr::Binding {
-                var: gen.next_ignored(span),
+                var: r#gen.next_ignored(span),
                 tuple_pos: None,
             });
             new_args.push(arg)
@@ -182,7 +182,7 @@ impl InputAtom {
 
     fn do_disjunctive_normal_form(
         self,
-        gen: &mut TempSymbGen,
+        r#gen: &mut TempSymbGen,
         tx: &SessionTx<'_>,
     ) -> Result<Disjunction> {
         // invariants: the input is already in negation normal form
@@ -191,7 +191,7 @@ impl InputAtom {
             InputAtom::Disjunction { inner: args, .. } => {
                 let mut ret = vec![];
                 for arg in args {
-                    for a in arg.do_disjunctive_normal_form(gen, tx)?.inner {
+                    for a in arg.do_disjunctive_normal_form(r#gen, tx)?.inner {
                         ret.push(a);
                     }
                 }
@@ -200,7 +200,7 @@ impl InputAtom {
             InputAtom::Conjunction { inner: args, .. } => {
                 let mut args = args
                     .into_iter()
-                    .map(|a| a.do_disjunctive_normal_form(gen, tx));
+                    .map(|a| a.do_disjunctive_normal_form(r#gen, tx));
                 let mut result = args
                     .next()
                     .ok_or_else(|| miette!("empty conjunction"))??;
@@ -209,35 +209,35 @@ impl InputAtom {
                 }
                 result
             }
-            InputAtom::Rule { inner: r } => r.normalize(false, gen),
+            InputAtom::Rule { inner: r } => r.normalize(false, r#gen),
             InputAtom::NamedFieldRelation { inner } => {
-                let r = Self::convert_named_field_relation(inner, gen, tx)?;
-                r.normalize(false, gen)
+                let r = Self::convert_named_field_relation(inner, r#gen, tx)?;
+                r.normalize(false, r#gen)
             }
-            InputAtom::Relation { inner: v } => v.normalize(false, gen),
+            InputAtom::Relation { inner: v } => v.normalize(false, r#gen),
             InputAtom::Predicate { inner: mut p } => {
                 p.partial_eval()?;
                 Disjunction::singlet(NormalFormAtom::Predicate(p))
             }
             InputAtom::Negation { inner: n, .. } => match *n {
-                InputAtom::Rule { inner: r } => r.normalize(true, gen),
-                InputAtom::Relation { inner: v } => v.normalize(true, gen),
+                InputAtom::Rule { inner: r } => r.normalize(true, r#gen),
+                InputAtom::Relation { inner: v } => v.normalize(true, r#gen),
                 InputAtom::NamedFieldRelation { inner } => {
-                    let r = Self::convert_named_field_relation(inner, gen, tx)?;
-                    r.normalize(true, gen)
+                    let r = Self::convert_named_field_relation(inner, r#gen, tx)?;
+                    r.normalize(true, r#gen)
                 }
                 _ => unreachable!(),
             },
             InputAtom::Unification { inner: u } => {
                 Disjunction::singlet(NormalFormAtom::Unification(u))
             }
-            InputAtom::Search { inner } => inner.normalize(gen, tx)?,
+            InputAtom::Search { inner } => inner.normalize(r#gen, tx)?,
         })
     }
 }
 
 impl InputRuleApplyAtom {
-    fn normalize(self, is_negated: bool, gen: &mut TempSymbGen) -> Disjunction {
+    fn normalize(self, is_negated: bool, r#gen: &mut TempSymbGen) -> Disjunction {
         let mut ret = Vec::with_capacity(self.args.len() + 1);
         let mut args = Vec::with_capacity(self.args.len());
         let mut seen_variables = BTreeSet::new();
@@ -245,12 +245,12 @@ impl InputRuleApplyAtom {
             match arg {
                 Expr::Binding { var, .. } => {
                     if var.is_ignored_symbol() {
-                        let dup = gen.next_ignored(var.span);
+                        let dup = r#gen.next_ignored(var.span);
                         args.push(dup);
                     } else if seen_variables.insert(var.clone()) {
                         args.push(var);
                     } else {
-                        let dup = gen.next(var.span);
+                        let dup = r#gen.next(var.span);
                         let unif = NormalFormAtom::Unification(Unification {
                             binding: dup.clone(),
                             expr: Expr::Binding {
@@ -266,7 +266,7 @@ impl InputRuleApplyAtom {
                 }
                 expr => {
                     let span = expr.span();
-                    let kw = gen.next(span);
+                    let kw = r#gen.next(span);
                     args.push(kw.clone());
                     let unif = NormalFormAtom::Unification(Unification {
                         binding: kw,
@@ -297,7 +297,7 @@ impl InputRuleApplyAtom {
 }
 
 impl InputRelationApplyAtom {
-    fn normalize(self, is_negated: bool, gen: &mut TempSymbGen) -> Disjunction {
+    fn normalize(self, is_negated: bool, r#gen: &mut TempSymbGen) -> Disjunction {
         let mut ret = Vec::with_capacity(self.args.len() + 1);
         let mut args = Vec::with_capacity(self.args.len());
         let mut seen_variables = BTreeSet::new();
@@ -305,12 +305,12 @@ impl InputRelationApplyAtom {
             match arg {
                 Expr::Binding { var, .. } => {
                     if var.is_ignored_symbol() {
-                        args.push(gen.next_ignored(var.span));
+                        args.push(r#gen.next_ignored(var.span));
                     } else if seen_variables.insert(var.clone()) {
                         args.push(var);
                     } else {
                         let span = var.span;
-                        let dup = gen.next(span);
+                        let dup = r#gen.next(span);
                         let unif = NormalFormAtom::Unification(Unification {
                             binding: dup.clone(),
                             expr: Expr::Binding {
@@ -326,7 +326,7 @@ impl InputRelationApplyAtom {
                 }
                 expr => {
                     let span = expr.span();
-                    let kw = gen.next(span);
+                    let kw = r#gen.next(span);
                     args.push(kw.clone());
                     let unif = NormalFormAtom::Unification(Unification {
                         binding: kw,

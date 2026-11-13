@@ -9,6 +9,8 @@ To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org
 
 ## Installation
 
+> `cozo-node` on npm is the original upstream package, not a Cozo-NG release. It may not contain changes from this fork.
+
 ```bash
 npm install --save cozo-node
 ```

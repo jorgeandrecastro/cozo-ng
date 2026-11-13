@@ -1,20 +1,21 @@
 ## Contributing
 
-Thanks for your interest in contributing to the Cozo project! 
-As Cozo is just getting started, we aim to keep everything simple.
+Thanks for your interest in contributing to Cozo-NG, a community-maintained fork of CozoDB.
 
-Contributions to code or other materials
-should be done via [pull requests](https://github.com/cozodb/cozo/pulls).
-You will be automatically prompted to sign a [Contributor Agreement (CLA)](https://github.com/cozodb/cozo-docs/blob/main/CLA.md).
+Please open issues and pull requests in the [Cozo-NG repository](https://github.com/jorgeandrecastro/cozo-ng). Contributions to this fork do not require signing the original upstream project's CLA.
 
-As the project matures, ideally before the end of 2023, we will change the CLA requirement to a DCO requirement: see [here](https://opensource.com/article/18/3/cla-vs-dco-whats-difference)
-if you are not familiar with the difference.
-The reason that we are asking for CLA now is that we want to retain the option to make changes that would become
-very difficult if copyright is distributed among the contributors, for example if we decide (again)
-that a different (FOSS) license would suit the project better. If you are uncomfortable with any form of CLA,
-you can wait until then.
+## Project priorities
 
-For code contributions other than simple bug fixes, please
-[discuss](https://github.com/cozodb/cozo/discussions) it
-first before opening a pull request,
-otherwise it is unlikely to be accepted.
+Maintenance starts with the Rust core and standalone server. Changes to optional storage backends and language bindings should include build or test coverage for the affected target where feasible. Upstream-only npm and Swift distributions are not releases of this fork.
+
+## Contribution checklist
+
+- For substantial changes, open an issue first so the approach can be discussed before implementation.
+- Include focused tests for behavior changes and run the narrowest relevant tests; run `cargo check --workspace` for cross-crate changes.
+- Keep user-facing documentation and `CHANGELOG.md` in sync with behavior and compatibility changes.
+- Treat storage formats and migrations as compatibility-sensitive; explain any migration required.
+- Avoid unrelated dependency updates. For dependency refreshes, validate the workspace and record notable changes.
+
+## Release policy
+
+Releases are made from this repository and documented in `CHANGELOG.md`. Before publishing Rust crates, verify the workspace, run package or publish dry-runs, and ensure published path dependencies have already been released to crates.io. The project is pre-1.0: minor releases may contain breaking changes, which must be highlighted with migration guidance.

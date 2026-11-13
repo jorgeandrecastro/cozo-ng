@@ -284,7 +284,7 @@ impl CozoDbPy {
     ) -> PyResult<()> {
         if let Some(db) = &self.db {
             let cb: Py<PyAny> = callback.into();
-            let rule_impl = SimpleFixedRule::new(arity, move |inputs, options| -> Result<_> {
+            let rule_impl = SimpleFixedRule::new(arity, move |inputs: Vec<NamedRows>, options: BTreeMap<String, DataValue>| -> Result<_> {
                 Python::with_gil(|py| -> Result<NamedRows> {
                     let py_inputs = PyList::new(
                         py,

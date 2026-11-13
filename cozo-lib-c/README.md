@@ -1,14 +1,13 @@
 # Cozo C lib
 
-[![C](https://img.shields.io/github/v/release/cozodb/cozo)](https://github.com/cozodb/cozo/releases)
+[![C](https://img.shields.io/github/v/release/jorgeandrecastro/cozo-ng)](https://github.com/jorgeandrecastro/cozo-ng/releases)
 
 This directory contains the source of the Cozo C API.
 
 This document describes how to set up the C library.
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
 
-You can download pre-built libraries from the [release page](https://github.com/cozodb/cozo/releases),
-look for those starting with `libcozo_c`.
+Pre-built libraries, when published for Cozo-NG, will be available from the [Cozo-NG release page](https://github.com/jorgeandrecastro/cozo-ng/releases); look for those starting with `libcozo_c`.
 
 The API is contained in this single [header file](./cozo_c.h).
 

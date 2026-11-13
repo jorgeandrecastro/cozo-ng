@@ -219,7 +219,10 @@ fn build_rocksdb() {
         config.define("ROCKSDB_PLATFORM_POSIX", None);
         config.define("ROCKSDB_LIB_IO_POSIX", None);
 
-        env::set_var("IPHONEOS_DEPLOYMENT_TARGET", "11.0");
+        // The build script sets this before launching the compiler, with no concurrent environment access.
+        unsafe {
+            env::set_var("IPHONEOS_DEPLOYMENT_TARGET", "11.0");
+        }
     } else if target.contains("darwin") {
         config.define("OS_MACOSX", None);
         config.define("ROCKSDB_PLATFORM_POSIX", None);

@@ -1,6 +1,8 @@
 # Cozo for Swift on Apple Hardware
 
-[![pod](https://img.shields.io/cocoapods/v/CozoSwiftBridge)](https://github.com/cozodb/cozo/tree/main/cozo-lib-swift)
+[![pod](https://img.shields.io/cocoapods/v/CozoSwiftBridge)](https://cocoapods.org/pods/CozoSwiftBridge)
+
+> The CocoaPods package and prebuilt Swift archive described below are upstream distributions, not Cozo-NG releases. They may not contain changes from this fork.
 
 This document describes how to set up the Cozo module for use in Swift on Apple hardware.
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
@@ -25,8 +27,8 @@ end
 
 ### Swift Package Manager (SPM)
 
-The package is published as an archive containing a Swift package.
-Download it from the [release page](https://github.com/cozodb/cozo/releases) (look for `CozoSwiftBridge.tgz`).
+The upstream package is published as an archive containing a Swift package.
+Its releases are not Cozo-NG releases; check the [Cozo-NG release page](https://github.com/jorgeandrecastro/cozo-ng/releases) for fork builds.
 Uncompress.
 
 In XCode of your project, select from the menu `File > Add Packages`,

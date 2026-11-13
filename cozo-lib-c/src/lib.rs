@@ -40,7 +40,7 @@ lazy_static! {
 /// When the function is successful, null pointer is returned,
 /// otherwise a pointer to a C-string containing the error message will be returned.
 /// The returned C-string must be freed with `cozo_free_str`.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn cozo_open_db(
     engine: *const c_char,
     path: *const c_char,
@@ -80,7 +80,7 @@ pub unsafe extern "C" fn cozo_open_db(
 ///
 /// Returns `true` if the database is closed,
 /// `false` if it has already been closed, or does not exist.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn cozo_close_db(db_id: i32) -> bool {
     let db = {
         let mut dbs = HANDLES.dbs.lock().unwrap();
@@ -101,7 +101,7 @@ pub unsafe extern "C" fn cozo_close_db(db_id: i32) -> bool {
 ///
 /// Returns a UTF-8-encoded C-string that **must** be freed with `cozo_free_str`.
 /// The string contains the JSON return value of the query.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn cozo_run_query(
     db_id: i32,
     script_raw: *const c_char,
@@ -145,7 +145,7 @@ pub unsafe extern "C" fn cozo_run_query(
     CString::new(result).unwrap().into_raw()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Import data into relations
 ///
 /// Note that triggers are _not_ run for the relations, if any exists.
@@ -182,7 +182,7 @@ pub unsafe extern "C" fn cozo_import_relations(
         .into_raw()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Export relations into JSON
 ///
 /// `db_id`:        the ID representing the database.
@@ -216,7 +216,7 @@ pub unsafe extern "C" fn cozo_export_relations(
         .into_raw()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Backup the database.
 ///
 /// `db_id`:    the ID representing the database.
@@ -245,7 +245,7 @@ pub unsafe extern "C" fn cozo_backup(db_id: i32, out_path: *const c_char) -> *mu
     CString::new(db.backup_db_str(data)).unwrap().into_raw()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Restore the database from a backup.
 ///
 /// `db_id`:   the ID representing the database.
@@ -276,7 +276,7 @@ pub unsafe extern "C" fn cozo_restore(db_id: i32, in_path: *const c_char) -> *mu
         .into_raw()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Import data into relations from a backup
 ///
 /// Note that triggers are _not_ run for the relations, if any exists.
@@ -319,7 +319,7 @@ pub unsafe extern "C" fn cozo_import_from_backup(
 /// Must be called exactly once for each returned C-string.
 ///
 /// `s`: the C-string to free.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn cozo_free_str(s: *mut c_char) {
     let _ = CString::from_raw(s);
 }

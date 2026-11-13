@@ -1,7 +1,7 @@
 [package]
 name = "cozo-swift"
-version = "0.7.6"
-edition = "2021"
+version = "0.8.0"
+edition = "2024"
 description = "Cozo database for Swift"
 authors = ["Ziyang Hu"]
 license = "MPL-2.0"
@@ -37,8 +37,8 @@ jemalloc = ["cozo/jemalloc"]
 io-uring = ["cozo/io-uring"]
 
 [build-dependencies]
-swift-bridge-build = "0.1.41"
+swift-bridge-build = "0.1.59"
 
 [dependencies]
-cozo = { version = "0.7.6", path = "../cozo-core", default-features = false }
-swift-bridge = "0.1.53"
+cozo = { package = "cozo-ng", version = "0.8.0", path = "../cozo-core", default-features = false }
+swift-bridge = "0.1.59"

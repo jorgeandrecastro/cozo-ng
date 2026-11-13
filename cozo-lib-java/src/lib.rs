@@ -34,7 +34,7 @@ fn get_db(id: i32) -> Option<DbInstance> {
     dbs.get(&id).cloned()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_org_cozodb_CozoJavaBridge_openDb(
     mut env: JNIEnv,
     _class: JClass,
@@ -42,40 +42,46 @@ pub extern "system" fn Java_org_cozodb_CozoJavaBridge_openDb(
     path: JString,
     options: JString,
 ) -> jint {
-    let engine: String = env.get_string(&engine).unwrap().into();
-    let path: String = env.get_string(&path).unwrap().into();
-    let options: String = env.get_string(&options).unwrap().into();
-    let id = match DbInstance::new(&engine, path, &options) {
-        Ok(db) => {
-            let id = HANDLES.current.fetch_add(1, Ordering::AcqRel);
-            let mut dbs = HANDLES.dbs.lock().unwrap();
-            dbs.insert(id, db);
-            id
-        }
-        Err(err) => {
-            eprintln!("{err:?}");
-            -1
-        }
-    };
-    id
+    env.with_env(|env| -> jni::errors::Result<jint> {
+        let engine: String = env.get_string(&engine)?.into();
+        let path: String = env.get_string(&path)?.into();
+        let options: String = env.get_string(&options)?.into();
+        let id = match DbInstance::new(&engine, path, &options) {
+            Ok(db) => {
+                let id = HANDLES.current.fetch_add(1, Ordering::AcqRel);
+                let mut dbs = HANDLES.dbs.lock().unwrap();
+                dbs.insert(id, db);
+                id
+            }
+            Err(err) => {
+                eprintln!("{err:?}");
+                -1
+            }
+        };
+        Ok(id)
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_org_cozodb_CozoJavaBridge_closeDb(
-    _env: JNIEnv,
+    mut env: JNIEnv,
     _class: JClass,
     id: jint,
 ) -> jboolean {
-    let db = {
-        let mut dbs = HANDLES.dbs.lock().unwrap();
-        dbs.remove(&id)
-    };
-    db.is_some().into()
+    env.with_env(|_| -> jni::errors::Result<jboolean> {
+        let db = {
+            let mut dbs = HANDLES.dbs.lock().unwrap();
+            dbs.remove(&id)
+        };
+        Ok(db.is_some().into())
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
 const DB_NOT_FOUND: &str = r#"{"ok":false,"message":"database not found"}"#;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_org_cozodb_CozoJavaBridge_runQuery(
     mut env: JNIEnv,
     _class: JClass,
@@ -83,98 +89,116 @@ pub extern "system" fn Java_org_cozodb_CozoJavaBridge_runQuery(
     script: JString,
     params_str: JString,
 ) -> jstring {
-    let script: String = env.get_string(&script).unwrap().into();
-    let params_str: String = env.get_string(&params_str).unwrap().into();
-    match get_db(id) {
-        None => env.new_string(DB_NOT_FOUND).unwrap().into_raw(),
-        Some(db) => {
-            let res = db.run_script_str(&script, &params_str, false);
-            env.new_string(res).unwrap().into_raw()
+    env.with_env(|env| -> jni::errors::Result<jstring> {
+        let script: String = env.get_string(&script)?.into();
+        let params_str: String = env.get_string(&params_str)?.into();
+        match get_db(id) {
+            None => Ok(env.new_string(DB_NOT_FOUND)?.into_raw()),
+            Some(db) => {
+                let res = db.run_script_str(&script, &params_str, false);
+                Ok(env.new_string(res)?.into_raw())
+            }
         }
-    }
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_org_cozodb_CozoJavaBridge_exportRelations(
     mut env: JNIEnv,
     _class: JClass,
     id: jint,
     rel: JString,
 ) -> jstring {
-    let rel: String = env.get_string(&rel).unwrap().into();
-    match get_db(id) {
-        None => env.new_string(DB_NOT_FOUND).unwrap().into_raw(),
-        Some(db) => {
-            let res = db.export_relations_str(&rel);
-            env.new_string(res).unwrap().into_raw()
+    env.with_env(|env| -> jni::errors::Result<jstring> {
+        let rel: String = env.get_string(&rel)?.into();
+        match get_db(id) {
+            None => Ok(env.new_string(DB_NOT_FOUND)?.into_raw()),
+            Some(db) => {
+                let res = db.export_relations_str(&rel);
+                Ok(env.new_string(res)?.into_raw())
+            }
         }
-    }
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_org_cozodb_CozoJavaBridge_importRelations(
     mut env: JNIEnv,
     _class: JClass,
     id: jint,
     data: JString,
 ) -> jstring {
-    let data: String = env.get_string(&data).unwrap().into();
-    match get_db(id) {
-        None => env.new_string(DB_NOT_FOUND).unwrap().into_raw(),
-        Some(db) => {
-            let res = db.import_relations_str(&data);
-            env.new_string(res).unwrap().into_raw()
+    env.with_env(|env| -> jni::errors::Result<jstring> {
+        let data: String = env.get_string(&data)?.into();
+        match get_db(id) {
+            None => Ok(env.new_string(DB_NOT_FOUND)?.into_raw()),
+            Some(db) => {
+                let res = db.import_relations_str(&data);
+                Ok(env.new_string(res)?.into_raw())
+            }
         }
-    }
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_org_cozodb_CozoJavaBridge_backup(
     mut env: JNIEnv,
     _class: JClass,
     id: jint,
     file: JString,
 ) -> jstring {
-    let file: String = env.get_string(&file).unwrap().into();
-    match get_db(id) {
-        None => env.new_string(DB_NOT_FOUND).unwrap().into_raw(),
-        Some(db) => {
-            let res = db.backup_db_str(file);
-            env.new_string(res).unwrap().into_raw()
+    env.with_env(|env| -> jni::errors::Result<jstring> {
+        let file: String = env.get_string(&file)?.into();
+        match get_db(id) {
+            None => Ok(env.new_string(DB_NOT_FOUND)?.into_raw()),
+            Some(db) => {
+                let res = db.backup_db_str(file);
+                Ok(env.new_string(res)?.into_raw())
+            }
         }
-    }
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_org_cozodb_CozoJavaBridge_restore(
     mut env: JNIEnv,
     _class: JClass,
     id: jint,
     file: JString,
 ) -> jstring {
-    let file: String = env.get_string(&file).unwrap().into();
-    match get_db(id) {
-        None => env.new_string(DB_NOT_FOUND).unwrap().into_raw(),
-        Some(db) => {
-            let res = db.restore_backup_str(file);
-            env.new_string(res).unwrap().into_raw()
+    env.with_env(|env| -> jni::errors::Result<jstring> {
+        let file: String = env.get_string(&file)?.into();
+        match get_db(id) {
+            None => Ok(env.new_string(DB_NOT_FOUND)?.into_raw()),
+            Some(db) => {
+                let res = db.restore_backup_str(file);
+                Ok(env.new_string(res)?.into_raw())
+            }
         }
-    }
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_org_cozodb_CozoJavaBridge_importFromBackup(
     mut env: JNIEnv,
     _class: JClass,
     id: jint,
     data: JString,
 ) -> jstring {
-    let data: String = env.get_string(&data).unwrap().into();
-    match get_db(id) {
-        None => env.new_string(DB_NOT_FOUND).unwrap().into_raw(),
-        Some(db) => {
-            let res = db.import_from_backup_str(&data);
-            env.new_string(res).unwrap().into_raw()
+    env.with_env(|env| -> jni::errors::Result<jstring> {
+        let data: String = env.get_string(&data)?.into();
+        match get_db(id) {
+            None => Ok(env.new_string(DB_NOT_FOUND)?.into_raw()),
+            Some(db) => {
+                let res = db.import_from_backup_str(&data);
+                Ok(env.new_string(res)?.into_raw())
+            }
         }
-    }
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }

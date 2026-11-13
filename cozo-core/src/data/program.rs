@@ -136,7 +136,7 @@ impl Display for QueryOutOptions {
                     write!(f, ", ")?;
                 }
                 write!(f, "{}: {}", col.name, col.typing)?;
-                if let Some(gen) = &col.default_gen {
+                if let Some(r#gen) = &col.default_gen {
                     write!(f, " default {gen}")?;
                 } else {
                     write!(f, " = {bind}")?;
@@ -151,7 +151,7 @@ impl Display for QueryOutOptions {
                     write!(f, ", ")?;
                 }
                 write!(f, "{}: {}", col.name, col.typing)?;
-                if let Some(gen) = &col.default_gen {
+                if let Some(r#gen) = &col.default_gen {
                     write!(f, " default {gen}")?;
                 } else {
                     write!(f, " = {bind}")?;
@@ -1036,7 +1036,7 @@ impl SearchInput {
         base_handle: RelationHandle,
         idx_handle: RelationHandle,
         manifest: MinHashLshIndexManifest,
-        gen: &mut TempSymbGen,
+        r#gen: &mut TempSymbGen,
     ) -> Result<Disjunction> {
         let mut conj = Vec::with_capacity(self.bindings.len() + 8);
         let mut bindings = Vec::with_capacity(self.bindings.len());
@@ -1052,12 +1052,12 @@ impl SearchInput {
                 match arg {
                     Expr::Binding { var, .. } => {
                         if var.is_ignored_symbol() {
-                            bindings.push(gen.next_ignored(var.span));
+                            bindings.push(r#gen.next_ignored(var.span));
                         } else if seen_variables.insert(var.clone()) {
                             bindings.push(var);
                         } else {
                             let span = var.span;
-                            let dup = gen.next(span);
+                            let dup = r#gen.next(span);
                             let unif = NormalFormAtom::Unification(Unification {
                                 binding: dup.clone(),
                                 expr: Expr::Binding {
@@ -1073,7 +1073,7 @@ impl SearchInput {
                     }
                     expr => {
                         let span = expr.span();
-                        let kw = gen.next(span);
+                        let kw = r#gen.next(span);
                         bindings.push(kw.clone());
                         let unif = NormalFormAtom::Unification(Unification {
                             binding: kw,
@@ -1085,7 +1085,7 @@ impl SearchInput {
                     }
                 }
             } else {
-                bindings.push(gen.next_ignored(self.span));
+                bindings.push(r#gen.next_ignored(self.span));
             }
         }
 
@@ -1120,7 +1120,7 @@ impl SearchInput {
             Expr::Binding { var, .. } => var,
             expr => {
                 let span = expr.span();
-                let kw = gen.next(span);
+                let kw = r#gen.next(span);
                 let unif = NormalFormAtom::Unification(Unification {
                     binding: kw.clone(),
                     expr,
@@ -1180,7 +1180,7 @@ impl SearchInput {
         base_handle: RelationHandle,
         idx_handle: RelationHandle,
         manifest: FtsIndexManifest,
-        gen: &mut TempSymbGen,
+        r#gen: &mut TempSymbGen,
     ) -> Result<Disjunction> {
         let mut conj = Vec::with_capacity(self.bindings.len() + 8);
         let mut bindings = Vec::with_capacity(self.bindings.len());
@@ -1196,12 +1196,12 @@ impl SearchInput {
                 match arg {
                     Expr::Binding { var, .. } => {
                         if var.is_ignored_symbol() {
-                            bindings.push(gen.next_ignored(var.span));
+                            bindings.push(r#gen.next_ignored(var.span));
                         } else if seen_variables.insert(var.clone()) {
                             bindings.push(var);
                         } else {
                             let span = var.span;
-                            let dup = gen.next(span);
+                            let dup = r#gen.next(span);
                             let unif = NormalFormAtom::Unification(Unification {
                                 binding: dup.clone(),
                                 expr: Expr::Binding {
@@ -1217,7 +1217,7 @@ impl SearchInput {
                     }
                     expr => {
                         let span = expr.span();
-                        let kw = gen.next(span);
+                        let kw = r#gen.next(span);
                         bindings.push(kw.clone());
                         let unif = NormalFormAtom::Unification(Unification {
                             binding: kw,
@@ -1229,7 +1229,7 @@ impl SearchInput {
                     }
                 }
             } else {
-                bindings.push(gen.next_ignored(self.span));
+                bindings.push(r#gen.next_ignored(self.span));
             }
         }
 
@@ -1254,7 +1254,7 @@ impl SearchInput {
             Expr::Binding { var, .. } => var,
             expr => {
                 let span = expr.span();
-                let kw = gen.next(span);
+                let kw = r#gen.next(span);
                 let unif = NormalFormAtom::Unification(Unification {
                     binding: kw.clone(),
                     expr,
@@ -1304,7 +1304,7 @@ impl SearchInput {
             Some(Expr::Binding { var, .. }) => Some(var),
             Some(expr) => {
                 let span = expr.span();
-                let kw = gen.next(span);
+                let kw = r#gen.next(span);
                 let unif = NormalFormAtom::Unification(Unification {
                     binding: kw.clone(),
                     expr,
@@ -1343,7 +1343,7 @@ impl SearchInput {
         base_handle: RelationHandle,
         idx_handle: RelationHandle,
         manifest: HnswIndexManifest,
-        gen: &mut TempSymbGen,
+        r#gen: &mut TempSymbGen,
     ) -> Result<Disjunction> {
         let mut conj = Vec::with_capacity(self.bindings.len() + 8);
         let mut bindings = Vec::with_capacity(self.bindings.len());
@@ -1359,12 +1359,12 @@ impl SearchInput {
                 match arg {
                     Expr::Binding { var, .. } => {
                         if var.is_ignored_symbol() {
-                            bindings.push(gen.next_ignored(var.span));
+                            bindings.push(r#gen.next_ignored(var.span));
                         } else if seen_variables.insert(var.clone()) {
                             bindings.push(var);
                         } else {
                             let span = var.span;
-                            let dup = gen.next(span);
+                            let dup = r#gen.next(span);
                             let unif = NormalFormAtom::Unification(Unification {
                                 binding: dup.clone(),
                                 expr: Expr::Binding {
@@ -1380,7 +1380,7 @@ impl SearchInput {
                     }
                     expr => {
                         let span = expr.span();
-                        let kw = gen.next(span);
+                        let kw = r#gen.next(span);
                         bindings.push(kw.clone());
                         let unif = NormalFormAtom::Unification(Unification {
                             binding: kw,
@@ -1392,7 +1392,7 @@ impl SearchInput {
                     }
                 }
             } else {
-                bindings.push(gen.next_ignored(self.span));
+                bindings.push(r#gen.next_ignored(self.span));
             }
         }
 
@@ -1417,7 +1417,7 @@ impl SearchInput {
             Expr::Binding { var, .. } => var,
             expr => {
                 let span = expr.span();
-                let kw = gen.next(span);
+                let kw = r#gen.next(span);
                 let unif = NormalFormAtom::Unification(Unification {
                     binding: kw.clone(),
                     expr,
@@ -1481,7 +1481,7 @@ impl SearchInput {
             Some(Expr::Binding { var, .. }) => Some(var),
             Some(expr) => {
                 let span = expr.span();
-                let kw = gen.next(span);
+                let kw = r#gen.next(span);
                 let unif = NormalFormAtom::Unification(Unification {
                     binding: kw.clone(),
                     expr,
@@ -1498,7 +1498,7 @@ impl SearchInput {
             Some(Expr::Binding { var, .. }) => Some(var),
             Some(expr) => {
                 let span = expr.span();
-                let kw = gen.next(span);
+                let kw = r#gen.next(span);
                 let unif = NormalFormAtom::Unification(Unification {
                     binding: kw.clone(),
                     expr,
@@ -1515,7 +1515,7 @@ impl SearchInput {
             Some(Expr::Binding { var, .. }) => Some(var),
             Some(expr) => {
                 let span = expr.span();
-                let kw = gen.next(span);
+                let kw = r#gen.next(span);
                 let unif = NormalFormAtom::Unification(Unification {
                     binding: kw.clone(),
                     expr,
@@ -1532,7 +1532,7 @@ impl SearchInput {
             Some(Expr::Binding { var, .. }) => Some(var),
             Some(expr) => {
                 let span = expr.span();
-                let kw = gen.next(span);
+                let kw = r#gen.next(span);
                 let unif = NormalFormAtom::Unification(Unification {
                     binding: kw.clone(),
                     expr,
@@ -1569,7 +1569,7 @@ impl SearchInput {
     }
     pub(crate) fn normalize(
         self,
-        gen: &mut TempSymbGen,
+        r#gen: &mut TempSymbGen,
         tx: &SessionTx<'_>,
     ) -> Result<Disjunction> {
         let base_handle = tx.get_relation(&self.relation, false)?;
@@ -1583,16 +1583,16 @@ impl SearchInput {
         if let Some((idx_handle, manifest)) =
             base_handle.hnsw_indices.get(&self.index.name).cloned()
         {
-            return self.normalize_hnsw(base_handle, idx_handle, manifest, gen);
+            return self.normalize_hnsw(base_handle, idx_handle, manifest, r#gen);
         }
         if let Some((idx_handle, manifest)) = base_handle.fts_indices.get(&self.index.name).cloned()
         {
-            return self.normalize_fts(base_handle, idx_handle, manifest, gen);
+            return self.normalize_fts(base_handle, idx_handle, manifest, r#gen);
         }
         if let Some((idx_handle, _, manifest)) =
             base_handle.lsh_indices.get(&self.index.name).cloned()
         {
-            return self.normalize_lsh(base_handle, idx_handle, manifest, gen);
+            return self.normalize_lsh(base_handle, idx_handle, manifest, r#gen);
         }
         #[derive(Debug, Error, Diagnostic)]
         #[error("Index {name} not found on relation {relation}")]

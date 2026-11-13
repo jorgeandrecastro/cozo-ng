@@ -1,13 +1,13 @@
 # Cozo (standalone executable)
 
-[![server](https://img.shields.io/github/v/release/cozodb/cozo)](https://github.com/cozodb/cozo/releases)
+[![server](https://img.shields.io/github/v/release/jorgeandrecastro/cozo-ng)](https://github.com/jorgeandrecastro/cozo-ng/releases)
 
 This document describes how to set up cozo (standalone executable).
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
 
 ## Download
 
-The standalone executable for Cozo can be downloaded from the [release page](https://github.com/cozodb/cozo/releases).
+The standalone executable for Cozo-NG, when published, will be available from the [Cozo-NG release page](https://github.com/jorgeandrecastro/cozo-ng/releases).
 Look for those with names `cozo-*`.
 Those with names `cozo_all-*` supports additional storage backends
 such as [TiKV](https://tikv.org/) storage, but are larger.

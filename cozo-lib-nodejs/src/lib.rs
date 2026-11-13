@@ -141,8 +141,7 @@ fn value2js<'a>(cx: &mut impl Context<'a>, val: &DataValue) -> JsResult<'a, JsVa
         },
         DataValue::Str(s) => cx.string(s).as_value(cx),
         DataValue::Bytes(b) => {
-            let b = b.clone();
-            JsBuffer::external(cx, b).as_value(cx)
+            JsBuffer::from_slice(cx, b)?.as_value(cx)
         }
         DataValue::Uuid(uuid) => cx.string(uuid.0.to_string()).as_value(cx),
         DataValue::Regex(rx) => cx.string(rx.0.to_string()).as_value(cx),

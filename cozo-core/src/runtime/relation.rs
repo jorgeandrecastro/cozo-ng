@@ -429,7 +429,7 @@ impl RelationHandle {
         &self,
         tx: &'a SessionTx<'_>,
         prefix: &Tuple,
-    ) -> impl Iterator<Item = Result<Tuple>> + 'a {
+    ) -> impl Iterator<Item = Result<Tuple>> + 'a + use<'a> {
         let mut lower = prefix.clone();
         lower.truncate(self.metadata.keys.len());
         let mut upper = lower.clone();
@@ -450,7 +450,7 @@ impl RelationHandle {
         tx: &'a SessionTx<'_>,
         prefix: &Tuple,
         valid_at: ValidityTs,
-    ) -> impl Iterator<Item = Result<Tuple>> + 'a {
+    ) -> impl Iterator<Item = Result<Tuple>> + 'a + use<'a> {
         let mut lower = prefix.clone();
         lower.truncate(self.metadata.keys.len());
         let mut upper = lower.clone();
@@ -472,7 +472,7 @@ impl RelationHandle {
         prefix: &[DataValue],
         lower: &[DataValue],
         upper: &[DataValue],
-    ) -> impl Iterator<Item = Result<Tuple>> + 'a {
+    ) -> impl Iterator<Item = Result<Tuple>> + 'a + use<'a> {
         let mut lower_t = prefix.to_vec();
         lower_t.extend_from_slice(lower);
         let mut upper_t = prefix.to_vec();
@@ -494,7 +494,7 @@ impl RelationHandle {
         lower: &[DataValue],
         upper: &[DataValue],
         valid_at: ValidityTs,
-    ) -> impl Iterator<Item = Result<Tuple>> + 'a {
+    ) -> impl Iterator<Item = Result<Tuple>> + 'a + use<'a> {
         let mut lower_t = prefix.clone();
         lower_t.extend_from_slice(lower);
         let mut upper_t = prefix.clone();

@@ -131,7 +131,7 @@ impl<'s> StoreTx<'s> for MemTx<'s> {
             MemTx::Reader(_) => {
                 bail!("write in read transaction")
             }
-            MemTx::Writer(ref mut wtr, _) => {
+            MemTx::Writer(wtr, _) => {
                 let keys = wtr
                     .range(lower.to_vec()..upper.to_vec())
                     .map(|kv| kv.0.clone())
