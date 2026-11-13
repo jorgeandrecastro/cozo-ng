@@ -2,7 +2,8 @@
 
 [![Crates.io](https://img.shields.io/crates/v/cozo-ng-rocks)](https://crates.io/crates/cozo-ng-rocks)
 [![docs.rs](https://img.shields.io/docsrs/cozo-ng-rocks?label=docs.rs)](https://docs.rs/cozo-ng-rocks)
-[![License: MPL-2.0](https://img.shields.io/badge/license-MPL--2.0-blue.svg)](https://github.com/jorgeandrecastro/cozo-ng/blob/main/LICENSE.txt)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/build.yml?branch=main)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/build.yml)
+[![GitHub](https://img.shields.io/github/license/jorgeandrecastro/cozo-ng)](https://github.com/jorgeandrecastro/cozo-ng/blob/main/LICENSE.txt)
 
 `cozo-ng-rocks` is the low-level RocksDB storage adapter for the Rust-first
 [Cozo-NG](https://github.com/jorgeandrecastro/cozo-ng) embedded database. It
@@ -24,6 +25,30 @@ crate is maintained as a Rust engine component within that project.
 > This is the Cozo-NG fork's `0.3.0` release, aligned with the Cozo-NG 0.9
 > engine. It is not an upstream CozoDB release.
 > See the crate's [changelog](CHANGELOG.md) for release notes.
+
+## Crate architecture
+
+This tree shows the adapter's Rust and C++ integration layers. The vendored
+RocksDB source is shown as a dependency subtree rather than expanded here.
+
+```text
+cozorocks/
+├── src/
+│   ├── lib.rs             # Public Rust exports
+│   └── bridge/            # Rust side of the cxx bridge
+├── bridge/                # C++ wrapper around RocksDB APIs
+├── rocksdb/               # Vendored RocksDB C++ source
+├── build.rs               # Builds the bridge and RocksDB native libraries
+├── build_version.cc       # RocksDB build-version metadata
+├── Cargo.toml             # Crate metadata, native dependencies, and features
+├── README.md
+└── CHANGELOG.md
+```
+
+The Rust API in `src/` crosses the `cxx` boundary into the C++ wrapper in
+`bridge/`, which uses the vendored or externally supplied RocksDB library.
+This crate provides storage primitives to the engine; it does not implement
+Cozo queries or the standalone server.
 
 ## Add the dependency
 

@@ -5,6 +5,12 @@ community-maintained fork of CozoDB; these are Cozo-NG releases, not upstream
 CozoDB releases. The package is `cozo-ng`, while the Rust library remains
 `cozo`.
 
+## 0.10.0
+
+### Changed
+
+- Split the database runtime implementation into focused modules under `runtime/db/`, while preserving the existing public and crate-level module paths.
+
 ## 0.9.0
 
 ### Fixed

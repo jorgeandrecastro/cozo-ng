@@ -21,9 +21,9 @@
 6. [Links](#Links)
 7. [Licensing and contributing](#Licensing-and-contributing)
 
-## 🚀 Roadmap: v0.9 (Current Focus)
+## 🚀 Roadmap: v0.10 (Current Focus)
 
-Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name. The `0.9.0` release continues this independent maintenance with a Rust-first focus on the embedded engine and its use as a data layer for AI agents and GraphRAG.
+Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name. The `0.10.0` release continues this independent maintenance with a Rust-first focus on the embedded engine and its use as a data layer for AI agents and GraphRAG.
 
 The focus is a high-performance, transactional, embedded Rust database that brings together relational storage, Datalog-powered knowledge graphs, and HNSW vector search. It is designed to give Rust AI agents and GraphRAG applications a local, in-process data layer.
 
@@ -32,7 +32,7 @@ Why Cozo-NG for AI and local-first applications?
 * **Rust-native and transactional:** Run in the application's process and use Cozo-NG's MVCC transaction model directly from Rust.
 * **One local data layer:** Keep structured relationships and semantic embeddings close to the application, reducing operational components for local-first and agentic systems.
 
-The v0.9 roadmap:
+The v0.10 roadmap:
 * [x] **Fork initialization:** Establish the independent project, licensing, crate namespace, and repository structure.
 * [ ] **Dependency modernization:** Finish validating updated dependencies across supported Rust toolchains, storage features, and platforms.
 * [x] **Rust-first scope:** Focus official maintenance on the Rust database engine and its Rust APIs. Keep `cozo` as the library name for migration compatibility.
@@ -40,7 +40,7 @@ The v0.9 roadmap:
 * [ ] **Storage safety:** Treat on-disk formats and migration behavior as compatibility-sensitive; test backend changes and document migrations.
 * **Community bindings:** Python, Node.js, WASM, Java, Swift, C, and other non-Rust bindings are welcome community efforts. Collaborations and pull requests to build, test, document, or maintain them are warmly welcome, but they are not currently part of the core maintenance commitment.
 
-See the [0.9.0 changelog](CHANGELOG.md) and [maintenance and contribution guidelines](CONTRIBUTING.md).
+See the [0.10.0 changelog](CHANGELOG.md) and [maintenance and contribution guidelines](CONTRIBUTING.md).
 
 ---
 
@@ -192,7 +192,7 @@ Add `cozo-ng` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.9" }
+cozo = { package = "cozo-ng", version = "0.10" }
 ```
 
 Because `cozo-ng` preserves the internal library name `cozo`, your Rust imports remain unchanged:
@@ -247,6 +247,38 @@ Cozo-NG consists of three stacked layers, with each layer calling only into the 
 +-----------------------------------+
 |        (Operating system)         |
 +-----------------------------------+
+```
+
+### Workspace structure
+
+The workspace is centered on the Rust database engine. The server and RocksDB
+adapter are supporting Rust crates; the other language bindings are separate,
+community-driven integration surfaces.
+
+```text
+cozo-ng/
+├── cozo-core/                 # Primary Rust database engine (package: cozo-ng, library: cozo)
+│   └── src/
+│       ├── data/              # Values, expressions, and relational data
+│       ├── parse/             # CozoScript parsing
+│       ├── query/             # Datalog compilation and query execution
+│       ├── runtime/           # Transactions, database operations, indexes
+│       ├── fixed_rule/        # Graph algorithms and query utilities
+│       ├── fts/               # Full-text search
+│       └── storage/           # Memory and persistent storage backends
+├── cozorocks/                 # RocksDB adapter (Rust/C++ bridge and vendored RocksDB)
+├── cozo-bin/                  # Optional standalone HTTP server and REPL
+├── cozo-core-examples/        # Internal Rust examples and tools
+├── cozo-lib-c/                # Community-driven C FFI
+├── cozo-lib-java/             # Community-driven Java/JNI binding
+├── cozo-lib-nodejs/           # Community-driven Node.js binding
+├── cozo-lib-python/           # Community-driven Python binding
+├── cozo-lib-swift/            # Community-driven Swift binding
+├── cozo-lib-wasm/             # Community-driven WebAssembly binding
+├── Cargo.toml                 # Workspace members and build profiles
+├── Cargo.lock                 # Workspace dependency lockfile
+├── CHANGELOG.md               # Project release notes
+└── publication.md             # crates.io publication guide
 ```
 
 ### Storage engine

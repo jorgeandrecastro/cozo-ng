@@ -1,5 +1,9 @@
 # Cozo (standalone executable)
 
+[![Crates.io](https://img.shields.io/crates/v/cozo-ng-bin)](https://crates.io/crates/cozo-ng-bin)
+[![docs.rs](https://img.shields.io/docsrs/cozo-ng-bin?label=docs.rs)](https://docs.rs/cozo-ng-bin)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/build.yml?branch=main)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/build.yml)
+[![GitHub](https://img.shields.io/github/license/jorgeandrecastro/cozo-ng)](https://github.com/jorgeandrecastro/cozo-ng/blob/main/LICENSE.txt)
 [![server](https://img.shields.io/github/v/release/jorgeandrecastro/cozo-ng)](https://github.com/jorgeandrecastro/cozo-ng/releases)
 
 This document describes how to set up cozo (standalone executable).
@@ -15,9 +19,32 @@ The standalone server is an optional way to run Cozo-NG. The project's primary
 maintenance target is the embedded Rust engine; the server is a Rust application
 built on that engine.
 
-The `cozo-ng-bin` crate is version `0.9.0` and targets the Cozo-NG 0.9 engine.
+The `cozo-ng-bin` crate is version `0.10.0` and targets the Cozo-NG 0.10 engine.
 This Rust crate version is separate from standalone binary release assets. See
 the [crate changelog](CHANGELOG.md).
+
+## Crate architecture
+
+This tree covers the standalone Rust executable only. The embedded engine it
+uses is maintained separately in [`cozo-core`](../cozo-core/README.md).
+
+```text
+cozo-bin/
+├── src/
+│   ├── main.rs       # CLI entry point; dispatches server and REPL commands
+│   ├── server.rs     # HTTP API and server startup
+│   ├── client.rs     # Client-side query helpers
+│   ├── repl.rs        # Interactive terminal interface
+│   ├── index.html    # Minimal browser-based query client
+│   └── security.txt  # Server security contact resource
+├── Cargo.toml        # Executable metadata, engine dependency, and features
+├── README.md
+└── CHANGELOG.md
+```
+
+The binary exposes two entry points: `server` for the HTTP API and `repl` for
+interactive terminal queries. Both use the Rust core crate; the server is an
+optional deployment mode, not a separate database engine.
 
 ## Download
 
