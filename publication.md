@@ -60,10 +60,10 @@ cargo publish -p cozo-ng-rocks
 Attendre l'indexation de la version, puis vérifier sa disponibilité :
 
 ```sh
-cargo info --registry crates-io cozo-ng-rocks@0.2.2
+cargo info --registry crates-io cozo-ng-rocks@0.2.3
 ```
 
-La tentative de publication de l'ancien nom `cozorocks` a été refusée par crates.io (403 : le compte ne possède pas cette crate). Cette tentative n'a pas publié `cozorocks 0.2.0`; le nouveau nom est `cozo-ng-rocks`.
+le nouveau nom est `cozo-ng-rocks`.
 
 ### 2. Publier le moteur
 

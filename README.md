@@ -5,7 +5,7 @@
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/build.yml?branch=main)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/build.yml)
 [![GitHub](https://img.shields.io/github/license/jorgeandrecastro/cozo-ng)](https://github.com/jorgeandrecastro/cozo-ng/blob/main/LICENSE.txt)
 
-# cozo-ng — The Embedded Graph + Vector Database for AI Agents & GraphRAG in Rust
+# cozo-ng : The Embedded Graph + Vector Database for AI Agents & GraphRAG in Rust
 
 > **Cozo-NG** is an independent fork and community-maintained continuation of [CozoDB](https://github.com/cozodb/cozo), currently focused on the Rust engine. It is not an official upstream release. Cozo-NG sets its own direction: a Rust-first embedded database for AI agents and GraphRAG, combining relational data, Datalog knowledge graphs, and vector search.
 >
