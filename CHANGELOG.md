@@ -2,6 +2,13 @@
 
 Notable changes to Cozo-NG are documented here. Cozo-NG is an independent community continuation of CozoDB; upstream release history is not the release history of this fork.
 
+## 0.8.1
+
+### Fixed
+
+- Made Rayon a required engine dependency because query evaluation and transaction execution use it even when default features are disabled.
+- Updated workspace bindings to depend on `cozo-ng 0.8.1`, so their published packages resolve the fixed engine release.
+
 ## 0.8.0
 
 ### Added

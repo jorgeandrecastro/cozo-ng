@@ -856,7 +856,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "aho-corasick",
  "approx",
@@ -919,7 +919,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-bin"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "async-stream",
  "axum 0.8.9",
@@ -949,7 +949,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-c"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "cbindgen",
  "cozo-ng",
@@ -958,7 +958,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-java"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "cozo-ng",
  "jni",
@@ -967,7 +967,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-node"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "cozo-ng",
  "crossbeam",
@@ -980,7 +980,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-python"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "cozo-ng",
  "miette",
@@ -1006,7 +1006,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-swift"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "cozo-ng",
  "swift-bridge",
@@ -1015,7 +1015,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-wasm"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "console_error_panic_hook",
  "cozo-ng",
