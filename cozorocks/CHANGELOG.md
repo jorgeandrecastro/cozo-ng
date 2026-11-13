@@ -4,6 +4,7 @@ Release notes for the `cozo-ng-rocks` crate. This crate is part of the
 independently maintained Cozo-NG fork and is not an official CozoDB upstream
 release.
 
+
 ## 0.3.1
 
 ### Changed
