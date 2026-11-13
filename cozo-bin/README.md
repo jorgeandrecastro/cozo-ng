@@ -15,6 +15,10 @@ The standalone server is an optional way to run Cozo-NG. The project's primary
 maintenance target is the embedded Rust engine; the server is a Rust application
 built on that engine.
 
+The `cozo-ng-bin` crate is version `0.9.0` and targets the Cozo-NG 0.9 engine.
+This Rust crate version is separate from standalone binary release assets. See
+the [crate changelog](CHANGELOG.md).
+
 ## Download
 
 The standalone executable for Cozo-NG, when published, will be available from the [Cozo-NG release page](https://github.com/jorgeandrecastro/cozo-ng/releases).

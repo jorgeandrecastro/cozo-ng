@@ -13,6 +13,10 @@ binding is a community integration surface. The npm package linked below is
 the original upstream distribution, not a Cozo-NG release. Contributions to
 build, test, document, or maintain a Cozo-NG-compatible binding are welcome.
 
+The `cozo-ng-node` crate is version `0.9.0` and targets the Cozo-NG 0.9
+engine. The npm package `cozo-node` linked below remains an upstream
+distribution, not a Cozo-NG release. See the [crate changelog](CHANGELOG.md).
+
 This document describes how to set up the Cozo module for use in NodeJS.
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
 

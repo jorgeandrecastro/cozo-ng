@@ -10,6 +10,10 @@ search. Maintenance focuses on the embedded Rust engine; this JNI binding is
 a community integration surface and may not have release parity with the Rust
 crate. Contributions to build, test, document, or maintain it are welcome.
 
+The `cozo-ng-java` crate is version `0.9.0` and targets the Cozo-NG 0.9
+engine. Java/JVM packages and binaries linked below remain upstream
+distributions, not Cozo-NG 0.9 releases. See the [crate changelog](CHANGELOG.md).
+
 You do not use this crate directly. Instead, use:
 
 * [Cozo Java](https://github.com/cozodb/cozo-lib-java) for Java or other JVM languages

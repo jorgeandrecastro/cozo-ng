@@ -6,11 +6,15 @@ The Rust engine is the primary supported and maintained part of Cozo-NG: an embe
 
 Cozo-NG is an independent fork and community-maintained continuation of CozoDB `0.7.6`, not an official upstream release. It sets its own Rust-first direction: an embedded data layer for AI agents and GraphRAG that combines relational data, Datalog knowledge graphs, and vector search. Language bindings are community-driven; contributions to build, test, and maintain them are welcome.
 
+This is the `cozo-ng` engine crate's `0.9.0` release. It includes the Rayon
+feature/dependency fix and updated `rand` and `thiserror` dependencies. See the
+[crate changelog](CHANGELOG.md) for details.
+
 The published package is named `cozo-ng`, while its Rust library name remains `cozo`. Existing code can therefore keep using `use cozo::*` by declaring the dependency as:
 
 ```toml
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.8" }
+cozo = { package = "cozo-ng", version = "0.9" }
 ```
 
 See the [Cozo-NG repository](https://github.com/jorgeandrecastro/cozo-ng) for project status and contribution information.

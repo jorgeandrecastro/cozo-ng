@@ -1,6 +1,6 @@
 [package]
 name = "cozo-ng"
-version = "0.8.1"
+version = "0.9.0"
 edition = "2024"
 description = "A general-purpose, transactional, relational database that uses Datalog and focuses on graph data and algorithms"
 authors = ["Ziyang Hu"]
@@ -92,7 +92,7 @@ rayon = []
 [dependencies]
 casey = "0.4"
 either = "1.19"
-rand = "0.8"
+rand = "0.10"
 miette = { version = "7.6", features = ["fancy"] }
 lazy_static = "1.5"
 log = "0.4"
@@ -119,7 +119,7 @@ pest = "2.9"
 pest_derive = "2.9"
 approx = "0.5"
 unicode-normalization = "0.1.26"
-thiserror = "1.0.59"
+thiserror = "2.0"
 uuid = { version = "1.29", features = ["v1", "v4", "serde"] }
 csv = "1.4"
 document-features = "0.2"

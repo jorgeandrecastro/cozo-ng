@@ -6,11 +6,11 @@ release.
 
 ## 0.3.0
 
-- Updated `Cargo.toml` dependencies to more recent versions available on crates.io.
-- Bumped the crate version for the Cozo-NG release.
-- No Rust API or storage behavior changes are included in this version bump.
+- Updated build dependencies.
+- Aligned the RocksDB adapter release with the Cozo-NG 0.9 engine.
+- Kept the Rust library name `cozorocks`; this low-level implementation crate is not an upstream CozoDB release.
 
 ## 0.2.3
 
-- Bumped the crate version for the next Cozo-NG release.
-- No Rust API or storage behavior changes are included in this version bump.
+- Bumped the crate version for a Cozo-NG maintenance release.
+- No Rust API or storage behavior changes were included in that version bump.

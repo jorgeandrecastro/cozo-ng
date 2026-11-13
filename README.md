@@ -23,7 +23,7 @@
 
 ## 🚀 Roadmap: v0.9 (Current Focus)
 
-Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name.
+Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name. The `0.9.0` release continues this independent maintenance with a Rust-first focus on the embedded engine and its use as a data layer for AI agents and GraphRAG.
 
 The focus is a high-performance, transactional, embedded Rust database that brings together relational storage, Datalog-powered knowledge graphs, and HNSW vector search. It is designed to give Rust AI agents and GraphRAG applications a local, in-process data layer.
 
@@ -40,7 +40,7 @@ The v0.9 roadmap:
 * [ ] **Storage safety:** Treat on-disk formats and migration behavior as compatibility-sensitive; test backend changes and document migrations.
 * **Community bindings:** Python, Node.js, WASM, Java, Swift, C, and other non-Rust bindings are welcome community efforts. Collaborations and pull requests to build, test, document, or maintain them are warmly welcome, but they are not currently part of the core maintenance commitment.
 
-See the [0.8.0 changelog](CHANGELOG.md) and [maintenance and contribution guidelines](CONTRIBUTING.md).
+See the [0.9.0 changelog](CHANGELOG.md) and [maintenance and contribution guidelines](CONTRIBUTING.md).
 
 ---
 
@@ -192,7 +192,7 @@ Add `cozo-ng` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.8" }
+cozo = { package = "cozo-ng", version = "0.9" }
 ```
 
 Because `cozo-ng` preserves the internal library name `cozo`, your Rust imports remain unchanged:
