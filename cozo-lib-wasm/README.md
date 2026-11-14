@@ -10,7 +10,7 @@ npm package linked below is an upstream distribution, not a Cozo-NG release.
 Contributions to build, test, document, or maintain a Cozo-NG WebAssembly
 integration are welcome.
 
-The `cozo-ng-wasm` crate is version `0.10.0` and targets the Cozo-NG 0.10
+The `cozo-ng-wasm` crate is version `0.11.0` and targets the Cozo-NG 0.11
 engine. The npm package linked below remains an upstream distribution, not a
 Cozo-NG release. See the [crate changelog](CHANGELOG.md).
 

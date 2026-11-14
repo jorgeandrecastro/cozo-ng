@@ -3,6 +3,7 @@
 [![Crates.io](https://img.shields.io/crates/v/cozo-ng-bin)](https://crates.io/crates/cozo-ng-bin)
 [![docs.rs](https://img.shields.io/docsrs/cozo-ng-bin?label=docs.rs)](https://docs.rs/cozo-ng-bin)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/build.yml?branch=main)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/build.yml)
+[![Docker](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/Docker.yaml?branch=main&label=docker)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/Docker.yaml)
 [![GitHub](https://img.shields.io/github/license/jorgeandrecastro/cozo-ng)](https://github.com/jorgeandrecastro/cozo-ng/blob/main/LICENSE.txt)
 [![server](https://img.shields.io/github/v/release/jorgeandrecastro/cozo-ng)](https://github.com/jorgeandrecastro/cozo-ng/releases)
 
@@ -19,9 +20,9 @@ The standalone server is an optional way to run Cozo-NG. The project's primary
 maintenance target is the embedded Rust engine; the server is a Rust application
 built on that engine.
 
-The `cozo-ng-bin` crate is version `0.11.0` and targets the Cozo-NG 0.10 engine.
-This Rust crate version is separate from standalone binary release assets. See
-the [crate changelog](CHANGELOG.md).
+The `cozo-ng-bin` crate is version `0.12.0` and targets the Cozo-NG 0.11 engine.
+This Rust crate version is separate from standalone binary release assets and
+from Docker image tags. See the [crate changelog](CHANGELOG.md).
 
 ## Crate architecture
 
@@ -34,7 +35,7 @@ cozo-bin/
 │   ├── main.rs       # CLI entry point; dispatches server and REPL commands
 │   ├── server.rs     # HTTP API and server startup
 │   ├── client.rs     # Client-side query helpers
-│   ├── repl.rs        # Interactive terminal interface
+│   ├── repl.rs       # Interactive terminal interface
 │   ├── index.html    # Minimal browser-based query client
 │   └── security.txt  # Server security contact resource
 ├── Cargo.toml        # Executable metadata, engine dependency, and features
@@ -53,23 +54,55 @@ Look for those with names `cozo-*`.
 Those with names `cozo_all-*` supports additional storage backends
 such as [TiKV](https://tikv.org/) storage, but are larger.
 
-## Starting the server
+## Run with Docker
 
-Run the cozo command in a terminal:
+The easiest way to run the server without installing a Rust toolchain or compiling RocksDB is the Docker image. It contains the `cozo-bin` executable built with the `compact` and `storage-rocksdb` features, and stores its data in the `/data` volume.
 
 ```bash
-./cozo server
+docker run --rm -p 127.0.0.1:9070:9070 -v cozo-data:/data \
+  ghcr.io/jorgeandrecastro/cozo-bin:main
+```
+
+Inside the container the server binds to `0.0.0.0`, so it requires the authentication token described in [the query API](#The-query-API). The token is generated on first start and stored in the data volume. Read it with:
+
+```bash
+docker run --rm -v cozo-data:/data --entrypoint cat \
+  ghcr.io/jorgeandrecastro/cozo-bin:main /data/db.rocksdb.cozo_auth
+```
+
+Then send it in the `x-cozo-auth` header:
+
+```bash
+curl -X POST http://127.0.0.1:9070/text-query \
+  -H 'content-type: application/json' \
+  -H 'x-cozo-auth: YOUR_TOKEN' \
+  -d '{"script": "?[] <- [[1, 2, 3]]", "params": {}}'
+```
+
+Notes:
+
+* Publish the port on `127.0.0.1` as shown, or place the server behind a reverse proxy, before exposing it to a network.
+* Arguments after the image name replace the default command, for example `... cozo-bin:main server --help`.
+* Use a version or commit SHA tag instead of `main` for reproducible deployments.
+* Images are built by the `Docker.yaml` workflow from the `Dockerfile` at the repository root.
+
+## Starting the server
+
+Run the `cozo-bin` command in a terminal:
+
+```bash
+./cozo-bin server
 ```
 
 This starts an in-memory, non-persistent database.
 For more options such as how to run a persistent database with other storage engines,
-see `./cozo server -h`
+see `./cozo-bin server -h`
 
 To stop Cozo, press `CTRL-C`, or send `SIGTERM` to the process with e.g. `kill`.
 
 ## The REPL
 
-Run `./cozo repl` to enter a terminal-based REPL. The engine options can be used when
+Run `./cozo-bin repl` to enter a terminal-based REPL. The engine options can be used when
 invoking the executable to choose the backend.
 
 You can use the following meta ops in the REPL:
@@ -145,8 +178,10 @@ The following are experimental:
 
 ## Building
 
-Building `cozo` requires a [Rust toolchain](https://rustup.rs). Run
+Building `cozo-bin` requires a [Rust toolchain](https://rustup.rs). Run
 
 ```bash
 cargo build --release -p cozo-ng-bin -F compact -F storage-rocksdb
 ```
+
+The executable is written to `target/release/cozo-bin`. To build the container image yourself, run `docker build -t cozo-bin .` from the repository root.

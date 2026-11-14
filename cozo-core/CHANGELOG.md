@@ -5,6 +5,14 @@ community-maintained fork of CozoDB; these are Cozo-NG releases, not upstream
 CozoDB releases. The package is `cozo-ng`, while the Rust library remains
 `cozo`.
 
+## 0.11.0
+
+### Changed
+
+- Released the engine as `cozo-ng 0.11.0`, keeping the Rust library name `cozo` and the `cozo::runtime::db` module path.
+- Updated the documentation and the dependency example to `version = "0.11"`.
+- No changes to the engine's public API or storage format are introduced by this release.
+
 ## 0.10.1
 
 ### Changed

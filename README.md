@@ -3,7 +3,7 @@
 [![Crates.io](https://img.shields.io/crates/v/cozo-ng)](https://crates.io/crates/cozo-ng)
 [![docs.rs](https://img.shields.io/docsrs/cozo-ng?label=docs.rs)](https://docs.rs/cozo-ng)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/build.yml?branch=main)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/build.yml)
-[![Docker](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/docker.yml?branch=main&label=docker)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/docker.yml)
+[![Docker](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/Docker.yaml?branch=main&label=docker)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/Docker.yaml)
 [![GitHub](https://img.shields.io/github/license/jorgeandrecastro/cozo-ng)](https://github.com/jorgeandrecastro/cozo-ng/blob/main/LICENSE.txt)
 
 # cozo-ng : The Embedded Graph + Vector Database for AI Agents & GraphRAG in Rust
@@ -32,9 +32,9 @@
 7. [Links](#Links)
 8. [Licensing and contributing](#Licensing-and-contributing)
 
-## 🚀 Roadmap: v0.10 (Current Focus)
+## 🚀 Roadmap: v0.11 (Current Focus)
 
-Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name. The `0.10.1` release continues this independent maintenance with a Rust-first focus on the embedded engine and its use as a data layer for AI agents and GraphRAG.
+Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name. The `0.11.0` release continues this independent maintenance with a Rust-first focus on the embedded engine and its use as a data layer for AI agents and GraphRAG.
 
 The focus is a high-performance, transactional, embedded Rust database that brings together relational storage, Datalog-powered knowledge graphs, and HNSW vector search. It is designed to give Rust AI agents and GraphRAG applications a local, in-process data layer.
 
@@ -44,7 +44,7 @@ Why Cozo-NG for AI and local-first applications?
 * **One local data layer:** Keep structured relationships and semantic embeddings close to the application, reducing operational components for local-first and agentic systems.
 * **Docker image for everyone else:** Run the same engine as an HTTP server in one command, with no Rust or C++ toolchain, and talk to it from any language.
 
-The v0.10 roadmap:
+The v0.11 roadmap:
 * [x] **Fork initialization:** Establish the independent project, licensing, crate namespace, and repository structure.
 * [ ] **Dependency modernization:** Finish validating updated dependencies across supported Rust toolchains, storage features, and platforms.
 * [x] **Rust-first scope:** Focus official maintenance on the Rust database engine and its Rust APIs. Keep `cozo` as the library name for migration compatibility.
@@ -53,7 +53,7 @@ The v0.10 roadmap:
 * [ ] **Storage safety:** Treat on-disk formats and migration behavior as compatibility-sensitive; test backend changes and document migrations.
 * **Community bindings:** Python, Node.js, WASM, Java, Swift, C, and other non-Rust bindings are welcome community efforts. Collaborations and pull requests to build, test, document, or maintain them are warmly welcome, but they are not currently part of the core maintenance commitment.
 
-See the [0.10.0 changelog](CHANGELOG.md) and [maintenance and contribution guidelines](CONTRIBUTING.md).
+See the [0.11.0 changelog](CHANGELOG.md) and [maintenance and contribution guidelines](CONTRIBUTING.md).
 
 ---
 
@@ -205,7 +205,7 @@ Add `cozo-ng` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.10" }
+cozo = { package = "cozo-ng", version = "0.11" }
 ```
 
 Because `cozo-ng` preserves the internal library name `cozo`, your Rust imports remain unchanged:
@@ -269,11 +269,19 @@ docker run --rm -p 127.0.0.1:9070:9070 -v cozo-data:/data \
 * `-p 127.0.0.1:9070:9070` publishes the server on your machine only.
 * `-v cozo-data:/data` stores the database in a named volume that survives restarts.
 
-Send a query:
+Because the server listens on `0.0.0.0` inside the container, it requires an authentication token. On first start it generates one and stores it in the data volume. Read it with:
+
+```sh
+docker run --rm -v cozo-data:/data --entrypoint cat \
+  ghcr.io/jorgeandrecastro/cozo-bin:main /data/db.rocksdb.cozo_auth
+```
+
+Send a query, passing the token in the `x-cozo-auth` header:
 
 ```sh
 curl -X POST http://127.0.0.1:9070/text-query \
   -H 'content-type: application/json' \
+  -H 'x-cozo-auth: YOUR_TOKEN' \
   -d '{"script": "?[] <- [[1, 2, 3]]", "params": {}}'
 ```
 
@@ -306,8 +314,8 @@ The first build takes a while because RocksDB is compiled from source.
 
 ### Good to know
 
-* **Security:** inside the container the server listens on `0.0.0.0` so that port publishing works. Publish it on `127.0.0.1` as shown above, or put it behind a reverse proxy with authentication, before exposing it to a network. Run `cozo-bin server --help` for the available options.
-* **Tags:** images are published to `ghcr.io` by GitHub Actions on pushes to `main` and on version tags (`v*`). Use a version or SHA tag for reproducible deployments rather than `main`.
+* **Security:** inside the container the server listens on `0.0.0.0` so that port publishing works, which is why it requires the `x-cozo-auth` token. This token is only a last line of defence: publish the port on `127.0.0.1` as shown above, or put the server behind a reverse proxy with proper authentication, before exposing it to a network. Run `cozo-bin server --help` for the available options.
+* **Tags:** images are published to `ghcr.io` by GitHub Actions on pushes to `main` and on version tags (`v*`). Pushing the tag `v0.11.0` publishes the tags `0.11.0` and `0.11`. Use a version or SHA tag for reproducible deployments rather than `main`.
 * **Custom options:** the arguments after the image name replace the default command, for example `docker run ... ghcr.io/jorgeandrecastro/cozo-bin:main server --help`.
 * **Data and upgrades:** the on-disk format is compatibility-sensitive. Back up the volume before upgrading across minor versions and read the [changelog](CHANGELOG.md).
 
@@ -356,7 +364,7 @@ cozo-ng/
 ├── cozo-lib-python/           # Community-driven Python binding
 ├── cozo-lib-swift/            # Community-driven Swift binding
 ├── cozo-lib-wasm/             # Community-driven WebAssembly binding
-├── .github/workflows/         # CI: build.yml (tests), docker.yml (image to ghcr.io)
+├── .github/workflows/         # CI: build.yml (tests), Docker.yaml (image to ghcr.io)
 ├── Dockerfile                 # Container image of the standalone server
 ├── Cargo.toml                 # Workspace members and build profiles
 ├── Cargo.lock                 # Workspace dependency lockfile

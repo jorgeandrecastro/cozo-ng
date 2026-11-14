@@ -2,7 +2,23 @@
 
 Release notes for the `cozo-ng-bin` Rust crate. This is part of the independent
 Cozo-NG fork, not an official CozoDB upstream release. Crate versions do not
-necessarily correspond to downloadable standalone binary releases.
+necessarily correspond to downloadable standalone binary releases or to Docker
+image tags.
+
+## 0.12.0
+
+### Fixed
+
+- Updated the HTTP server routes to the axum 0.8 path syntax (`/{param}` instead of `/:param`) for `/export`, `/changes`, `/rules`, `/rule-result` and `/transact`. With the previous syntax the router panicked at startup.
+
+### Added
+
+- Added a Docker image of the standalone server, built from the `Dockerfile` at the repository root with the `compact` and `storage-rocksdb` features and published to `ghcr.io/jorgeandrecastro/cozo-bin` by the `Docker.yaml` workflow.
+- Documented the Docker image in the README, including how to read the authentication token that the server generates when it binds to a non-loopback address.
+
+### Changed
+
+- Corrected the README to use the real executable name `cozo-bin` and the build command `cargo build --release -p cozo-ng-bin -F compact -F storage-rocksdb`.
 
 ## 0.11.0
 

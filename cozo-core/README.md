@@ -9,7 +9,7 @@ The Rust engine is the primary supported and maintained part of Cozo-NG: an embe
 
 Cozo-NG is an independent fork and community-maintained continuation of CozoDB `0.7.6`, not an official upstream release. It sets its own Rust-first direction: an embedded data layer for AI agents and GraphRAG that combines relational data, Datalog knowledge graphs, and vector search. Language bindings are community-driven; contributions to build, test, and maintain them are welcome.
 
-This is the `cozo-ng` engine crate's `0.10.1` release. The former
+This is the `cozo-ng` engine crate's `0.11.0` release. Since `0.10.0`, the former
 `src/runtime/db.rs` implementation is organized into focused modules under
 `src/runtime/db/`; the `cozo::runtime::db` module path and public API are
 preserved. See the [crate changelog](CHANGELOG.md) for details.
@@ -18,7 +18,7 @@ The published package is named `cozo-ng`, while its Rust library name remains `c
 
 ```toml
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.10" }
+cozo = { package = "cozo-ng", version = "0.11" }
 ```
 
 See the [Cozo-NG repository](https://github.com/jorgeandrecastro/cozo-ng) for project status and contribution information.
@@ -29,7 +29,7 @@ See the [Cozo-NG repository](https://github.com/jorgeandrecastro/cozo-ng) for pr
 - **Knowledge graphs with Datalog:** Express recursive, multi-hop relationships as composable queries.
 - **Vector search:** Use the engine's HNSW indexing alongside structured relational and graph data.
 - **Storage choices:** Select an in-memory or persistent backend through Cargo features, including SQLite and RocksDB.
-- **Rust-native:** Use the library directly from Rust. The standalone server and non-Rust bindings are additional integration options, not the project's primary maintenance focus.
+- **Rust-native:** Use the library directly from Rust. The standalone server (also available as a [Docker image](../README.md#Run-with-Docker)) and non-Rust bindings are additional integration options, not the project's primary maintenance focus.
 
 For examples, feature selection, and storage details, see the [main README](../README.md) and the [API documentation](https://docs.rs/cozo-ng).
 

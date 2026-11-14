@@ -4,8 +4,21 @@ Release notes for the `cozo-ng-rocks` crate. This crate is part of the
 independently maintained Cozo-NG fork and is not an official CozoDB upstream
 release.
 
+## 0.4.0
+
+### Added
+
+- Documented in the README how to use the RocksDB backend without compiling it, through the prebuilt `ghcr.io/jorgeandrecastro/cozo-bin` Docker image, and pointed to the repository `Dockerfile` as a reference for Debian build dependencies.
+
+### Notes
+
+- Documentation only. The adapter API, its storage behavior, and its version are unchanged, so no new crates.io release is required.
+
 ## 0.3.2
-- Aligned documentation and harmonized dependency versions across the project.
+
+### Changed
+
+- Aligned the adapter release with the Cozo-NG 0.11 engine. The RocksDB adapter API and storage behavior are unchanged.
 
 ## 0.3.1
 

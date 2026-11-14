@@ -15,9 +15,9 @@ PyPI package linked below is an upstream distribution and is not a Cozo-NG
 release. Contributions to build, test, document, or maintain Python bindings
 for Cozo-NG are warmly welcome.
 
-The `cozo-ng-python` crate is version `0.10.0` and targets the Cozo-NG 0.10
-engine. The PyPI distribution linked above remains upstream and is not a
-Cozo-NG 0.10 release. See the [crate changelog](CHANGELOG.md).
+The `cozo-ng-python` crate is version `0.11.0` and targets the Cozo-NG 0.11
+engine. The PyPI distribution linked above remains upstream and is not a Cozo-NG release.
+See the [crate changelog](CHANGELOG.md).
 
 The linked [PyCozo](https://github.com/cozodb/pycozo) package is the upstream
 Python distribution and depends on the upstream binding; it does not currently
