@@ -5,6 +5,11 @@ community-maintained fork of CozoDB; these are Cozo-NG releases, not upstream
 CozoDB releases. The package is `cozo-ng`, while the Rust library remains
 `cozo`.
 
+## 0.10.1
+
+### Changed
+- Aligned documentation and harmonized dependency versions across the project.
+
 ## 0.10.0
 
 ### Changed

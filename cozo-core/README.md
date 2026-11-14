@@ -9,7 +9,7 @@ The Rust engine is the primary supported and maintained part of Cozo-NG: an embe
 
 Cozo-NG is an independent fork and community-maintained continuation of CozoDB `0.7.6`, not an official upstream release. It sets its own Rust-first direction: an embedded data layer for AI agents and GraphRAG that combines relational data, Datalog knowledge graphs, and vector search. Language bindings are community-driven; contributions to build, test, and maintain them are welcome.
 
-This is the `cozo-ng` engine crate's `0.10.0` release. The former
+This is the `cozo-ng` engine crate's `0.10.1` release. The former
 `src/runtime/db.rs` implementation is organized into focused modules under
 `src/runtime/db/`; the `cozo::runtime::db` module path and public API are
 preserved. See the [crate changelog](CHANGELOG.md) for details.
