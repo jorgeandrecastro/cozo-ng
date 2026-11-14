@@ -3,6 +3,19 @@
 Notable changes to Cozo-NG are documented here. Cozo-NG is an independent community continuation of CozoDB; upstream release history is not the release history of this fork.
 
 
+## Unreleased
+
+### Added
+
+- Added a `Dockerfile` and `.dockerignore` to build a container image of the standalone server (`cozo-bin`) with the RocksDB storage engine, listening on port `9070` and storing data in a `/data` volume.
+- Added a `docker.yml` GitHub Actions workflow that builds the image on pull requests and publishes it to `ghcr.io/jorgeandrecastro/cozo-ng` on pushes to `main` and on `v*` tags, with branch, version, and commit SHA tags.
+- Documented the Docker image in the README: what it is for, quick start, Docker Compose, building locally, and security notes.
+
+### Notes
+
+- This change adds distribution tooling and documentation only. The engine, the other crates, and their versions are unchanged, and no new crates.io release is required for it.
+
+
 ## 0.10.1
 
 - Aligned documentation and harmonized dependency versions across the project.

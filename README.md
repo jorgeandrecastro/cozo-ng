@@ -3,6 +3,7 @@
 [![Crates.io](https://img.shields.io/crates/v/cozo-ng)](https://crates.io/crates/cozo-ng)
 [![docs.rs](https://img.shields.io/docsrs/cozo-ng?label=docs.rs)](https://docs.rs/cozo-ng)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/build.yml?branch=main)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/build.yml)
+[![Docker](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/docker.yml?branch=main&label=docker)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/docker.yml)
 [![GitHub](https://img.shields.io/github/license/jorgeandrecastro/cozo-ng)](https://github.com/jorgeandrecastro/cozo-ng/blob/main/LICENSE.txt)
 
 # cozo-ng : The Embedded Graph + Vector Database for AI Agents & GraphRAG in Rust
@@ -11,15 +12,25 @@
 >
 > *If you are migrating from the original `cozo` crate, change the dependency package to `cozo-ng` while keeping the dependency key `cozo`; the library name remains `cozo`, so your Rust code does not need to change.*
 
+**Two ways to use Cozo-NG:**
+
+| | Embedded (Rust library) | Server (Docker image) |
+|---|---|---|
+| How | `cargo add` the `cozo-ng` crate | `docker run ghcr.io/jorgeandrecastro/cozo-ng` |
+| Runs | Inside your Rust process | As a separate HTTP service |
+| Best for | Local-first apps, AI agents, GraphRAG in Rust | Any language, quick trials, shared or deployed setups |
+| Jump to | [Install](#Install) | [Run with Docker](#Run-with-Docker) |
+
 ### Table of contents
 
 1. [Introduction](#Introduction)
 2. [Getting started](#Getting-started)
 3. [Install](#Install)
-4. [Architecture](#Architecture)
-5. [Status of the project](#Status-of-the-project)
-6. [Links](#Links)
-7. [Licensing and contributing](#Licensing-and-contributing)
+4. [Run with Docker](#Run-with-Docker)
+5. [Architecture](#Architecture)
+6. [Status of the project](#Status-of-the-project)
+7. [Links](#Links)
+8. [Licensing and contributing](#Licensing-and-contributing)
 
 ## 🚀 Roadmap: v0.10 (Current Focus)
 
@@ -31,11 +42,13 @@ Why Cozo-NG for AI and local-first applications?
 * **Embedded GraphRAG building block:** Compose vector similarity search, relational filters, and multi-hop graph traversal without requiring a separate graph or vector database service.
 * **Rust-native and transactional:** Run in the application's process and use Cozo-NG's MVCC transaction model directly from Rust.
 * **One local data layer:** Keep structured relationships and semantic embeddings close to the application, reducing operational components for local-first and agentic systems.
+* **Docker image for everyone else:** Run the same engine as an HTTP server in one command, with no Rust or C++ toolchain, and talk to it from any language.
 
 The v0.10 roadmap:
 * [x] **Fork initialization:** Establish the independent project, licensing, crate namespace, and repository structure.
 * [ ] **Dependency modernization:** Finish validating updated dependencies across supported Rust toolchains, storage features, and platforms.
 * [x] **Rust-first scope:** Focus official maintenance on the Rust database engine and its Rust APIs. Keep `cozo` as the library name for migration compatibility.
+* [x] **Docker image:** Provide a container image of the standalone server, published to `ghcr.io` by GitHub Actions.
 * [ ] **Core performance and DX:** Refine query execution and improve examples, diagnostics, and developer documentation.
 * [ ] **Storage safety:** Treat on-disk formats and migration behavior as compatibility-sensitive; test backend changes and document migrations.
 * **Community bindings:** Python, Node.js, WASM, Java, Swift, C, and other non-Rust bindings are welcome community efforts. Collaborations and pull requests to build, test, document, or maintain them are warmly welcome, but they are not currently part of the core maintenance commitment.
@@ -53,7 +66,7 @@ See the [0.10.0 changelog](CHANGELOG.md) and [maintenance and contribution guide
 
 Cozo-NG is an embedded, transactional database engine written in Rust. It combines relational data, **Datalog** queries and recursion for knowledge graphs, and **HNSW vector search**. Its in-process design makes it a building block for local-first applications, AI agents, and GraphRAG systems that need structured relationships and semantic retrieval together.
 
-Cozo-NG can also be run through a standalone HTTP server, but the Rust library is the project's primary interface and maintenance target.
+Cozo-NG can also be run as a standalone HTTP server, most easily through the [Docker image](#Run-with-Docker). The Rust library remains the project's primary interface and maintenance target.
 
 ### What does _embeddable_ mean here?
 
@@ -211,12 +224,12 @@ are welcome.
 | Target / Environment                                     | Platform support                                                                                                        | Storage |
 |----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|---------|
 | [Rust (`cozo-ng`)](https://docs.rs/cozo-ng/)             | Source only, usable on any [platform](https://doc.rust-lang.org/nightly/rustc/platform-support.html) with `std` support | MQRST   |
-| [Standalone HTTP server](./cozo-bin)                     | Linux (x86_64, ARM64), Mac (ARM64, x86_64), Windows (x86_64)                                                            | MQRST   |
+| [Standalone HTTP server](./cozo-bin) / [Docker image](#Run-with-Docker) | Linux (x86_64, ARM64), Mac (ARM64, x86_64), Windows (x86_64); Docker image for Linux containers | MQRST   |
 | [C/C++/FFI (`cozo-lib-c`)](./cozo-lib-c)                 | Linux (x86_64, ARM64), Mac (ARM64, x86_64), Windows (x86_64)                                                            | MQR     |
 | [WebAssembly (`cozo-lib-wasm`)](./cozo-lib-wasm)         | Modern browsers supporting [WebAssembly](https://developer.mozilla.org/en-US/docs/WebAssembly#browser_compatibility)    | M       |
 | [NodeJS (`cozo-lib-nodejs`)](./cozo-lib-nodejs)          | Linux (x86_64, ARM64), Mac (ARM64, x86_64), Windows (x86_64)                                                            | MQR     |
 
-Python, Java, Swift, Node.js, WebAssembly, C, and other non-Rust bindings are not current core-maintenance priorities. The original upstream packages may not contain Cozo-NG changes. Please coordinate with the project if you would like to contribute or take responsibility for one of these bindings.
+Python, Java, Swift, Node.js, WebAssembly, C, and other non-Rust bindings are not current core-maintenance priorities. The original upstream packages may not contain Cozo-NG changes. Please coordinate with the project if you would like to contribute or take responsibility for one of these bindings. In the meantime, the [Docker image](#Run-with-Docker) gives any language access to the engine over HTTP.
 
 Storage legend:
 * **M**: In-memory, non-persistent backend
@@ -230,6 +243,71 @@ Storage legend:
 When creating a Cozo instance with the RocksDB backend, you provide a path to a data directory. If you place a file named `options` inside this directory, the engine will load it as a [RocksDB options file](https://github.com/facebook/rocksdb/wiki/RocksDB-Options-File).
 
 To customize safely, run your database once, copy `data/OPTIONS-XXXXXX` from your database directory, rename it to `options`, and adjust only the parameters you understand.
+
+## Run with Docker
+
+The Docker image packages `cozo-bin`, the standalone Cozo-NG server, with the RocksDB storage engine. It exposes the database over HTTP on port `9070`.
+
+### What is it for?
+
+* **Try Cozo-NG in one command.** No Rust toolchain, no C++ compiler, no compiling RocksDB (which is slow). Pull the image and run it.
+* **Use Cozo-NG from any language.** Python, JavaScript, Go, shell scripts: anything that can send an HTTP request can run queries. This is the recommended route while the non-Rust bindings are community-maintained.
+* **Run it as a shared service.** Several applications or machines can use the same database, and it fits Docker Compose, CI pipelines, and servers.
+* **Keep your data outside the container.** A volume holds the database files, so upgrading or recreating the container does not lose data.
+
+The Docker image does **not** replace the embedded library. If you write Rust and want the lowest latency and no extra process, use the [crate](#Rust-Primary-Target) directly.
+
+### Quick start
+
+```sh
+docker run --rm -p 127.0.0.1:9070:9070 -v cozo-data:/data \
+  ghcr.io/jorgeandrecastro/cozo-ng:main
+```
+
+* `-p 127.0.0.1:9070:9070` publishes the server on your machine only.
+* `-v cozo-data:/data` stores the database in a named volume that survives restarts.
+
+Send a query:
+
+```sh
+curl -X POST http://127.0.0.1:9070/text-query \
+  -H 'content-type: application/json' \
+  -d '{"script": "?[] <- [[1, 2, 3]]", "params": {}}'
+```
+
+### Docker Compose
+
+```yaml
+services:
+  cozo:
+    image: ghcr.io/jorgeandrecastro/cozo-ng:main
+    ports:
+      - "127.0.0.1:9070:9070"
+    volumes:
+      - cozo-data:/data
+    restart: unless-stopped
+
+volumes:
+  cozo-data:
+```
+
+### Build the image yourself
+
+```sh
+git clone https://github.com/jorgeandrecastro/cozo-ng
+cd cozo-ng
+docker build -t cozo-ng .
+docker run --rm -p 127.0.0.1:9070:9070 -v cozo-data:/data cozo-ng
+```
+
+The first build takes a while because RocksDB is compiled from source.
+
+### Good to know
+
+* **Security:** inside the container the server listens on `0.0.0.0` so that port publishing works. Publish it on `127.0.0.1` as shown above, or put it behind a reverse proxy with authentication, before exposing it to a network. Run `cozo-bin server --help` for the available options.
+* **Tags:** images are published to `ghcr.io` by GitHub Actions on pushes to `main` and on version tags (`v*`). Use a version or SHA tag for reproducible deployments rather than `main`.
+* **Custom options:** the arguments after the image name replace the default command, for example `docker run ... ghcr.io/jorgeandrecastro/cozo-ng:main server --help`.
+* **Data and upgrades:** the on-disk format is compatibility-sensitive. Back up the volume before upgrading across minor versions and read the [changelog](CHANGELOG.md).
 
 ## Architecture
 
@@ -263,7 +341,7 @@ cozo-ng/
 │       ├── parse/             # CozoScript parsing
 │       ├── query/             # Datalog compilation and query execution
 │       ├── runtime/           # Transactions, indexes, and database runtime
-│   └── db/            # Database operations, execution, backup, import/export
+│       │   └── db/            # Database operations, execution, backup, import/export
 │       ├── fixed_rule/        # Graph algorithms and query utilities
 │       ├── fts/               # Full-text search
 │       └── storage/           # Memory and persistent storage backends
@@ -276,6 +354,8 @@ cozo-ng/
 ├── cozo-lib-python/           # Community-driven Python binding
 ├── cozo-lib-swift/            # Community-driven Swift binding
 ├── cozo-lib-wasm/             # Community-driven WebAssembly binding
+├── .github/workflows/         # CI: build.yml (tests), docker.yml (image to ghcr.io)
+├── Dockerfile                 # Container image of the standalone server
 ├── Cargo.toml                 # Workspace members and build profiles
 ├── Cargo.lock                 # Workspace dependency lockfile
 ├── CHANGELOG.md               # Project release notes
@@ -297,7 +377,7 @@ The query engine handles:
 
 ### Language/environment wrapper
 
-For Rust users, there is no wrapper—you call the query engine directly. The standalone server and language bindings are separate integration surfaces around that core. Rust is the maintained first-class interface; non-Rust bindings welcome community maintainers and contributions.
+For Rust users, there is no wrapper—you call the query engine directly. The standalone server (and its Docker image) and language bindings are separate integration surfaces around that core. Rust is the maintained first-class interface; non-Rust bindings welcome community maintainers and contributions.
 
 ## Status of the project
 
@@ -313,6 +393,7 @@ Bug reports, dependency updates, and pull requests are actively welcomed.
 * [Cozo-NG Issue Tracker](https://github.com/jorgeandrecastro/cozo-ng/issues)
 * [Crates.io (`cozo-ng`)](https://crates.io/crates/cozo-ng)
 * [Rust API Docs (`docs.rs`)](https://docs.rs/cozo-ng/)
+* [Docker image (`ghcr.io`)](https://github.com/jorgeandrecastro/cozo-ng/pkgs/container/cozo-ng)
 * [Changelog](CHANGELOG.md)
 * [Upstream Documentation (CozoDB v0.7)](https://docs.cozodb.org/en/latest/)
 * [Original Upstream Repository](https://github.com/cozodb/cozo)
