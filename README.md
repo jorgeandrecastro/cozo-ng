@@ -16,7 +16,7 @@
 
 | | Embedded (Rust library) | Server (Docker image) |
 |---|---|---|
-| How | `cargo add` the `cozo-ng` crate | `docker run ghcr.io/jorgeandrecastro/cozo-ng` |
+| How | `cargo add` the `cozo-ng` crate | `docker run ghcr.io/jorgeandrecastro/cozo-bin` |
 | Runs | Inside your Rust process | As a separate HTTP service |
 | Best for | Local-first apps, AI agents, GraphRAG in Rust | Any language, quick trials, shared or deployed setups |
 | Jump to | [Install](#Install) | [Run with Docker](#Run-with-Docker) |
@@ -248,6 +248,8 @@ To customize safely, run your database once, copy `data/OPTIONS-XXXXXX` from you
 
 The Docker image packages `cozo-bin`, the standalone Cozo-NG server, with the RocksDB storage engine. It exposes the database over HTTP on port `9070`.
 
+The image is named `cozo-bin` on purpose: it contains the standalone server executable, not the Rust library. The embedded library is distributed as the `cozo-ng` crate on crates.io.
+
 ### What is it for?
 
 * **Try Cozo-NG in one command.** No Rust toolchain, no C++ compiler, no compiling RocksDB (which is slow). Pull the image and run it.
@@ -261,7 +263,7 @@ The Docker image does **not** replace the embedded library. If you write Rust an
 
 ```sh
 docker run --rm -p 127.0.0.1:9070:9070 -v cozo-data:/data \
-  ghcr.io/jorgeandrecastro/cozo-ng:main
+  ghcr.io/jorgeandrecastro/cozo-bin:main
 ```
 
 * `-p 127.0.0.1:9070:9070` publishes the server on your machine only.
@@ -280,7 +282,7 @@ curl -X POST http://127.0.0.1:9070/text-query \
 ```yaml
 services:
   cozo:
-    image: ghcr.io/jorgeandrecastro/cozo-ng:main
+    image: ghcr.io/jorgeandrecastro/cozo-bin:main
     ports:
       - "127.0.0.1:9070:9070"
     volumes:
@@ -296,8 +298,8 @@ volumes:
 ```sh
 git clone https://github.com/jorgeandrecastro/cozo-ng
 cd cozo-ng
-docker build -t cozo-ng .
-docker run --rm -p 127.0.0.1:9070:9070 -v cozo-data:/data cozo-ng
+docker build -t cozo-bin .
+docker run --rm -p 127.0.0.1:9070:9070 -v cozo-data:/data cozo-bin
 ```
 
 The first build takes a while because RocksDB is compiled from source.
@@ -306,7 +308,7 @@ The first build takes a while because RocksDB is compiled from source.
 
 * **Security:** inside the container the server listens on `0.0.0.0` so that port publishing works. Publish it on `127.0.0.1` as shown above, or put it behind a reverse proxy with authentication, before exposing it to a network. Run `cozo-bin server --help` for the available options.
 * **Tags:** images are published to `ghcr.io` by GitHub Actions on pushes to `main` and on version tags (`v*`). Use a version or SHA tag for reproducible deployments rather than `main`.
-* **Custom options:** the arguments after the image name replace the default command, for example `docker run ... ghcr.io/jorgeandrecastro/cozo-ng:main server --help`.
+* **Custom options:** the arguments after the image name replace the default command, for example `docker run ... ghcr.io/jorgeandrecastro/cozo-bin:main server --help`.
 * **Data and upgrades:** the on-disk format is compatibility-sensitive. Back up the volume before upgrading across minor versions and read the [changelog](CHANGELOG.md).
 
 ## Architecture
@@ -393,7 +395,7 @@ Bug reports, dependency updates, and pull requests are actively welcomed.
 * [Cozo-NG Issue Tracker](https://github.com/jorgeandrecastro/cozo-ng/issues)
 * [Crates.io (`cozo-ng`)](https://crates.io/crates/cozo-ng)
 * [Rust API Docs (`docs.rs`)](https://docs.rs/cozo-ng/)
-* [Docker image (`ghcr.io`)](https://github.com/jorgeandrecastro/cozo-ng/pkgs/container/cozo-ng)
+* [Docker image (`ghcr.io`)](https://github.com/jorgeandrecastro/cozo-ng/pkgs/container/cozo-bin)
 * [Changelog](CHANGELOG.md)
 * [Upstream Documentation (CozoDB v0.7)](https://docs.cozodb.org/en/latest/)
 * [Original Upstream Repository](https://github.com/cozodb/cozo)
