@@ -3,7 +3,7 @@
 # ---- Build stage ----
 FROM rust:1-bookworm AS builder
 
-# RocksDB (cozo-ng-rocks)needs toolchain C++
+# RocksDB (cozo-ng-rocks) a besoin d'un toolchain C++
 RUN apt-get update && apt-get install -y --no-install-recommends \
     clang libclang-dev cmake pkg-config \
     && rm -rf /var/lib/apt/lists/*
@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /src
 COPY . .
 
-# Ajoute --features / --no-default-features if you need
-RUN cargo build --release -p cozo-ng-bin \
+# RocksDB doit etre active explicitement (storage-rocksdb) en plus de compact (sqlite, requests, graph-algo)
+RUN cargo build --release -p cozo-ng-bin --features compact,storage-rocksdb \
     && strip target/release/cozo-bin
 
 # ---- Runtime stage ----
