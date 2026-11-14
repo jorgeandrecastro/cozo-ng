@@ -19,7 +19,7 @@ RUN cargo build --release -p cozo-ng-bin --features compact,storage-rocksdb \
 FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
+    ca-certificates libsqlite3-0 \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --system --create-home --home-dir /data cozo
 
