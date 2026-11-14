@@ -5,6 +5,12 @@ Cozo-NG fork, not an official CozoDB upstream release. Crate versions do not
 necessarily correspond to downloadable standalone binary releases or to Docker
 image tags.
 
+## 0.12.1
+
+### Changed
+
+- Updated the engine dependency to Cozo-NG `0.11.1` for the crates.io release; no server API changes.
+
 ## 0.12.0
 
 ### Fixed

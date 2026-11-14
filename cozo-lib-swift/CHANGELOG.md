@@ -4,6 +4,10 @@ Release notes for the `cozo-ng-swift` Rust crate. Cozo-NG is an independent
 fork of CozoDB. This crate release does not publish or update upstream
 CocoaPods packages or prebuilt Swift archives.
 
+## 0.11.1
+
+- Updated the engine dependency to Cozo-NG `0.11.1`; no Swift binding API changes.
+
 ## 0.11.0
 
 - Updated the Swift binding crate to target the Cozo-NG `0.11.0` engine.

@@ -2,6 +2,16 @@
 
 Notable changes to Cozo-NG are documented here. Cozo-NG is an independent community continuation of CozoDB; upstream release history is not the release history of this fork.
 
+## 0.11.1
+
+### Added
+
+- Added `cozo-ng-cli 0.1.0`, a standalone CLI for embedded and remote databases, with query, REPL, import/export, schema, vector, and graph commands.
+- Documented CLI installation and common workflows in the main README.
+
+### Changed
+
+- Updated the engine and binding crates to `0.11.1`, the RocksDB adapter to `0.4.1`, and the standalone server to `0.12.1` for the crates.io release.
 
 ## 0.11.0
 

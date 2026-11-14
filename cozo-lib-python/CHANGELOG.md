@@ -4,6 +4,10 @@ Release notes for the `cozo-ng-python` Rust crate. Cozo-NG is an independent
 fork of CozoDB. This crate release does not publish or update the upstream
 PyPI distribution.
 
+## 0.11.1
+
+- Updated the engine dependency to Cozo-NG `0.11.1`; no Python binding API changes.
+
 ## 0.11.0
 
 - Updated the Python binding crate to target the Cozo-NG `0.11.0` engine.

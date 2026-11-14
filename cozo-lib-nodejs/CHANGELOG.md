@@ -4,6 +4,10 @@ Release notes for the `cozo-ng-node` Rust crate. Cozo-NG is an independent fork
 of CozoDB. This crate release does not publish or update the upstream npm
 package `cozo-node`.
 
+## 0.11.1
+
+- Updated the engine dependency to Cozo-NG `0.11.1`; no Node.js binding API changes.
+
 ## 0.11.0
 
 - Updated the Node.js binding crate to target the Cozo-NG `0.11.0` engine.

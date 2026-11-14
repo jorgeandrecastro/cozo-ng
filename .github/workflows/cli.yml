@@ -1,0 +1,23 @@
+# Save as .github/workflows/cli.yml
+name: CLI
+
+on:
+  push:
+    branches: [main]
+    paths: ["cozo-cli/**", "cozo-core/**", "Cargo.toml", "Cargo.lock"]
+  pull_request:
+    paths: ["cozo-cli/**", "cozo-core/**", "Cargo.toml", "Cargo.lock"]
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test -p cozo-ng-cli --locked
+      - run: cargo build -p cozo-ng-cli --release --locked

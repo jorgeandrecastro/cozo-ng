@@ -9,6 +9,7 @@ Les noms de packages de cette reprise utilisent le préfixe `cozo-ng-` pour ne p
 | Moteur Rust | `cozo-ng` | bibliothèque `cozo` |
 | Backend RocksDB | `cozo-ng-rocks` | bibliothèque `cozorocks` |
 | Serveur autonome | `cozo-ng-bin` | exécutable `cozo-bin` |
+| CLI | `cozo-ng-cli` | exécutable `cozo-ng` |
 | Binding C | `cozo-ng-c` | bibliothèque `cozo_c` |
 | Binding Java/JNI | `cozo-ng-java` | bibliothèque `cozo_java` |
 | Binding Python | `cozo-ng-python` | bibliothèque `cozo_embedded` |
@@ -20,7 +21,7 @@ Le nom du package et celui de sa bibliothèque Cargo sont distincts. Pour le mot
 
 ```toml
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.11.0" }
+cozo = { package = "cozo-ng", version = "0.11.1" }
 ```
 
 ## Avant la publication
@@ -41,6 +42,7 @@ cozo = { package = "cozo-ng", version = "0.11.0" }
    ```sh
    cargo package -p cozo-ng-rocks --list
    cargo package -p cozo-ng --list
+   cargo package -p cozo-ng-cli --list
    cargo publish -p cozo-ng-rocks --dry-run
    ```
 
@@ -48,7 +50,7 @@ cozo = { package = "cozo-ng", version = "0.11.0" }
 
 ## Ordre de publication
 
-Le moteur `cozo-ng 0.11.0` dépend optionnellement de `cozo-ng-rocks 0.3.2`. Cette dépendance doit néanmoins être disponible sur crates.io pour que le moteur puisse être publié et résolu depuis le registre.
+Le moteur `cozo-ng 0.11.1` dépend optionnellement de `cozo-ng-rocks 0.4.1`. Cette dépendance doit néanmoins être disponible sur crates.io pour que le moteur puisse être publié et résolu depuis le registre.
 
 ### 1. Publier le backend RocksDB
 
@@ -60,7 +62,7 @@ cargo publish -p cozo-ng-rocks
 Attendre l'indexation de la version, puis vérifier sa disponibilité :
 
 ```sh
-cargo info --registry crates-io cozo-ng-rocks@0.3.2
+cargo info --registry crates-io cozo-ng-rocks@0.4.1
 ```
 
 le nouveau nom est `cozo-ng-rocks`.
@@ -78,10 +80,11 @@ Le package est `cozo-ng`, mais son nom de bibliothèque reste `cozo`.
 
 ### 3. Publier les autres crates Rust
 
-Ces packages dépendent du moteur `cozo-ng 0.11.0`. Le serveur autonome est versionné séparément (`cozo-ng-bin 0.12.0`); les bindings sont en `0.11.0`. Publier et attendre l'indexation du moteur avant les bindings. Ne publier que les crates Rust prêtes pour cette version :
+Ces packages dépendent du moteur `cozo-ng 0.11.1`. Le serveur autonome est versionné séparément (`cozo-ng-bin 0.12.1`); les bindings sont en `0.11.1`. Publier et attendre l'indexation du moteur et de `cozo-ng-rocks` avant ces crates :
 
 ```sh
 cargo publish -p cozo-ng-bin
+cargo publish -p cozo-ng-cli
 cargo publish -p cozo-ng-c
 cargo publish -p cozo-ng-java
 cargo publish -p cozo-ng-python
@@ -97,8 +100,10 @@ On peut d'abord remplacer chaque commande par `cargo publish -p <package> --dry-
 Vérifier la présence des versions sur crates.io et tester une résolution depuis le registre, pas seulement depuis le workspace local :
 
 ```sh
-cargo info --registry crates-io cozo-ng@0.11.0
-cargo info --registry crates-io cozo-ng-rocks@0.3.2
+cargo info --registry crates-io cozo-ng@0.11.1
+cargo info --registry crates-io cozo-ng-bin@0.12.1
+cargo info --registry crates-io cozo-ng-rocks@0.4.1
+cargo info --registry crates-io cozo-ng-cli@0.1.0
 ```
 
 Mettre ensuite à jour les liens de release et annoncer les crates réellement publiées. La publication sur crates.io ne publie pas les paquets npm, Python/PyPI ni les artefacts Swift : ces distributions ont leurs propres procédures et noms.
