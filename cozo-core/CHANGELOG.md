@@ -9,7 +9,7 @@ CozoDB releases. The package is `cozo-ng`, while the Rust library remains
 
 ### Changed
 
-- Split the database runtime implementation into focused modules under `runtime/db/`, while preserving the existing public and crate-level module paths.
+- Moved the database runtime from the single `src/runtime/db.rs` file into focused modules under `src/runtime/db/`, preserving the existing `cozo::runtime::db` module path and public API.
 
 ## 0.9.0
 

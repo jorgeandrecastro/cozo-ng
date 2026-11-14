@@ -4,12 +4,14 @@ Release notes for the `cozo-ng-rocks` crate. This crate is part of the
 independently maintained Cozo-NG fork and is not an official CozoDB upstream
 release.
 
+## 0.3.2
+- Aligned documentation and harmonized dependency versions across the project.
 
 ## 0.3.1
 
 ### Changed
 
-- Split the database runtime implementation into focused modules under `runtime/db/`, while preserving the existing public and crate-level module paths (cozo-ng) .
+- Aligned this adapter release with the Cozo-NG 0.10 engine, whose database runtime was reorganized under `cozo-core/src/runtime/db/`. The refactor does not change the RocksDB adapter API.
 
 ## 0.3.0
 

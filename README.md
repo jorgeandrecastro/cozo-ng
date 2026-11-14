@@ -23,7 +23,7 @@
 
 ## 🚀 Roadmap: v0.10 (Current Focus)
 
-Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name. The `0.10.0` release continues this independent maintenance with a Rust-first focus on the embedded engine and its use as a data layer for AI agents and GraphRAG.
+Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name. The `0.10.1` release continues this independent maintenance with a Rust-first focus on the embedded engine and its use as a data layer for AI agents and GraphRAG.
 
 The focus is a high-performance, transactional, embedded Rust database that brings together relational storage, Datalog-powered knowledge graphs, and HNSW vector search. It is designed to give Rust AI agents and GraphRAG applications a local, in-process data layer.
 
@@ -262,7 +262,8 @@ cozo-ng/
 │       ├── data/              # Values, expressions, and relational data
 │       ├── parse/             # CozoScript parsing
 │       ├── query/             # Datalog compilation and query execution
-│       ├── runtime/           # Transactions, database operations, indexes
+│       ├── runtime/           # Transactions, indexes, and database runtime
+│   └── db/            # Database operations, execution, backup, import/export
 │       ├── fixed_rule/        # Graph algorithms and query utilities
 │       ├── fts/               # Full-text search
 │       └── storage/           # Memory and persistent storage backends

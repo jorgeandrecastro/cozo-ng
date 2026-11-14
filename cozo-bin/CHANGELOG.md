@@ -4,6 +4,12 @@ Release notes for the `cozo-ng-bin` Rust crate. This is part of the independent
 Cozo-NG fork, not an official CozoDB upstream release. Crate versions do not
 necessarily correspond to downloadable standalone binary releases.
 
+## 0.11.0
+
+### Changed
+
+- Updated the standalone server crate release to follow the Cozo-NG 0.10 engine, whose database runtime was reorganized under `cozo-core/src/runtime/db/` without changing the engine's public API.
+
 ## 0.10.0
 
 - Updated the server crate to use the Cozo-NG `0.10.0` engine.

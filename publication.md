@@ -20,7 +20,7 @@ Le nom du package et celui de sa bibliothèque Cargo sont distincts. Pour le mot
 
 ```toml
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.9.0" }
+cozo = { package = "cozo-ng", version = "0.10.0" }
 ```
 
 ## Avant la publication
@@ -48,7 +48,7 @@ cozo = { package = "cozo-ng", version = "0.9.0" }
 
 ## Ordre de publication
 
-Le moteur `cozo-ng 0.9.0` dépend optionnellement de `cozo-ng-rocks 0.3.0`. Cette dépendance doit néanmoins être disponible sur crates.io pour que le moteur puisse être publié et résolu depuis le registre.
+Le moteur `cozo-ng 0.10.0` dépend optionnellement de `cozo-ng-rocks 0.3.1`. Cette dépendance doit néanmoins être disponible sur crates.io pour que le moteur puisse être publié et résolu depuis le registre.
 
 ### 1. Publier le backend RocksDB
 
@@ -60,7 +60,7 @@ cargo publish -p cozo-ng-rocks
 Attendre l'indexation de la version, puis vérifier sa disponibilité :
 
 ```sh
-cargo info --registry crates-io cozo-ng-rocks@0.3.0
+cargo info --registry crates-io cozo-ng-rocks@0.3.1
 ```
 
 le nouveau nom est `cozo-ng-rocks`.
@@ -78,7 +78,7 @@ Le package est `cozo-ng`, mais son nom de bibliothèque reste `cozo`.
 
 ### 3. Publier les autres crates Rust
 
-Ces packages sont alignés sur le moteur `cozo-ng 0.9.0`. Publier et attendre l'indexation du moteur avant les bindings. Ne publier que les crates Rust prêtes pour cette version :
+Ces packages dépendent du moteur `cozo-ng 0.10.0`. Leurs versions de crate sont indépendantes de celle du moteur; vérifier chaque manifeste avant publication. Publier et attendre l'indexation du moteur avant les bindings. Ne publier que les crates Rust prêtes pour cette version :
 
 ```sh
 cargo publish -p cozo-ng-bin
@@ -97,8 +97,8 @@ On peut d'abord remplacer chaque commande par `cargo publish -p <package> --dry-
 Vérifier la présence des versions sur crates.io et tester une résolution depuis le registre, pas seulement depuis le workspace local :
 
 ```sh
-cargo info --registry crates-io cozo-ng@0.9.0
-cargo info --registry crates-io cozo-ng-rocks@0.3.0
+cargo info --registry crates-io cozo-ng@0.10.0
+cargo info --registry crates-io cozo-ng-rocks@0.3.1
 ```
 
 Mettre ensuite à jour les liens de release et annoncer les crates réellement publiées. La publication sur crates.io ne publie pas les paquets npm, Python/PyPI ni les artefacts Swift : ces distributions ont leurs propres procédures et noms.

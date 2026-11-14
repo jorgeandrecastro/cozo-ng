@@ -13,7 +13,7 @@ community-driven, with no guaranteed release or compatibility schedule.
 Contributions to build, test, document, or maintain a Swift integration are
 welcome.
 
-The `cozo-ng-swift` crate is version `0.9.0` and targets the Cozo-NG 0.9
+The `cozo-ng-swift` crate is version `0.10.0` and targets the Cozo-NG 0.10
 engine. The CocoaPods package and prebuilt archives described below remain
 upstream distributions, not Cozo-NG releases. See the
 [crate changelog](CHANGELOG.md).

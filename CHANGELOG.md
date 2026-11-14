@@ -2,12 +2,18 @@
 
 Notable changes to Cozo-NG are documented here. Cozo-NG is an independent community continuation of CozoDB; upstream release history is not the release history of this fork.
 
+
+## 0.10.1
+
+- Aligned documentation and harmonized dependency versions across the project.
+
+
 ## 0.10.0
 
 ### Changed
 
 - Released the Rust engine as `cozo-ng 0.10.0`, preserving the Rust library name `cozo`.
-- Split the database runtime implementation into focused modules under `cozo-core/src/runtime/db/` while preserving existing public and crate-level module paths.
+- Moved the database runtime from the single `cozo-core/src/runtime/db.rs` file into focused modules under `cozo-core/src/runtime/db/`, preserving the existing `cozo::runtime::db` module path and public API.
 
 ## 0.9.0
 
