@@ -9,6 +9,7 @@ repository = "https://github.com/jorgeandrecastro/cozo-ng"
 readme = "README.md"
 keywords = ["cli", "database", "graph", "datalog", "vector-search"]
 categories = ["command-line-utilities", "database"]
+authors = ["Castro Jorge Andre"]
 
 [[bin]]
 name = "cozo-ng"
