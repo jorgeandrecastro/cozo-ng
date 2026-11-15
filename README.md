@@ -2,6 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/cozo-ng)](https://crates.io/crates/cozo-ng)
 [![CLI on crates.io](https://img.shields.io/crates/v/cozo-ng-cli)](https://crates.io/crates/cozo-ng-cli)
+[![Cleaner on crates.io](https://img.shields.io/crates/v/cozo-ng-cleaner)](https://crates.io/crates/cozo-ng-cleaner)
 [![docs.rs](https://img.shields.io/docsrs/cozo-ng?label=docs.rs)](https://docs.rs/cozo-ng)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/build.yml?branch=main)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/build.yml)
 [![Docker](https://img.shields.io/github/actions/workflow/status/jorgeandrecastro/cozo-ng/Docker.yaml?branch=main&label=docker)](https://github.com/jorgeandrecastro/cozo-ng/actions/workflows/Docker.yaml)
@@ -28,6 +29,7 @@
 2. [Getting started](#Getting-started)
 3. [Install](#Install)
 4. [Command-line interface](#Command-line-interface)
+   - [Data cleaning for AI and GraphRAG](#data-cleaning-for-ai-and-graphrag)
 5. [Run with Docker](#Run-with-Docker)
 6. [Architecture](#Architecture)
 7. [Status of the project](#Status-of-the-project)
@@ -46,6 +48,7 @@ Why Cozo-NG for AI and local-first applications?
 * **One local data layer:** Keep structured relationships and semantic embeddings close to the application, reducing operational components for local-first and agentic systems.
 * **Docker image for everyone else:** Run the same engine as an HTTP server in one command, with no Rust or C++ toolchain, and talk to it from any language.
 * **A dedicated CLI:** Query embedded or remote databases, import and export data, use vector and graph commands, or explore a database in the REPL.
+* **Data preparation for GraphRAG:** Clean, validate, deduplicate and chunk source data with the standalone `cozo-ng-cleaner` crate or the CLI before importing it.
 
 The v0.12 roadmap:
 * [x] **Fork initialization:** Establish the independent project, licensing, crate namespace, and repository structure.
@@ -236,6 +239,12 @@ are welcome.
 
 Python, Java, Swift, Node.js, WebAssembly, C, and other non-Rust bindings are not current core-maintenance priorities. The original upstream packages may not contain Cozo-NG changes. Please coordinate with the project if you would like to contribute or take responsibility for one of these bindings. In the meantime, the [Docker image](#Run-with-Docker) gives any language access to the engine over HTTP.
 
+The [Python binding](./cozo-lib-python/README.md) is configured as the
+`cozo-ng` PyPI distribution with the `cozo_embedded` module. Its
+[PyPI workflow](./.github/workflows/pypi.yaml) builds Linux, Windows and macOS
+artifacts and uploads them on tag refs; see the binding README for setup and
+publication details. Availability depends on a successful release.
+
 Storage legend:
 * **M**: In-memory, non-persistent backend
 * **Q**: [SQLite](https://www.sqlite.org/) storage backend
@@ -266,15 +275,35 @@ backups, vector search, graph algorithms, shell completions, and scriptable
 JSON/CSV/NDJSON output. See the [CLI guide](./cozo-cli/README.md) for all
 commands and configuration.
 
-The `clean` command prepares CSV, TSV, JSON, or JSONL data using
-[`cozo-ng-cleaner`](./cozo-cleaner/README.md), either writing the cleaned
-records or importing them into an existing relation:
+### Data cleaning for AI and GraphRAG
+
+[`cozo-ng-cleaner`](./cozo-cleaner/README.md) prepares CSV, TSV, JSON and JSONL
+data before import or embedding. Its ordered TOML or Rust pipelines can
+normalize Unicode and text, convert and validate values, remove duplicates,
+strip HTML, split documents into overlapping chunks and create deterministic
+IDs. Reports summarize each step, and rejected rows can be saved with their
+original row numbers and reasons.
+
+The CLI includes `clean` by default. Write cleaned records to a file or import
+them into an existing relation:
 
 ```sh
 cozo-ng clean --example-config > pipeline.toml
 cozo-ng clean docs.csv -c pipeline.toml -o clean.jsonl --rejects rejects.jsonl
 cozo-ng -d sqlite:./app.db clean docs.csv -c pipeline.toml --into doc
 ```
+
+The standard pipeline runs without a configuration file; `--dry-run` previews
+the report without writing data. Cleaner can also be used independently of the
+database as a Rust library:
+
+```toml
+[dependencies]
+cozo-ng-cleaner = "0.1"
+```
+
+See the [cleaner guide](./cozo-cleaner/README.md) for all pipeline steps and
+library examples.
 
 ### Tuning the RocksDB backend
 

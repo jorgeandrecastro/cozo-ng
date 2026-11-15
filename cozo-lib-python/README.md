@@ -1,36 +1,66 @@
-# cozo-lib-python
+# Cozo-NG Python bindings
 
-[![pypi](https://img.shields.io/pypi/v/cozo_embedded)](https://pypi.org/project/cozo_embedded/)
+[![PyPI](https://img.shields.io/pypi/v/cozo-ng)](https://pypi.org/project/cozo-ng/)
 
-Native bindings for embedding [CozoDB](https://www.cozodb.org) in Python, providing the
-`cozo_embedded` package.
+Native Python bindings for the independent [Cozo-NG](https://github.com/jorgeandrecastro/cozo-ng)
+embedded graph and vector database. The Rust crate is `cozo-ng-python`; the
+configured Python distribution is `cozo-ng` version `0.12.0`, and its extension
+module is named `cozo_embedded`. See the [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-python/CHANGELOG.md).
 
-Cozo-NG is an independent fork and community-maintained continuation of
-[CozoDB](https://github.com/cozodb/cozo), not an official upstream release. It
-sets its own Rust-first direction: an embedded data layer for AI agents and
-GraphRAG combining relational data, Datalog knowledge graphs, and vector
-search. Maintenance focuses on the embedded Rust engine; Python support is
-community-driven, with no guaranteed release or compatibility schedule. The
-PyPI package linked below is an upstream distribution and is not a Cozo-NG
-release. Contributions to build, test, document, or maintain Python bindings
-for Cozo-NG are warmly welcome.
+## Installation and usage
 
-The `cozo-ng-python` crate is version `0.12.0` and targets the Cozo-NG 0.12.0
-engine. The PyPI distribution linked above remains upstream and is not a Cozo-NG release.
-See the [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-python/CHANGELOG.md).
+Once this version has been published to PyPI, install the distribution with:
 
-The linked [PyCozo](https://github.com/cozodb/pycozo) package is the upstream
-Python distribution and depends on the upstream binding; it does not currently
-provide a Cozo-NG release. This directory is a starting point for community
-work to build and maintain a Python integration for the fork.
-
-To build this package, you need to install the Rust toolchain
-as well as the [maturin](https://github.com/PyO3/maturin) python package.
-Then run
-
-```bash
-maturin build -F compact -F storage-rocksdb --release
+```sh
+python -m pip install cozo-ng
 ```
 
-Refer maturin's docs for more information about how to [develop](https://www.maturin.rs/develop.html)
-and [build](https://www.maturin.rs/distribution.html) this package.
+The distribution name differs from the module name:
+
+```python
+from cozo_embedded import CozoDbPy
+
+db = CozoDbPy("mem", "", "{}")
+result = db.run_script("?[x] <- [[1], [2]]", {}, False)
+print(result["headers"], result["rows"])
+```
+
+The package metadata requires Python 3.7 or newer. The configured build enables
+SQLite, RocksDB, graph algorithms and the engine's request utilities.
+
+## Building from source
+
+Install a Rust toolchain, the native build requirements for RocksDB and
+[maturin](https://github.com/PyO3/maturin). From the repository root:
+
+```sh
+cd cozo-lib-python
+maturin build --release -F compact -F storage-rocksdb
+```
+
+See the maturin documentation for [development](https://www.maturin.rs/develop.html)
+and [building](https://www.maturin.rs/distribution.html).
+
+## PyPI release workflow
+
+The [PyPI Release workflow](https://github.com/jorgeandrecastro/cozo-ng/blob/main/.github/workflows/pypi.yaml)
+runs on pushes to `main` or `master`, pushes of tags matching `v*`, and manual
+dispatch. Its Linux, Windows and macOS jobs use maturin to build wheels with
+`compact` and `storage-rocksdb`; Linux also produces a source distribution and
+macOS requests universal2 wheels. Each job uploads its output as a GitHub
+Actions artifact.
+
+The PyPI upload job runs only for a tag ref, after all three build jobs succeed.
+It downloads their artifacts and uploads them with `--skip-existing`, using the
+repository secret `PYPI_API_TOKEN`. Configure that secret with a token
+authorized to publish the `cozo-ng` project before triggering a tag release.
+The workflow uses the version in `pyproject.toml`; ensure it matches the intended
+release and the Rust crate version before publishing. A workflow or version
+configuration alone does not mean the distribution has been published.
+
+## Upstream packages
+
+Cozo-NG is an independent continuation of CozoDB. The upstream
+[`cozo_embedded`](https://pypi.org/project/cozo_embedded/) distribution and
+[PyCozo](https://github.com/cozodb/pycozo) are separate projects, not Cozo-NG
+releases. The new distribution retains `cozo_embedded` as its module name.

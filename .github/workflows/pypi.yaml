@@ -1,0 +1,74 @@
+name: PyPI Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: messense/maturin-action@v1
+        with:
+          working-directory: cozo-lib-python
+          manylinux: auto
+          command: build
+          args: --release --sdist -o dist --find-interpreter -F compact -F storage-rocksdb
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-linux
+          path: cozo-lib-python/dist/*
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: messense/maturin-action@v1
+        with:
+          working-directory: cozo-lib-python
+          command: build
+          args: --release -o dist --find-interpreter -F compact -F storage-rocksdb
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-windows
+          path: cozo-lib-python/dist/*
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: messense/maturin-action@v1
+        with:
+          working-directory: cozo-lib-python
+          command: build
+          args: --release -o dist --universal2 --find-interpreter -F compact -F storage-rocksdb
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-macos
+          path: cozo-lib-python/dist/*
+
+  release:
+    name: Release to PyPI
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [linux, windows, macos]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Publish to PyPI
+        uses: messense/maturin-action@v1
+        env:
+          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        with:
+          command: upload
+          args: --skip-existing artifacts/wheels-*/*
