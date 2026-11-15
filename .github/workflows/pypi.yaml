@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
       - uses: messense/maturin-action@v1
         with:
           working-directory: cozo-lib-python
-          rust-toolchain: stable
-          manylinux: auto
+          manylinux: manylinux_2_28
           command: build
           args: --release --sdist -o dist --find-interpreter -F compact -F storage-rocksdb
       - name: Upload wheels
@@ -31,10 +31,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
       - uses: messense/maturin-action@v1
         with:
           working-directory: cozo-lib-python
-          rust-toolchain: stable
           command: build
           args: --release -o dist --find-interpreter -F compact -F storage-rocksdb
       - name: Upload wheels
@@ -47,10 +47,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
       - uses: messense/maturin-action@v1
         with:
           working-directory: cozo-lib-python
-          rust-toolchain: stable
           command: build
           args: --release -o dist --universal2 --find-interpreter -F compact -F storage-rocksdb
       - name: Upload wheels
