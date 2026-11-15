@@ -58,7 +58,7 @@ jobs:
           working-directory: cozo-lib-python
           rust-toolchain: stable
           command: build
-          args: --release -o dist --universal2 --find-interpreter -F compact -F storage-rocksdb
+          args: --release -o dist --find-interpreter -F compact -F storage-rocksdb
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
