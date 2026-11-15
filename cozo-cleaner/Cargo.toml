@@ -1,0 +1,20 @@
+[package]
+name = "cozo-ng-cleaner"
+version = "0.1.0"
+edition = "2024"
+license = "MPL-2.0"
+description = "Data cleaning and preparation pipelines (normalization, typing, validation, deduplication, chunking) for Cozo-NG, AI agents and GraphRAG"
+homepage = "https://github.com/jorgeandrecastro/cozo-ng"
+repository = "https://github.com/jorgeandrecastro/cozo-ng"
+documentation = "https://docs.rs/cozo-ng-cleaner"
+readme = "README.md"
+keywords = ["data-cleaning", "etl", "rag", "csv", "text-processing"]
+categories = ["data-structures", "text-processing", "command-line-utilities"]
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
+toml = "0.8"
+csv = "1"
+regex = "1"
+unicode-normalization = "0.1"

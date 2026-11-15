@@ -148,3 +148,86 @@ fn completions_are_generated() {
         .success()
         .stdout(predicate::str::contains("cozo-ng"));
 }
+
+// ---- `clean` -------------------------------------------------------------------------------
+
+#[test]
+fn clean_standard_pipeline_to_stdout() {
+    let dir = TempDir::new().unwrap();
+    let f = dir.path().join("in.csv");
+    std::fs::write(&f, "name,city\n  Ada   Lovelace ,London\nAda Lovelace,London\n,\nBob,N/A\n").unwrap();
+    cozo(&dir)
+        .args(["clean", f.to_str().unwrap(), "-q"])
+        .assert()
+        .success()
+        .stdout("{\"name\":\"Ada Lovelace\",\"city\":\"London\"}\n{\"name\":\"Bob\",\"city\":null}\n");
+}
+
+#[test]
+fn clean_with_config_rejects_and_output_file() {
+    let dir = TempDir::new().unwrap();
+    let f = dir.path().join("in.csv");
+    std::fs::write(&f, "id,price\n1,10\n2,abc\n3,-5\n").unwrap();
+    let cfg = dir.path().join("p.toml");
+    std::fs::write(
+        &cfg,
+        "[[steps]]\nop = \"cast\"\ntypes = { id = \"int\", price = \"float\" }\non_error = \"reject\"\n\
+         [[steps]]\nop = \"validate\"\nrules = [{ column = \"price\", min = 0 }]\n",
+    )
+    .unwrap();
+    let out = dir.path().join("clean.jsonl");
+    let rej = dir.path().join("rej.jsonl");
+    cozo(&dir)
+        .args(["clean", f.to_str().unwrap(), "-c", cfg.to_str().unwrap(), "-o", out.to_str().unwrap()])
+        .args(["--rejects", rej.to_str().unwrap()])
+        .assert()
+        .success()
+        .stderr(predicate::str::contains("rows: 3 in, 1 out, 2 rejected"));
+    assert_eq!(std::fs::read_to_string(&out).unwrap(), "{\"id\":1,\"price\":10.0}\n");
+    let rejects = std::fs::read_to_string(&rej).unwrap();
+    assert_eq!(rejects.lines().count(), 2);
+    assert!(rejects.contains("\"row\":2") && rejects.contains("\"row\":3"));
+}
+
+#[test]
+fn clean_into_relation_types_values_from_the_schema() {
+    let dir = TempDir::new().unwrap();
+    cozo(&dir).args(["query", ":create item {id: Int => name: String, price: Float?}"]).assert().success();
+    let f = dir.path().join("items.csv");
+    std::fs::write(&f, "id,name,price\n1, Widget ,9.5\n1,Widget,9.5\n2,Gadget,N/A\n").unwrap();
+    cozo(&dir).args(["clean", f.to_str().unwrap(), "--into", "item", "-q"]).assert().success();
+    cozo(&dir)
+        .args(["export", "-r", "item", "-f", "csv"])
+        .assert()
+        .success()
+        .stdout("id,name,price\n1,Widget,9.5\n2,Gadget,null\n");
+}
+
+#[test]
+fn clean_dry_run_writes_nothing_and_example_config_is_valid() {
+    let dir = TempDir::new().unwrap();
+    cozo(&dir).args(["query", ":create t {a: Int}"]).assert().success();
+    let f = dir.path().join("t.csv");
+    std::fs::write(&f, "a\n1\n2\n").unwrap();
+    cozo(&dir).args(["clean", f.to_str().unwrap(), "--into", "t", "--dry-run"]).assert().success().stderr(predicate::str::contains("dry run"));
+    cozo(&dir).args(["query", "?[count(a)] := *t{a}"]).assert().success().stdout("{\"count(a)\":0}\n");
+
+    let example = cozo(&dir).args(["clean", "--example-config"]).assert().success().get_output().stdout.clone();
+    let cfg = dir.path().join("example.toml");
+    std::fs::write(&cfg, example).unwrap();
+    std::fs::write(dir.path().join("x.csv"), "id,title\n1,a\n").unwrap();
+    // the example casts `price`, which this file lacks: the error names the step and the column
+    cozo(&dir)
+        .args(["clean", dir.path().join("x.csv").to_str().unwrap(), "-c", cfg.to_str().unwrap()])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("unknown column"));
+}
+
+#[test]
+fn clean_into_unknown_relation_fails_early() {
+    let dir = TempDir::new().unwrap();
+    let f = dir.path().join("a.csv");
+    std::fs::write(&f, "a\n1\n").unwrap();
+    cozo(&dir).args(["clean", f.to_str().unwrap(), "--into", "nope"]).assert().failure().stderr(predicate::str::contains("relation_not_found"));
+}

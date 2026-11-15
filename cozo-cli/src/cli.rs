@@ -56,6 +56,9 @@ pub enum Cmd {
     Query(QueryArgs),
     /// Run a CozoScript file
     Run(RunArgs),
+    /// Clean and prepare data (normalize, type, validate, deduplicate, chunk), then write it or import it
+    #[cfg(feature = "cleaner")]
+    Clean(CleanArgs),
     /// Interactive shell with multi-line input, history and completion
     Repl,
     /// List relations
@@ -176,6 +179,44 @@ pub struct ImportArgs {
     /// CSV without a header row: columns are taken in relation order
     #[arg(long)]
     pub no_header: bool,
+}
+
+#[cfg(feature = "cleaner")]
+#[derive(Args, Debug)]
+pub struct CleanArgs {
+    /// Input file: CSV, TSV, JSON or JSONL ("-" for stdin)
+    #[arg(required_unless_present = "example_config")]
+    pub file: Option<String>,
+    /// Pipeline file (TOML). Without it a standard pipeline runs: normalize text, nulls, drop empty rows, dedup
+    #[arg(short, long)]
+    pub config: Option<PathBuf>,
+    /// Write the clean data to a file (format from the extension: csv, tsv, json, jsonl)
+    #[arg(short, long, conflicts_with = "into")]
+    pub output: Option<PathBuf>,
+    /// Write rejected rows, with the reason, to a JSONL file
+    #[arg(long)]
+    pub rejects: Option<PathBuf>,
+    /// Import the clean data into this existing relation instead of writing a file
+    #[arg(long, value_name = "RELATION")]
+    pub into: Option<String>,
+    /// Operation used with --into
+    #[arg(long, value_enum, default_value = "put")]
+    pub op: PutOp,
+    /// Rows per transaction with --into
+    #[arg(long, default_value_t = 1000)]
+    pub batch: usize,
+    /// Input format [default: from the file extension]
+    #[arg(short = 'i', long, value_enum)]
+    pub input_format: Option<InputFormat>,
+    /// Run the pipeline and show the report, but write nothing
+    #[arg(long)]
+    pub dry_run: bool,
+    /// Print a complete example pipeline file and exit
+    #[arg(long)]
+    pub example_config: bool,
+    /// Do not print the report
+    #[arg(short, long)]
+    pub quiet: bool,
 }
 
 #[derive(Args, Debug)]

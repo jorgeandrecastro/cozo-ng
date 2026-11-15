@@ -4,8 +4,8 @@
 
 The command-line tool for [Cozo-NG](https://github.com/jorgeandrecastro/cozo-ng): one binary to query, import, export,
 back up and explore a database, **embedded or remote**, with the same commands.
-This is the first crates.io release, `cozo-ng-cli 0.1.0`, targeting the
-Cozo-NG `0.11.1` engine. See the [CLI changelog](CHANGELOG.md).
+Version `0.2.0` targets the Cozo-NG `0.12.0` engine and adds data cleaning
+through `cozo-ng-cleaner`. See the [CLI changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-cli/CHANGELOG.md).
 
 ```text
 cozo-ng -d sqlite:./app.db  query "?[count(id)] := *doc{id}"
@@ -16,24 +16,24 @@ cozo-ng -d http://localhost:9070 --token $TOKEN  query "::relations"
 * **Script-friendly**: table on a terminal, NDJSON when piped, plus `json` and `csv`; stdin input; proper exit codes.
 * **Cozo diagnostics preserved**: the underlined, `miette`-style errors of the engine are shown as-is.
 * **A real REPL**: multi-line input, persistent history, completion of relations / columns / functions, syntax colouring.
-* **Built for AI and GraphRAG**: CSV/JSONL import with embeddings, HNSW index creation, vector search, PageRank / neighbours / shortest path.
+* **Built for AI and GraphRAG**: CSV/JSONL import with embeddings, data cleaning and chunking, HNSW index creation, vector search, PageRank / neighbours / shortest path.
 
 ## Install
 
-Install from crates.io:
+From crates.io:
 
 ```sh
-cargo install cozo-ng-cli                          # SQLite backend (default)
+cargo install cozo-ng-cli                          # SQLite, graph algorithms and cleaner (default)
 cargo install cozo-ng-cli --features full          # + RocksDB (needs a C++ toolchain, slow to compile)
 ```
 
-To install directly from a local workspace checkout, use
-`cargo install --path cozo-cli` (add `--features full` to enable RocksDB).
+From a workspace checkout, use `cargo install --path cozo-cli`.
 
 | Feature     | Default | Effect |
 |-------------|:-------:|--------|
 | `sqlite`    | yes | `sqlite:` databases, `backup` / `restore` |
 | `graph-algo`| yes | `graph …` commands and graph algorithms in scripts |
+| `cleaner`   | yes | `clean` command ([`cozo-ng-cleaner`](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-cleaner/README.md)) |
 | `rocksdb`   | no  | `rocksdb:` databases |
 | `full`      | no  | all of the above |
 
@@ -61,6 +61,7 @@ The database comes from `-d/--db`, then `$COZO_DB`, then `default_db` in the con
 | `relations` | list relations |
 | `schema show [REL]` / `schema dump [REL]` | columns, or `:create` statements that recreate the schema |
 | `import <file\|-> -r REL` | CSV / JSON / JSONL → relation, in batches |
+| `clean <file>` | clean and prepare data (normalize, type, validate, dedup, chunk), then write a file or `--into` a relation |
 | `export -r REL` | relation → table / json / ndjson / csv |
 | `backup <file>` / `restore <file>` | SQLite backup and restore |
 | `explain <script>` | query plan |
@@ -115,6 +116,28 @@ cozo-ng -d sqlite:app.db export -r route -c fr,to --limit 10 -f json
 extension (`-i` overrides it), and writes `--batch` rows (default 1000) per transaction with `--op put|insert|update|ensure|rm`.
 Vector columns can be given as JSON arrays (`"[0.1, 0.2, 0.3]"` in CSV, a real array in JSON/JSONL).
 Each batch is its own transaction: if a batch fails, earlier batches stay committed and the error says how many rows went in.
+
+### Clean data before it goes in
+
+`clean` runs a pipeline from [`cozo-ng-cleaner`](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-cleaner/README.md) and then writes a file or imports straight into a relation.
+
+```sh
+cozo-ng clean --example-config > pipeline.toml                 # a complete, commented starting point
+cozo-ng clean docs.csv -c pipeline.toml --dry-run              # report only
+cozo-ng clean docs.csv -c pipeline.toml -o clean.jsonl --rejects rejects.jsonl
+cozo-ng -d sqlite:kb.db clean docs.csv -c pipeline.toml --into chunk
+```
+
+```console
+$ cozo-ng clean docs.csv -c pipeline.toml --rejects rejects.jsonl -q
+{"chunk_id":"45b6c118185ec5cb","doc_id":1,"title":"Intro to Graphs","chunk_index":0,"body":"Graphs model relationships. …"}
+…
+```
+
+Without `-c`, a standard pipeline runs (normalize text, placeholders to nulls, drop empty rows, drop duplicates).
+Rejected rows keep their original row number and the reason. The report goes to stderr (hide it with `-q`).
+With `--into`, the relation must exist; strings are converted to its column types. The `cleaner` feature is on by default
+(`--no-default-features --features sqlite,graph-algo` builds without it).
 
 ### Schema as code
 

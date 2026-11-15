@@ -1,6 +1,6 @@
 [package]
 name = "cozo-ng-cli"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 license = "MPL-2.0"
 description = "The Cozo-NG command-line tool: query, import/export, vector search and graph algorithms on embedded or remote Cozo-NG databases"
@@ -16,18 +16,21 @@ name = "cozo-ng"
 path = "src/main.rs"
 
 [features]
-default = ["sqlite", "graph-algo"]
+default = ["sqlite", "graph-algo", "cleaner"]
 ## SQLite storage backend (bundled, easy to compile).
 sqlite = ["cozo/minimal"]
 ## Graph algorithms (PageRank, Dijkstra, ...), needed by `cozo-ng graph`.
 graph-algo = ["cozo/graph-algo"]
+## `cozo-ng clean`: data cleaning and preparation (cozo-ng-cleaner).
+cleaner = ["dep:cozo-ng-cleaner"]
 ## RocksDB storage backend (slow to compile, needs a C++ toolchain).
 rocksdb = ["cozo/storage-rocksdb"]
 ## Everything.
-full = ["sqlite", "graph-algo", "rocksdb"]
+full = ["sqlite", "graph-algo", "cleaner", "rocksdb"]
 
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.11.1", path = "../cozo-core", default-features = false }
+cozo = { package = "cozo-ng", version = "0.12.0", path = "../cozo-core", default-features = false }
+cozo-ng-cleaner = { version = "0.1", path = "../cozo-cleaner", optional = true }
 clap = { version = "4.6", features = ["derive", "env", "wrap_help"] }
 clap_complete = "4"
 rustyline = "19.0"

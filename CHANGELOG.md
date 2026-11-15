@@ -2,6 +2,17 @@
 
 Notable changes to Cozo-NG are documented here. Cozo-NG is an independent community continuation of CozoDB; upstream release history is not the release history of this fork.
 
+## 0.12.0
+
+### Added
+
+- Added the independent `cozo-ng-cleaner 0.1.0` crate for data cleaning and preparation pipelines.
+- Added the `clean` command to `cozo-ng-cli 0.2.0`, with file output and import into existing relations; the `cleaner` feature is enabled by default.
+
+### Changed
+
+- Updated the engine and binding crates to `0.12.0`, the RocksDB adapter to `0.5.0`, and the standalone server to `0.13.0`.
+
 ## 0.11.1
 
 ### Added

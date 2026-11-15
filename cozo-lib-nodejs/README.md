@@ -13,9 +13,9 @@ binding is a community integration surface. The npm package linked below is
 the original upstream distribution, not a Cozo-NG release. Contributions to
 build, test, document, or maintain a Cozo-NG-compatible binding are welcome.
 
-The `cozo-ng-node` crate is version `0.11.1` and targets the Cozo-NG 0.11.1
+The `cozo-ng-node` crate is version `0.12.0` and targets the Cozo-NG 0.12.0
 engine. The npm package `cozo-node` linked below remains an upstream
-distribution, not a Cozo-NG release. See the [crate changelog](CHANGELOG.md).
+distribution, not a Cozo-NG release. See the [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-nodejs/CHANGELOG.md).
 
 This document describes how to set up the Cozo module for use in NodeJS.
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
@@ -131,7 +131,7 @@ More information are [here](https://docs.cozodb.org/en/latest/nonscript.html).
 
 There are API for multi-statement transactions, mutation callbacks and implementing custom fixed rules
 for NodeJS, much like the [Python counterpart](https://github.com/cozodb/pycozo). If you are interested,
-look at this [example](./example.js).
+look at this [example](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-nodejs/example.js).
 
 ## Building
 

@@ -13,10 +13,10 @@ community-driven, with no guaranteed release or compatibility schedule.
 Contributions to build, test, document, or maintain a Swift integration are
 welcome.
 
-The `cozo-ng-swift` crate is version `0.11.1` and targets the Cozo-NG 0.11.1
+The `cozo-ng-swift` crate is version `0.12.0` and targets the Cozo-NG 0.12.0
 engine. The CocoaPods package and prebuilt archives described below remain
 upstream distributions, not Cozo-NG releases. See the
-[crate changelog](CHANGELOG.md).
+[crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-swift/CHANGELOG.md).
 
 This document describes how to set up the Cozo module for use in Swift on Apple hardware.
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).

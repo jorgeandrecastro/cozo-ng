@@ -1,4 +1,6 @@
 mod admin;
+#[cfg(feature = "cleaner")]
+mod clean;
 mod data;
 mod graph;
 mod query;
@@ -73,6 +75,8 @@ pub fn dispatch(cli: Cli) -> Result<()> {
         Cmd::Query(a) => query::query(&ctx, &a.script, &a.params, a.immutable, a.timer),
         Cmd::Run(a) => query::run_file(&ctx, &a.file, &a.params, a.immutable, a.timer),
         Cmd::Explain(a) => query::explain(&ctx, &a.script),
+        #[cfg(feature = "cleaner")]
+        Cmd::Clean(a) => clean::run(&ctx, a),
         Cmd::Repl => crate::repl::run(ctx),
         Cmd::Relations => ctx.emit(&ctx.read("::relations")?),
         Cmd::Schema(s) => schema::run(&ctx, s),

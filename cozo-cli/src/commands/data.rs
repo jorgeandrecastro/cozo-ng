@@ -7,7 +7,7 @@ use serde_json::Value as JsonValue;
 
 use super::schema::{columns, Column};
 use super::Ctx;
-use crate::cli::{ExportArgs, ImportArgs, InputFormat};
+use crate::cli::{ExportArgs, ImportArgs, InputFormat, PutOp};
 use crate::output::render;
 use crate::util::{ident, read_input};
 
@@ -45,9 +45,9 @@ fn coerce(s: &str, ty: &str) -> JsonValue {
     }
 }
 
-struct Records {
-    headers: Vec<String>,
-    rows: Vec<Vec<JsonValue>>,
+pub struct Records {
+    pub headers: Vec<String>,
+    pub rows: Vec<Vec<JsonValue>>,
 }
 
 fn read_csv(text: &str, args: &ImportArgs, cols: &[Column]) -> Result<Records> {
@@ -125,6 +125,35 @@ pub fn import(ctx: &Ctx, args: ImportArgs) -> Result<()> {
             _ => return Err(miette!("a JSON import file must contain an array of objects or arrays")),
         },
     };
+    put_records(ctx, rel, &cols, recs, args.op, args.batch, fmt_name(fmt))
+}
+
+/// Strings that sit in a typed column (`Int`, `Float`, `Bool`, lists, vectors) are converted first,
+/// so CSV-like sources and cleaned tables can be written without a schema of their own.
+fn coerce_cell(v: JsonValue, ty: &str) -> JsonValue {
+    match v {
+        JsonValue::String(s) => {
+            let base = ty.trim_end_matches('?');
+            if matches!(base, "Int" | "Float" | "Bool") || base.starts_with('<') || base.starts_with('[') {
+                coerce(&s, ty)
+            } else {
+                JsonValue::String(s)
+            }
+        }
+        other => other,
+    }
+}
+
+/// Writes records into `rel` in batches of `batch` rows (one transaction per batch).
+pub fn put_records(
+    ctx: &Ctx,
+    rel: &str,
+    cols: &[Column],
+    recs: Records,
+    op: PutOp,
+    batch: usize,
+    source: &str,
+) -> Result<()> {
     if recs.rows.is_empty() {
         eprintln!("nothing to import");
         return Ok(());
@@ -135,13 +164,25 @@ pub fn import(ctx: &Ctx, args: ImportArgs) -> Result<()> {
             return Err(miette!("`{h}` is not a column of `{rel}`"));
         }
     }
+    let types: Vec<&str> = recs
+        .headers
+        .iter()
+        .map(|h| cols.iter().find(|c| &c.name == h).map(|c| c.ty.as_str()).unwrap_or("Any"))
+        .collect();
     let list = recs.headers.join(", ");
-    let script = format!("?[{list}] <- $data\n:{} {rel} {{ {list} }}", args.op.keyword());
+    let script = format!("?[{list}] <- $data\n:{} {rel} {{ {list} }}", op.keyword());
     let total = recs.rows.len();
     let mut done = 0usize;
-    for chunk in recs.rows.chunks(args.batch.max(1)) {
+    for chunk in recs.rows.chunks(batch.max(1)) {
         let data = DataValue::List(
-            chunk.iter().map(|r| DataValue::List(r.iter().cloned().map(DataValue::from).collect())).collect(),
+            chunk
+                .iter()
+                .map(|r| {
+                    DataValue::List(
+                        r.iter().zip(&types).map(|(v, t)| DataValue::from(coerce_cell(v.clone(), t))).collect(),
+                    )
+                })
+                .collect(),
         );
         ctx.backend
             .run(&script, [("data".to_string(), data)].into(), true)
@@ -154,7 +195,7 @@ pub fn import(ctx: &Ctx, args: ImportArgs) -> Result<()> {
     if ctx.tty {
         eprintln!();
     }
-    eprintln!("{} {total} rows into `{rel}` ({})", args.op.keyword(), fmt_name(fmt));
+    eprintln!("{} {total} rows into `{rel}` ({source})", op.keyword());
     Ok(())
 }
 

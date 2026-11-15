@@ -12,18 +12,18 @@ Rust crate is the primary supported interface. This C binding is a community
 integration surface; it may not have release parity with the Rust engine.
 Contributions to build, test, document, or maintain it are welcome.
 
-The `cozo-ng-c` crate is version `0.11.1` and targets the Cozo-NG 0.11.1 engine.
+The `cozo-ng-c` crate is version `0.12.0` and targets the Cozo-NG 0.12.0 engine.
 This does not imply a matching prebuilt C library release. See the
-[crate changelog](CHANGELOG.md).
+[crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-c/CHANGELOG.md).
 
 This document describes how to set up the C library.
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
 
 Pre-built libraries, when published for Cozo-NG, will be available from the [Cozo-NG release page](https://github.com/jorgeandrecastro/cozo-ng/releases); look for those starting with `libcozo_c`.
 
-The API is contained in this single [header file](./cozo_c.h).
+The API is contained in this single [header file](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-c/cozo_c.h).
 
-An example for using the API is [here](./example.c).
+An example for using the API is [here](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-c/example.c).
 
 To build and run the example:
 
