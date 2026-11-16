@@ -4,6 +4,10 @@ Release notes for the `cozo-ng-java` JNI Rust crate. Cozo-NG is an independent
 fork of CozoDB. This crate release does not publish or update the upstream
 Java, Android, or other JVM packages listed in the README.
 
+## 0.12.1
+
+- Updated the engine dependency to Cozo-NG `0.12.1`; no Java/JNI API changes.
+
 ## 0.12.0
 
 - Updated the engine dependency to Cozo-NG `0.12.0`.

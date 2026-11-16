@@ -4,7 +4,8 @@
 
 The command-line tool for [Cozo-NG](https://github.com/jorgeandrecastro/cozo-ng): one binary to query, import, export,
 back up and explore a database, **embedded or remote**, with the same commands.
-Version `0.2.0` targets the Cozo-NG `0.12.0` engine and adds data cleaning
+Version `0.2.1` targets the Cozo-NG `0.12.1` engine and includes the latest core
+engine improvements; data cleaning is provided
 through `cozo-ng-cleaner`. See the [CLI changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-cli/CHANGELOG.md).
 
 ```text

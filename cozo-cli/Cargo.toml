@@ -1,6 +1,6 @@
 [package]
 name = "cozo-ng-cli"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 license = "MPL-2.0"
 description = "The Cozo-NG command-line tool: query, import/export, vector search and graph algorithms on embedded or remote Cozo-NG databases"
@@ -29,7 +29,7 @@ rocksdb = ["cozo/storage-rocksdb"]
 full = ["sqlite", "graph-algo", "cleaner", "rocksdb"]
 
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.12.0", path = "../cozo-core", default-features = false }
+cozo = { package = "cozo-ng", version = "0.12.1", path = "../cozo-core", default-features = false }
 cozo-ng-cleaner = { version = "0.1", path = "../cozo-cleaner", optional = true }
 clap = { version = "4.6", features = ["derive", "env", "wrap_help"] }
 clap_complete = "4"

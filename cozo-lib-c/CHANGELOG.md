@@ -4,6 +4,10 @@ Release notes for the `cozo-ng-c` Rust crate. Cozo-NG is an independent,
 community-maintained fork of CozoDB; this crate's release does not imply a
 matching prebuilt C library release.
 
+## 0.12.1
+
+- Updated the engine dependency to Cozo-NG `0.12.1`; no C API changes.
+
 ## 0.12.0
 
 - Updated the engine dependency to Cozo-NG `0.12.0`.

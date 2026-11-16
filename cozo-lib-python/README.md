@@ -4,7 +4,7 @@
 
 Native Python bindings for the independent [Cozo-NG](https://github.com/jorgeandrecastro/cozo-ng)
 embedded graph and vector database. The Rust crate is `cozo-ng-python`; the
-configured Python distribution is `cozo-ng` version `0.12.0`, and its extension
+configured Python distribution is `cozo-ng` version `0.12.1`, and its extension
 module is named `cozo_embedded`. See the [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-python/CHANGELOG.md).
 
 ## Installation and usage

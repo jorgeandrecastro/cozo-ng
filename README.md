@@ -38,7 +38,7 @@
 
 ## 🚀 Roadmap: v0.12 (Current Focus)
 
-Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name. The `0.12.0` release continues this independent maintenance with a Rust-first focus on the embedded engine and its use as a data layer for AI agents and GraphRAG.
+Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name. The `0.12.1` release continues this independent maintenance with a Rust-first focus on the embedded engine and its use as a data layer for AI agents and GraphRAG.
 
 The focus is a high-performance, transactional, embedded Rust database that brings together relational storage, Datalog-powered knowledge graphs, and HNSW vector search. It is designed to give Rust AI agents and GraphRAG applications a local, in-process data layer.
 
@@ -60,7 +60,7 @@ The v0.12 roadmap:
 * [ ] **Storage safety:** Treat on-disk formats and migration behavior as compatibility-sensitive; test backend changes and document migrations.
 * **Community bindings:** Python, Node.js, WASM, Java, Swift, C, and other non-Rust bindings are welcome community efforts. Collaborations and pull requests to build, test, document, or maintain them are warmly welcome, but they are not currently part of the core maintenance commitment.
 
-See the [0.12.0 changelog](CHANGELOG.md) and [maintenance and contribution guidelines](CONTRIBUTING.md).
+See the [0.12.1 changelog](CHANGELOG.md) and [maintenance and contribution guidelines](CONTRIBUTING.md).
 
 ---
 
@@ -212,7 +212,7 @@ Add `cozo-ng` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.12.0" }
+cozo = { package = "cozo-ng", version = "0.12.1" }
 ```
 
 Because `cozo-ng` preserves the internal library name `cozo`, your Rust imports remain unchanged:
@@ -382,7 +382,7 @@ The first build takes a while because RocksDB is compiled from source.
 ### Good to know
 
 * **Security:** inside the container the server listens on `0.0.0.0` so that port publishing works, which is why it requires the `x-cozo-auth` token. This token is only a last line of defence: publish the port on `127.0.0.1` as shown above, or put the server behind a reverse proxy with proper authentication, before exposing it to a network. Run `cozo-bin server --help` for the available options.
-* **Tags:** images are published to `ghcr.io` by GitHub Actions on pushes to `main` and on version tags (`v*`). Pushing the tag `v0.12.0` publishes the tags `0.12.0` and `0.12`. Use a version or SHA tag for reproducible deployments rather than `main`.
+* **Tags:** images are published to `ghcr.io` by GitHub Actions on pushes to `main` and on version tags (`v*`). Pushing the tag `v0.12.1` publishes the tags `0.12.1` and `0.12`. Use a version or SHA tag for reproducible deployments rather than `main`.
 * **Custom options:** the arguments after the image name replace the default command, for example `docker run ... ghcr.io/jorgeandrecastro/cozo-bin:main server --help`.
 * **Data and upgrades:** the on-disk format is compatibility-sensitive. Back up the volume before upgrading across minor versions and read the [changelog](CHANGELOG.md).
 

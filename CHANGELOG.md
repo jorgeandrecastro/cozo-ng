@@ -2,6 +2,16 @@
 
 Notable changes to Cozo-NG are documented here. Cozo-NG is an independent community continuation of CozoDB; upstream release history is not the release history of this fork.
 
+## 0.12.1
+
+### Changed
+
+- Released the `cozo-ng` engine crate as `0.12.1`.
+- Split the query parser, HNSW runtime, and relation runtime into focused modules without changing their existing module paths or engine behavior.
+- Aligned the Rust bindings to `0.12.1`, the standalone server to `0.13.1`, and the CLI to `0.2.1` with the engine release.
+- Updated the RocksDB adapter to `cozo-ng-rocks 0.5.1` for the `0.12.1` engine.
+- No engine API or storage-format changes.
+
 ## 0.12.0
 
 ### Added

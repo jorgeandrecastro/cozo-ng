@@ -9,16 +9,17 @@ The Rust engine is the primary supported and maintained part of Cozo-NG: an embe
 
 Cozo-NG is an independent fork and community-maintained continuation of CozoDB `0.7.6`, not an official upstream release. It sets its own Rust-first direction: an embedded data layer for AI agents and GraphRAG that combines relational data, Datalog knowledge graphs, and vector search. Language bindings are community-driven; contributions to build, test, and maintain them are welcome.
 
-This is the `cozo-ng` engine crate's `0.12.0` release. Since `0.10.0`, the former
-`src/runtime/db.rs` implementation is organized into focused modules under
-`src/runtime/db/`; the `cozo::runtime::db` module path and public API are
-preserved. See the [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-core/CHANGELOG.md) for details.
+This is the `cozo-ng` engine crate's `0.12.1` release. The query parser,
+HNSW runtime, and relation runtime are organized into focused modules while
+preserving their existing module paths and behavior. See the
+[crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-core/CHANGELOG.md)
+for details.
 
 The published package is named `cozo-ng`, while its Rust library name remains `cozo`. Existing code can therefore keep using `use cozo::*` by declaring the dependency as:
 
 ```toml
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.12.0" }
+cozo = { package = "cozo-ng", version = "0.12.1" }
 ```
 
 See the [Cozo-NG repository](https://github.com/jorgeandrecastro/cozo-ng) for project status and contribution information.
@@ -46,9 +47,12 @@ cozo-core/
 │   ├── cozoscript.pest    # CozoScript grammar
 │   ├── data/              # Values, expressions, relations, functions, aggregates
 │   ├── parse/             # Query, schema, expression, and command parsing
+│   │   └── query/          # Query atoms and rule parsing
 │   ├── query/             # Query planning, compilation, optimization, evaluation
 │   ├── runtime/           # Database runtime, transactions, indexes, execution
-│   │   └── db/            # Database operations, execution, backup, and import/export
+│   │   ├── db/            # Database operations, execution, backup, and import/export
+│   │   ├── hnsw/          # HNSW insertion, search, and removal
+│   │   └── relation/      # Relation operations and index creation
 │   ├── fixed_rule/        # Built-in graph algorithms and query utilities
 │   ├── fts/               # Full-text search
 │   ├── storage/           # Memory and persistent storage backends

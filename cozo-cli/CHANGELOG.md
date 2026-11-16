@@ -3,6 +3,12 @@
 All notable changes to `cozo-ng-cli` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 0.2.1
+
+### Changed
+- Updated the engine dependency to Cozo-NG `0.12.1`.
+- No CLI API changes.
+
 ## 0.2.0
 
 ### Added
