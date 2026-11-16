@@ -3,6 +3,14 @@
 All notable changes to `cozo-ng-cli` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 0.2.2 (unreleased)
+
+### Changed
+
+- Prepared the CLI for the Cozo-NG `0.12.2` query-module refactoring and
+  compilation fixes. No CLI API changes.
+- Updated the optional cleaner dependency to `cozo-ng-cleaner 0.1.2`.
+
 ## 0.2.1
 
 ### Changed

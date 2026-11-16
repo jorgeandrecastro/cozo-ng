@@ -5,6 +5,13 @@ Cozo-NG fork, not an official CozoDB upstream release. Crate versions do not
 necessarily correspond to downloadable standalone binary releases or to Docker
 image tags.
 
+## 0.13.2 (unreleased)
+
+### Changed
+
+- Prepared the standalone server for the Cozo-NG `0.12.2` engine, including
+  its query-module refactoring and compilation fixes. No server API changes.
+
 ## 0.13.1
 
 ### Changed

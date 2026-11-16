@@ -9,9 +9,9 @@ The Rust engine is the primary supported and maintained part of Cozo-NG: an embe
 
 Cozo-NG is an independent fork and community-maintained continuation of CozoDB `0.7.6`, not an official upstream release. It sets its own Rust-first direction: an embedded data layer for AI agents and GraphRAG that combines relational data, Datalog knowledge graphs, and vector search. Language bindings are community-driven; contributions to build, test, and maintain them are welcome.
 
-This is the `cozo-ng` engine crate's `0.12.1` release. The query parser,
-HNSW runtime, and relation runtime are organized into focused modules while
-preserving their existing module paths and behavior. See the
+The `cozo-ng` engine crate is version `0.12.2`. The query parser, HNSW
+runtime, relation runtime, relational algebra, and stored-relation query
+execution are organized into focused modules. See the
 [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-core/CHANGELOG.md)
 for details.
 
@@ -19,7 +19,7 @@ The published package is named `cozo-ng`, while its Rust library name remains `c
 
 ```toml
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.12.1" }
+cozo = { package = "cozo-ng", version = "0.12.2" }
 ```
 
 See the [Cozo-NG repository](https://github.com/jorgeandrecastro/cozo-ng) for project status and contribution information.
@@ -33,6 +33,23 @@ See the [Cozo-NG repository](https://github.com/jorgeandrecastro/cozo-ng) for pr
 - **Rust-native:** Use the library directly from Rust. The standalone server (also available as a [Docker image](https://github.com/jorgeandrecastro/cozo-ng/blob/main/README.md#run-with-docker)) and non-Rust bindings are additional integration options, not the project's primary maintenance focus.
 
 For examples, feature selection, and storage details, see the [main README](https://github.com/jorgeandrecastro/cozo-ng/blob/main/README.md), the [CLI guide](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-cli/README.md), and the [API documentation](https://docs.rs/cozo-ng).
+
+## Benchmarks
+
+The benchmarks use Rust's unstable `test` framework and are excluded from
+stable builds by default. Enable them explicitly with a nightly toolchain:
+
+```sh
+cargo +nightly bench -p cozo-ng --features nightly-benchmarks --bench pokec
+cargo +nightly bench -p cozo-ng --features nightly-benchmarks --bench wiki_pagerank
+cargo +nightly bench -p cozo-ng --features nightly-benchmarks,storage-rocksdb --bench time_travel
+```
+
+The Pokec benchmark requires `COZO_BENCH_POKEC_DIR` and
+`COZO_BENCH_POKEC_BATCH`, and the Wikipedia benchmark requires
+`COZO_BENCH_WIKI_DIR`; the directories must contain the corresponding datasets.
+The time-travel benchmark creates a RocksDB database in the current directory.
+The `nightly-benchmarks` feature must not be enabled with a stable compiler.
 
 ## Crate architecture
 
@@ -49,6 +66,8 @@ cozo-core/
 │   ├── parse/             # Query, schema, expression, and command parsing
 │   │   └── query/          # Query atoms and rule parsing
 │   ├── query/             # Query planning, compilation, optimization, evaluation
+│   │   ├── ra/            # Relational algebra operators, joins, and scans
+│   │   └── stored/        # Stored-relation operations, indexes, and triggers
 │   ├── runtime/           # Database runtime, transactions, indexes, execution
 │   │   ├── db/            # Database operations, execution, backup, and import/export
 │   │   ├── hnsw/          # HNSW insertion, search, and removal

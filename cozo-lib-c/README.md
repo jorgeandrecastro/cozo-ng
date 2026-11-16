@@ -12,7 +12,10 @@ Rust crate is the primary supported interface. This C binding is a community
 integration surface; it may not have release parity with the Rust engine.
 Contributions to build, test, document, or maintain it are welcome.
 
-The `cozo-ng-c` crate is version `0.12.1` and targets the Cozo-NG 0.12.1 engine.
+The `cozo-ng-c` crate is version `0.12.2` and targets the Cozo-NG 0.12.2 engine.
+
+The `0.12.2` patch accompanies the engine's query-module refactoring
+and compilation fixes, without changing the C binding API.
 This does not imply a matching prebuilt C library release. See the
 [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-c/CHANGELOG.md).
 

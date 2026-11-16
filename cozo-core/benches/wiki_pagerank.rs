@@ -20,7 +20,7 @@ use test::Bencher;
 
 use lazy_static::{initialize, lazy_static};
 
-use cozo::{DbInstance, NamedRows, DataValue};
+use cozo::{DataValue, DbInstance, NamedRows, ScriptMutability};
 
 lazy_static! {
     static ref TEST_DB: DbInstance = {
@@ -36,9 +36,12 @@ lazy_static! {
         // dbg!(&data_size);
         // dbg!(&n_threads);
 
-        db.run_script(":create article {fr: Int, to: Int}",
+        db.run_script(
+            ":create article {fr: Int, to: Int}",
             Default::default(),
-        ).unwrap();
+            ScriptMutability::Mutable,
+        )
+        .unwrap();
 
         let file = File::open(&file_path).unwrap();
         let mut articles = vec![];
@@ -72,7 +75,11 @@ fn wikipedia_pagerank(b: &mut Bencher) {
     initialize(&TEST_DB);
     b.iter(|| {
         TEST_DB
-            .run_script("?[id, rank] <~ PageRank(*article[])", Default::default())
+            .run_script(
+                "?[id, rank] <~ PageRank(*article[])",
+                Default::default(),
+                ScriptMutability::Immutable,
+            )
             .unwrap()
     });
 }
@@ -86,6 +93,7 @@ fn wikipedia_louvain(b: &mut Bencher) {
             .run_script(
                 "?[grp, idx] <~ CommunityDetectionLouvain(*article[])",
                 Default::default(),
+                ScriptMutability::Immutable,
             )
             .unwrap();
         dbg!(start.elapsed());

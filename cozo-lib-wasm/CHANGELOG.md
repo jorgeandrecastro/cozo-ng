@@ -4,6 +4,11 @@ Release notes for the `cozo-ng-wasm` Rust crate. Cozo-NG is an independent fork
 of CozoDB. This crate release does not publish or update the upstream npm
 package `cozo-lib-wasm`.
 
+## 0.12.2 (unreleased)
+
+- Prepared the WebAssembly binding for the Cozo-NG `0.12.2` query-module
+  refactoring and compilation fixes. No WebAssembly binding API changes.
+
 ## 0.12.1
 
 - Updated the engine dependency to Cozo-NG `0.12.1`; no WebAssembly binding API changes.

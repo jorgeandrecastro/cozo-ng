@@ -896,14 +896,14 @@ checksum = "7f8f80099a98041a3d1622845c271458a2d73e688351bf3cb999266764b81d48"
 
 [[package]]
 name = "cozo-core-examples"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "cozo-ng",
 ]
 
 [[package]]
 name = "cozo-ng"
-version = "0.12.1"
+version = "0.12.2"
 dependencies = [
  "aho-corasick",
  "approx",
@@ -966,7 +966,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-bin"
-version = "0.13.1"
+version = "0.13.2"
 dependencies = [
  "async-stream",
  "axum 0.8.9",
@@ -996,7 +996,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-c"
-version = "0.12.1"
+version = "0.12.2"
 dependencies = [
  "cbindgen",
  "cozo-ng",
@@ -1005,7 +1005,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-cleaner"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "csv",
  "regex",
@@ -1017,7 +1017,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-cli"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "assert_cmd",
  "clap",
@@ -1039,7 +1039,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-java"
-version = "0.12.1"
+version = "0.12.2"
 dependencies = [
  "cozo-ng",
  "jni",
@@ -1048,7 +1048,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-node"
-version = "0.12.1"
+version = "0.12.2"
 dependencies = [
  "cozo-ng",
  "crossbeam",
@@ -1061,7 +1061,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-python"
-version = "0.12.1"
+version = "0.12.2"
 dependencies = [
  "cozo-ng",
  "miette",
@@ -1072,7 +1072,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-rocks"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "cc",
  "cxx",
@@ -1087,7 +1087,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-swift"
-version = "0.12.1"
+version = "0.12.2"
 dependencies = [
  "cozo-ng",
  "swift-bridge",
@@ -1096,7 +1096,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-wasm"
-version = "0.12.1"
+version = "0.12.2"
 dependencies = [
  "console_error_panic_hook",
  "cozo-ng",

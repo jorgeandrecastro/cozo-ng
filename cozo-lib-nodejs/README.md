@@ -13,7 +13,10 @@ binding is a community integration surface. The npm package linked below is
 the original upstream distribution, not a Cozo-NG release. Contributions to
 build, test, document, or maintain a Cozo-NG-compatible binding are welcome.
 
-The `cozo-ng-node` crate is version `0.12.1` and targets the Cozo-NG 0.12.1
+The `0.12.2` patch accompanies the engine's query-module refactoring
+and compilation fixes, without changing the Node.js binding API.
+
+The `cozo-ng-node` crate is version `0.12.2` and targets the Cozo-NG 0.12.2
 engine. The npm package `cozo-node` linked below remains an upstream
 distribution, not a Cozo-NG release. See the [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-nodejs/CHANGELOG.md).
 

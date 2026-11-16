@@ -2,6 +2,16 @@
 
 Notable changes to Cozo-NG are documented here. Cozo-NG is an independent community continuation of CozoDB; upstream release history is not the release history of this fork.
 
+## 0.12.2 (unreleased)
+
+### Changed
+
+- Split relational algebra and stored-relation query code into focused modules,
+  preserving existing interfaces and behavior.
+- Fixed module visibility and imports after the relational algebra split, and
+  replaced deprecated UUID and iterator APIs.
+- Prepared patch release notes for the workspace crates.
+
 ## 0.12.1
 
 ### Changed

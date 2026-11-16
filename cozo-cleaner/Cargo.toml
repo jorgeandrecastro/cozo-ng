@@ -1,6 +1,6 @@
 [package]
 name = "cozo-ng-cleaner"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 license = "MPL-2.0"
 description = "Data cleaning and preparation pipelines (normalization, typing, validation, deduplication, chunking) for Cozo-NG, AI agents and GraphRAG"

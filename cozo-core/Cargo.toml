@@ -1,6 +1,6 @@
 [package]
 name = "cozo-ng"
-version = "0.12.1"
+version = "0.12.2"
 edition = "2024"
 description = "A general-purpose, transactional, relational database that uses Datalog and focuses on graph data and algorithms"
 authors = ["Ziyang Hu"]
@@ -15,10 +15,24 @@ exclude = [
 [lib]
 name = "cozo"
 
+[[bench]]
+name = "pokec"
+required-features = ["nightly-benchmarks"]
+
+[[bench]]
+name = "time_travel"
+required-features = ["nightly-benchmarks"]
+
+[[bench]]
+name = "wiki_pagerank"
+required-features = ["nightly-benchmarks"]
+
 [features]
 #! # Features
 
 default = ["compact"]
+## Enables the benchmarks using Rust's unstable `test` framework (requires nightly).
+nightly-benchmarks = []
 ## Enables the `minimal`, `requests` and `graph-algo` features.
 compact = ["minimal", "requests", "graph-algo"]
 ## Enables the `minimal`, `requests` and `graph-algo` features in single threaded mode.
@@ -126,7 +140,7 @@ document-features = "0.2"
 rayon = "1.12"
 minreq = { version = "3.0", features = ["https-rustls"], optional = true }
 tikv-jemallocator-global = { version = "0.7", optional = true }
-cozorocks = { package = "cozo-ng-rocks", path = "../cozorocks", version = "0.5.1", optional = true }
+cozorocks = { package = "cozo-ng-rocks", path = "../cozorocks", version = "0.5.2", optional = true }
 rocksdb = { version = "0.25", optional = true }
 sled = { version = "0.34", optional = true }
 tikv-client = { version = "0.4", optional = true }

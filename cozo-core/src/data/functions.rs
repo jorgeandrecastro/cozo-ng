@@ -2527,7 +2527,7 @@ pub(crate) fn str2vld(s: &str) -> Result<ValidityTs> {
 define_op!(OP_RAND_UUID_V1, 0, false);
 pub(crate) fn op_rand_uuid_v1(_args: &[DataValue]) -> Result<DataValue> {
     let mut rng = rand::rng();
-    let uuid_ctx = uuid::v1::Context::new(rng.random());
+    let uuid_ctx = uuid::ContextV1::new(rng.random());
     #[cfg(target_arch = "wasm32")]
     let ts = {
         let since_epoch: f64 = Date::now();

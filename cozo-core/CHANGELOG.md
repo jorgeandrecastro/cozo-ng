@@ -5,6 +5,16 @@ community-maintained fork of CozoDB; these are Cozo-NG releases, not upstream
 CozoDB releases. The package is `cozo-ng`, while the Rust library remains
 `cozo`.
 
+## 0.12.2 (unreleased)
+
+### Changed
+
+- Split relational algebra and stored-relation query execution into focused
+  modules without intentionally changing engine behavior or public interfaces.
+- Fixed module visibility and imports introduced by the split.
+- Replaced deprecated UUID and iterator APIs and removed an unused import.
+- Updated the optional RocksDB adapter dependency to `cozo-ng-rocks 0.5.2`.
+
 ## 0.12.1
 
 ### Changed

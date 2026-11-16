@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "cozo-ng"
-version = "0.12.1"
+version = "0.12.2"
 description = "The Embedded Graph + Vector Database for AI Agents & GraphRAG in Python"
 requires-python = ">=3.7"
 classifiers = [
