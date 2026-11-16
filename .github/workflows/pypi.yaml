@@ -76,10 +76,9 @@ jobs:
       - name: Download all workflow artifacts
         uses: actions/download-artifact@v4
         with:
-          path: dist
-          merge-artifacts: true
+          path: artifacts
       - name: Publish to PyPI
         uses: messense/maturin-action@v1
         with:
           command: upload
-          args: --skip-existing dist/*
+          args: --skip-existing artifacts/wheels-*/*/* artifacts/wheels-*/*.tar.gz artifacts/wheels-*/*.whl
