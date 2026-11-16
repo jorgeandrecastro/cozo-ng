@@ -4,7 +4,7 @@
 [![docs.rs](https://img.shields.io/docsrs/cozo-ng-cleaner?label=docs.rs)](https://docs.rs/cozo-ng-cleaner)
 
 Data cleaning and preparation pipelines for [Cozo-NG](https://github.com/jorgeandrecastro/cozo-ng), AI agents and GraphRAG.
-This is the `cozo-ng-cleaner` crate's first release, version `0.1.0`.
+This is the `cozo-ng-cleaner` crate's first release, version `0.1.1`.
 See the [changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-cleaner/CHANGELOG.md) for release notes.
 
 Real-world data arrives with stray whitespace, `N/A` strings, numbers stored as text, duplicates, HTML and documents too long

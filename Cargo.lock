@@ -1005,7 +1005,7 @@ dependencies = [
 
 [[package]]
 name = "cozo-ng-cleaner"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "csv",
  "regex",
