@@ -18,6 +18,7 @@ use thiserror::Error;
 
 use crate::data::tuple::TupleT;
 use crate::runtime::transact::SessionTx;
+use crate::storage::StoreTx;
 
 impl<'a> SessionTx<'a> {
     pub(crate) fn relation_exists(&self, name: &str) -> Result<bool> {

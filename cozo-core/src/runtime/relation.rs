@@ -27,6 +27,7 @@ use crate::runtime::hnsw::HnswIndexManifest;
 use crate::query::compile::IndexPositionUse;
 use crate::runtime::minhash_lsh::MinHashLshIndexManifest;
 use crate::runtime::transact::SessionTx;
+use crate::storage::StoreTx;
 use crate::NamedRows;
 use crate::SourceSpan;
 

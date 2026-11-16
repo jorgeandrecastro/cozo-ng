@@ -19,10 +19,9 @@ use pest::Parser;
 use smartstring::SmartString;
 use thiserror::Error;
 
-use crate::data::expr::Expr;
 use crate::data::program::{
     FixedRuleApply, InputInlineRulesOrFixed, InputProgram, QueryAssertion, QueryOutOptions,
-    RelationOp, ReturnMutation,
+    RelationOp, ReturnMutation, SortDir,
 };
 use crate::data::relation::{ColType, ColumnDef, NullableColType, StoredRelationMetadata};
 use crate::data::symb::Symbol;
