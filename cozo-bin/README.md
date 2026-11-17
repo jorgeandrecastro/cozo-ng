@@ -20,12 +20,16 @@ The standalone server is an optional way to run Cozo-NG. The project's primary
 maintenance target is the embedded Rust engine; the server is a Rust application
 built on that engine.
 
-The `cozo-ng-bin` crate is version `0.13.2` and targets the Cozo-NG 0.12.2 engine.
+The `cozo-ng-bin` crate is version `0.14.0` and targets the Cozo-NG 0.12.2 engine.
 
-The `0.13.2` patch accompanies the Cozo-NG `0.12.2` query-module
-refactoring and compilation fixes.
+The `0.14.0` release hardens the HTTP server: fixed token authentication,
+no more panic when an SSE client disconnects, blocking work moved off the async
+threads, idle transaction timeout, and configurable body size limit and
+compression. The HTTP routes are unchanged; see the
+[crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-bin/CHANGELOG.md)
+for the few behaviour differences.
 This Rust crate version is separate from standalone binary release assets and
-from Docker image tags. See the [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-bin/CHANGELOG.md).
+from Docker image tags.
 
 ## Crate architecture
 
@@ -41,6 +45,8 @@ cozo-bin/
 │   ├── repl.rs       # Interactive terminal interface
 │   ├── index.html    # Minimal browser-based query client
 │   └── security.txt  # Server security contact resource
+├── tests/
+│   └── smoke.sh      # curl-based smoke test of the HTTP API
 ├── Cargo.toml        # Executable metadata, engine dependency, and features
 ├── README.md
 └── CHANGELOG.md
@@ -104,6 +110,17 @@ see `./cozo-bin server -h`
 
 To stop Cozo, press `CTRL-C`, or send `SIGTERM` to the process with e.g. `kill`.
 
+### Server options
+
+Besides the engine, path, bind address and port options, the server accepts:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--token-table <RELATION>` | none | Use the named relation (columns `token` and `mutable`) as a table of bearer tokens |
+| `--tx-timeout <SECONDS>` | `300` | Abort multi-statement transactions idle for longer than this |
+| `--max-body-mb <MIB>` | `512` | Maximum size of a request body |
+| `--no-compress` | off | Disable HTTP response compression (useful on loopback, or behind a proxy that already compresses) |
+
 ## The REPL
 
 Run `./cozo-bin repl` to enter a terminal-based REPL. The engine options can be used when
@@ -139,6 +156,8 @@ params should be an object of named parameters. For example, if params is `{"num
 then `$num` can be used anywhere in your query string where an expression is expected.
 Always use params instead of concatenating strings when you need parametrized queries.
 
+Add `"immutable": true` to run a read-only script.
+
 The HTTP API always responds in JSON. If a request is successful, then its `"ok"` field will be `true`,
 and the `"rows"` field will contain the data for the resulting relation, and `"headers"` will contain
 the headers. If an error occurs, then `"ok"` will contain `false`, the error message will be in `"message"`
@@ -159,6 +178,9 @@ and a nicely-formatted diagnostic will be in `"display"` if available.
 >
 > In some environments, setting the header may be difficult or impossible
 > for some of the APIs. In this case you can pass the token in the query parameter `auth`.
+>
+> When the server is started with `--token-table`, a token from that relation can
+> also be sent as `Authorization: Bearer <token>`.
 
 ## API
 
@@ -169,6 +191,10 @@ and a nicely-formatted diagnostic will be in `"display"` if available.
 * `POST /backup`, backup database, should supply a JSON body of the form `{"path": <PATH>}`
 * `POST /import-from-backup`, import data into the database from a backup. Should supply a JSON body
   of the form `{"path": <PATH>, "relations": <ARRAY OF RELATION NAMES>}`.
+* `POST /transact?write=<bool>`, start a multi-statement transaction; returns its `id`.
+  Run queries in it with `POST /transact/{id}` (same body as `/text-query`) and finish it with
+  `PUT /transact/{id}` and a body of the form `{"abort": <bool>}`. A transaction left idle for longer
+  than `--tx-timeout` seconds is aborted by the server.
 * `GET /`, if you open this in your browser and open your developer tools, you will be able to use
   a very simple client to query this database.
 
@@ -179,6 +205,16 @@ The following are experimental:
 
 * `GET(SSE) /changes/{relation: String}` get changes when mutations are made against a relation, relies
   on [SSE](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events).
+
+## Testing
+
+With a server running, run the smoke test of the HTTP API:
+
+```bash
+tests/smoke.sh                                        # local server, no token needed
+COZO_AUTH=YOUR_TOKEN tests/smoke.sh http://127.0.0.1:9070   # server that requires a token
+SLOW=1 tests/smoke.sh                                 # also test the transaction timeout (start the server with --tx-timeout 5)
+```
 
 ## Building
 

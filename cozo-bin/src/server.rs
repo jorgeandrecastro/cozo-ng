@@ -10,8 +10,9 @@ use std::collections::BTreeMap;
 use std::convert::Infallible;
 use std::net::{Ipv6Addr, SocketAddr};
 use std::str::FromStr;
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
-use std::sync::atomic::{AtomicU32, Ordering};
+use std::time::{Duration, Instant};
 
 use axum::body::Body;
 use axum::extract::{DefaultBodyLimit, Path, Query, State};
@@ -26,7 +27,6 @@ use futures::stream::Stream;
 use itertools::Itertools;
 use log::{error, info, warn};
 use miette::miette;
-// use miette::miette;
 use rand::Rng;
 use serde_json::json;
 use tokio::net::TcpListener;
@@ -35,7 +35,10 @@ use tower_http::auth::{AsyncAuthorizeRequest, AsyncRequireAuthorizationLayer};
 use tower_http::compression::CompressionLayer;
 use tower_http::cors::{Any, CorsLayer};
 
-use cozo::{DataValue, DbInstance, format_error_as_json, MultiTransaction, NamedRows, ScriptMutability, SimpleFixedRule};
+use cozo::{
+    format_error_as_json, DataValue, DbInstance, MultiTransaction, NamedRows, ScriptMutability,
+    SimpleFixedRule,
+};
 
 #[derive(Args, Debug)]
 pub(crate) struct ServerArgs {
@@ -66,15 +69,35 @@ pub(crate) struct ServerArgs {
     /// When set, the content of the named table will be used as a token table
     #[clap(long)]
     token_table: Option<String>,
+
+    /// Multi-statement transactions idle for longer than this many seconds are aborted
+    #[clap(long, default_value_t = 300)]
+    tx_timeout: u64,
+
+    /// Maximum size of a request body, in MiB
+    #[clap(long, default_value_t = 512)]
+    max_body_mb: u64,
+
+    /// Disable HTTP response compression (saves CPU, useful on loopback/LAN)
+    #[clap(long)]
+    no_compress: bool,
 }
+
+struct TxEntry {
+    tx: Arc<MultiTransaction>,
+    last_used: Instant,
+}
+
+type RuleSenders =
+    Arc<Mutex<BTreeMap<u32, (String, crossbeam::channel::Sender<miette::Result<NamedRows>>)>>>;
 
 #[derive(Clone)]
 struct DbState {
     db: DbInstance,
-    rule_senders: Arc<Mutex<BTreeMap<u32, crossbeam::channel::Sender<miette::Result<NamedRows>>>>>,
+    rule_senders: RuleSenders,
     rule_counter: Arc<AtomicU32>,
-    tx_counter: Arc<AtomicU32>,
-    txs: Arc<Mutex<BTreeMap<u32, Arc<MultiTransaction>>>>,
+    tx_counter: Arc<AtomicU64>,
+    txs: Arc<Mutex<BTreeMap<u64, TxEntry>>>,
 }
 
 #[derive(Clone)]
@@ -84,8 +107,45 @@ struct MyAuth {
     token_table: Option<Arc<(String, DbInstance)>>,
 }
 
-impl AsyncAuthorizeRequest<Body> for MyAuth
-{
+/// Constant-time comparison, to avoid leaking the token through timing.
+fn ct_eq(a: &[u8], b: &[u8]) -> bool {
+    if a.len() != b.len() {
+        return false;
+    }
+    let mut diff = 0u8;
+    for (x, y) in a.iter().zip(b.iter()) {
+        diff |= x ^ y;
+    }
+    diff == 0
+}
+
+/// Looks the bearer token up in the token table, off the async worker threads.
+async fn lookup_token(tt: Arc<(String, DbInstance)>, token: String) -> Option<ScriptMutability> {
+    let res = spawn_blocking(move || {
+        let (name, db) = tt.as_ref();
+        match db.run_script(
+            &format!("?[mutable] := *{name} {{ token: $token, mutable }}"),
+            BTreeMap::from([(String::from("token"), DataValue::from(token.as_str()))]),
+            ScriptMutability::Immutable,
+        ) {
+            Ok(rows) => rows.rows.first().map(|val| {
+                if val[0].get_bool() == Some(true) {
+                    ScriptMutability::Mutable
+                } else {
+                    ScriptMutability::Immutable
+                }
+            }),
+            Err(err) => {
+                error!("token table lookup failed: {}", err);
+                None
+            }
+        }
+    })
+    .await;
+    res.ok().flatten()
+}
+
+impl AsyncAuthorizeRequest<Body> for MyAuth {
     type RequestBody = Body;
     type ResponseBody = Body;
     type Future = BoxFuture<'static, Result<Request<Body>, Response<Self::ResponseBody>>>;
@@ -100,76 +160,48 @@ impl AsyncAuthorizeRequest<Body> for MyAuth
                 return Ok(request);
             }
 
-            let mutability = match request.headers().get("x-cozo-auth") {
-                None => match request.uri().query() {
-                    Some(q_str) => {
-                        let mut bingo = false;
-                        for pair in q_str.split('&') {
-                            if let Some((k, v)) = pair.split_once('=') {
-                                if k == "auth" {
-                                    if v == auth_guard.as_str() {
-                                        bingo = true
-                                    }
-                                    break;
+            let mut mutability: Option<ScriptMutability> = None;
+
+            // 1. `x-cozo-auth` header
+            if let Some(h) = request.headers().get("x-cozo-auth") {
+                if let Ok(s) = h.to_str() {
+                    if ct_eq(s.as_bytes(), auth_guard.as_bytes()) {
+                        mutability = Some(ScriptMutability::Mutable);
+                    }
+                }
+            }
+
+            // 2. `?auth=` query parameter
+            if mutability.is_none() {
+                if let Some(q_str) = request.uri().query() {
+                    for pair in q_str.split('&') {
+                        if let Some((k, v)) = pair.split_once('=') {
+                            if k == "auth" {
+                                if ct_eq(v.as_bytes(), auth_guard.as_bytes()) {
+                                    mutability = Some(ScriptMutability::Mutable);
                                 }
+                                break;
                             }
                         }
-                        if bingo {
-                            Some(ScriptMutability::Mutable)
-                        } else {
-                            None
-                        }
                     }
-                    None => match token_table {
-                        None => None,
-                        Some(tt) => {
-                            let (name, db) = tt.as_ref();
-                            if let Some(auth_header) = request.headers().get("Authorization") {
-                                if let Ok(auth_str) = auth_header.to_str() {
-                                    if let Some(token) = auth_str.strip_prefix("Bearer ") {
-                                        match db.run_script(
-                                            &format!("?[mutable] := *{name} {{ token: $token, mutable }}"),
-                                            BTreeMap::from([(String::from("token"), DataValue::from(token))]),
-                                            ScriptMutability::Immutable,
-                                        ) {
-                                            Ok(rows) => match rows.rows.first() {
-                                                None => None,
-                                                Some(val) => {
-                                                    if val[0].get_bool() == Some(true) {
-                                                        Some(ScriptMutability::Mutable)
-                                                    } else {
-                                                        Some(ScriptMutability::Immutable)
-                                                    }
-                                                }
-                                            },
-                                            Err(err) => {
-                                                eprintln!("Error: {}", err);
-                                                None
-                                            }
-                                        }
-                                    } else {
-                                        None
-                                    }
-                                } else {
-                                    None
-                                }
-                            } else {
-                                None
-                            }
-                        }
-                    },
-                },
-                Some(data) => match data.to_str() {
-                    Ok(s) => {
-                        if s == auth_guard.as_str() {
-                            Some(ScriptMutability::Mutable)
-                        } else {
-                            None
-                        }
+                }
+            }
+
+            // 3. `Authorization: Bearer <token>` checked against the token table
+            if mutability.is_none() {
+                if let Some(tt) = token_table {
+                    let token = request
+                        .headers()
+                        .get(header::AUTHORIZATION)
+                        .and_then(|h| h.to_str().ok())
+                        .and_then(|s| s.strip_prefix("Bearer "))
+                        .map(str::to_owned);
+                    if let Some(token) = token {
+                        mutability = lookup_token(tt, token).await;
                     }
-                    Err(_) => None,
-                },
-            };
+                }
+            }
+
             if let Some(mutability) = mutability {
                 request.extensions_mut().insert(mutability);
                 Ok(request)
@@ -184,9 +216,6 @@ impl AsyncAuthorizeRequest<Body> for MyAuth
         })
     }
 }
-
-#[test]
-fn x() {}
 
 pub(crate) async fn server_main(args: ServerArgs) {
     let db = DbInstance::new(&args.engine, &args.path, &args.config).unwrap();
@@ -222,6 +251,10 @@ pub(crate) async fn server_main(args: ServerArgs) {
         }
     };
 
+    let tx_ttl = Duration::from_secs(args.tx_timeout);
+    let body_limit = (args.max_body_mb as usize).saturating_mul(1024 * 1024);
+    let compress = !args.no_compress;
+
     let auth_obj = MyAuth {
         skip_auth,
         auth_guard,
@@ -235,6 +268,34 @@ pub(crate) async fn server_main(args: ServerArgs) {
         tx_counter: Default::default(),
         txs: Default::default(),
     };
+
+    // Background task: abort multi-statement transactions that were abandoned by their client.
+    {
+        let txs = state.txs.clone();
+        tokio::spawn(async move {
+            let mut tick = tokio::time::interval(Duration::from_secs(30));
+            loop {
+                tick.tick().await;
+                let expired: Vec<Arc<MultiTransaction>> = {
+                    let mut guard = txs.lock().unwrap();
+                    let ids: Vec<u64> = guard
+                        .iter()
+                        .filter(|(_, e)| e.last_used.elapsed() > tx_ttl)
+                        .map(|(k, _)| *k)
+                        .collect();
+                    ids.into_iter()
+                        .filter_map(|id| guard.remove(&id))
+                        .map(|e| e.tx)
+                        .collect()
+                };
+                for tx in expired {
+                    warn!("aborting idle transaction");
+                    let _ = spawn_blocking(move || tx.abort()).await;
+                }
+            }
+        });
+    }
+
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
         .allow_origin(Any)
@@ -258,9 +319,14 @@ pub(crate) async fn server_main(args: ServerArgs) {
         .layer(AsyncRequireAuthorizationLayer::new(auth_obj))
         .fallback(not_found)
         .route("/", get(root))
-        .layer(cors)
-        .layer(CompressionLayer::new())
-        .layer(DefaultBodyLimit::disable());
+        .layer(cors);
+
+    let app = if compress {
+        app.layer(CompressionLayer::new())
+    } else {
+        app
+    };
+    let app = app.layer(DefaultBodyLimit::max(body_limit));
 
     let addr = if Ipv6Addr::from_str(&args.bind).is_ok() {
         SocketAddr::from_str(&format!("[{}]:{}", args.bind, args.port)).unwrap()
@@ -279,7 +345,9 @@ pub(crate) async fn server_main(args: ServerArgs) {
     );
 
     let listener = TcpListener::bind(&addr).await.unwrap();
-    axum::serve(listener, app.into_make_service()).await.unwrap();
+    axum::serve(listener, app.into_make_service())
+        .await
+        .unwrap();
 }
 
 #[derive(serde_derive::Deserialize)]
@@ -291,20 +359,38 @@ async fn start_transact(
     State(st): State<DbState>,
     Query(payload): Query<StartTransactPayload>,
 ) -> (StatusCode, Json<serde_json::Value>) {
-    let tx = st.db.multi_transaction(payload.write);
-    let id = st.tx_counter.fetch_add(1, Ordering::SeqCst);
-    st.txs.lock().unwrap().insert(id, Arc::new(tx));
-    (StatusCode::OK, json!({"ok": true, "id": id}).into())
+    let db = st.db.clone();
+    let write = payload.write;
+    match spawn_blocking(move || db.multi_transaction(write)).await {
+        Ok(tx) => {
+            let id = st.tx_counter.fetch_add(1, Ordering::SeqCst);
+            st.txs.lock().unwrap().insert(
+                id,
+                TxEntry {
+                    tx: Arc::new(tx),
+                    last_used: Instant::now(),
+                },
+            );
+            (StatusCode::OK, json!({"ok": true, "id": id}).into())
+        }
+        Err(err) => internal_error(err),
+    }
 }
 
 async fn transact_query(
     State(st): State<DbState>,
-    Path(id): Path<u32>,
+    Path(id): Path<u64>,
     Json(payload): Json<QueryPayload>,
 ) -> (StatusCode, Json<serde_json::Value>) {
-    let tx = match st.txs.lock().unwrap().get(&id) {
-        None => return (StatusCode::NOT_FOUND, json!({"ok": false}).into()),
-        Some(tx) => tx.clone(),
+    let tx = {
+        let mut guard = st.txs.lock().unwrap();
+        match guard.get_mut(&id) {
+            None => return (StatusCode::NOT_FOUND, json!({"ok": false}).into()),
+            Some(entry) => {
+                entry.last_used = Instant::now();
+                entry.tx.clone()
+            }
+        }
     };
     let src = payload.script.clone();
     let result = spawn_blocking(move || {
@@ -316,7 +402,7 @@ async fn transact_query(
         let query = payload.script;
         tx.run_script(&query, params)
     })
-        .await;
+    .await;
     match result {
         Ok(Ok(res)) => (StatusCode::OK, res.into_json().into()),
         Ok(Err(err)) => (
@@ -334,24 +420,22 @@ struct FinishTransactPayload {
 
 async fn finish_query(
     State(st): State<DbState>,
-    Path(id): Path<u32>,
+    Path(id): Path<u64>,
     Json(payload): Json<FinishTransactPayload>,
 ) -> (StatusCode, Json<serde_json::Value>) {
     let tx = match st.txs.lock().unwrap().remove(&id) {
         None => return (StatusCode::NOT_FOUND, json!({"ok": false}).into()),
-        Some(tx) => tx,
+        Some(entry) => entry.tx,
     };
-    let res = if payload.abort {
-        tx.abort()
-    } else {
-        tx.commit()
-    };
+    let abort = payload.abort;
+    let res = spawn_blocking(move || if abort { tx.abort() } else { tx.commit() }).await;
     match res {
-        Ok(_) => (StatusCode::OK, json!({"ok": true}).into()),
-        Err(err) => (
+        Ok(Ok(_)) => (StatusCode::OK, json!({"ok": true}).into()),
+        Ok(Err(err)) => (
             StatusCode::BAD_REQUEST,
             json!({"ok": false, "message": err.to_string()}).into(),
         ),
+        Err(err) => internal_error(err),
     }
 }
 
@@ -367,16 +451,17 @@ async fn text_query(
     State(st): State<DbState>,
     Json(payload): Json<QueryPayload>,
 ) -> (StatusCode, Json<serde_json::Value>) {
-    let params = payload
-        .params
-        .into_iter()
-        .map(|(k, v)| (k, DataValue::from(v)))
-        .collect();
     let immutable = match mutability {
         ScriptMutability::Mutable => payload.immutable.unwrap_or(false),
         ScriptMutability::Immutable => true,
     };
     let result = spawn_blocking(move || {
+        // the JSON -> DataValue conversion can be costly for big params, keep it off the async threads
+        let params = payload
+            .params
+            .into_iter()
+            .map(|(k, v)| (k, DataValue::from(v)))
+            .collect();
         st.db.run_script_fold_err(
             &payload.script,
             params,
@@ -387,7 +472,7 @@ async fn text_query(
             },
         )
     })
-        .await;
+    .await;
     match result {
         Ok(res) => wrap_json(res),
         Err(err) => internal_error(err),
@@ -427,32 +512,18 @@ async fn import_relations(
     State(st): State<DbState>,
     Json(payload): Json<serde_json::Value>,
 ) -> (StatusCode, Json<serde_json::Value>) {
-    let payload = match payload.as_object() {
-        None => {
-            return (
-                StatusCode::BAD_REQUEST,
-                json!({"ok": false, "message": "payload must be a JSON object"}).into(),
-            );
+    // parsing a large payload into NamedRows is CPU-bound: do it in the blocking pool too
+    let result = spawn_blocking(move || -> miette::Result<()> {
+        let obj = payload
+            .as_object()
+            .ok_or_else(|| miette!("payload must be a JSON object"))?;
+        let mut ret = BTreeMap::new();
+        for (k, v) in obj {
+            ret.insert(k.to_string(), NamedRows::from_json(v)?);
         }
-        Some(pl) => {
-            let mut ret = BTreeMap::new();
-            for (k, v) in pl {
-                let nr = match NamedRows::from_json(v) {
-                    Ok(p) => p,
-                    Err(err) => {
-                        return (
-                            StatusCode::BAD_REQUEST,
-                            json!({"ok": false, "message": err.to_string()}).into(),
-                        );
-                    }
-                };
-                ret.insert(k.to_string(), nr);
-            }
-            ret
-        }
-    };
-
-    let result = spawn_blocking(move || st.db.import_relations(payload)).await;
+        st.db.import_relations(ret)
+    })
+    .await;
     match result {
         Ok(Ok(_)) => (StatusCode::OK, json!({"ok": true}).into()),
         Ok(Err(err)) => {
@@ -526,7 +597,7 @@ async fn post_rule_result(
     let res = match NamedRows::from_json(&res) {
         Ok(res) => res,
         Err(err) => {
-            if let Some(ch) = st.rule_senders.lock().unwrap().remove(&id) {
+            if let Some((_, ch)) = st.rule_senders.lock().unwrap().remove(&id) {
                 let _ = ch.send(Err(miette!("downstream posted malformed result")));
             }
             return (
@@ -535,7 +606,8 @@ async fn post_rule_result(
             );
         }
     };
-    if let Some(ch) = st.rule_senders.lock().unwrap().remove(&id) {
+    let sender = st.rule_senders.lock().unwrap().remove(&id);
+    if let Some((_, ch)) = sender {
         match ch.send(Ok(res)) {
             Ok(_) => (StatusCode::OK, json!({"ok": true}).into()),
             Err(err) => (
@@ -552,7 +624,8 @@ async fn post_rule_err(
     State(st): State<DbState>,
     Path(id): Path<u32>,
 ) -> (StatusCode, Json<serde_json::Value>) {
-    if let Some(ch) = st.rule_senders.lock().unwrap().remove(&id) {
+    let sender = st.rule_senders.lock().unwrap().remove(&id);
+    if let Some((_, ch)) = sender {
         match ch.send(Err(miette!("downstream cancelled computation"))) {
             Ok(_) => (StatusCode::OK, json!({"ok": true}).into()),
             Err(err) => (
@@ -565,13 +638,39 @@ async fn post_rule_err(
     }
 }
 
+/// Unregisters the rule when the SSE stream goes away, and fails every request
+/// still waiting for an answer from this (now gone) downstream.
+struct RuleGuard {
+    name: String,
+    db: DbInstance,
+    rule_senders: RuleSenders,
+}
+
+impl Drop for RuleGuard {
+    fn drop(&mut self) {
+        info!("dropping rules SSE {}", self.name);
+        let _ = self.db.unregister_fixed_rule(&self.name);
+        let mut guard = self.rule_senders.lock().unwrap();
+        let ids: Vec<u32> = guard
+            .iter()
+            .filter(|(_, v)| v.0 == self.name)
+            .map(|(k, _)| *k)
+            .collect();
+        for id in ids {
+            if let Some((_, s)) = guard.remove(&id) {
+                let _ = s.send(Err(miette!("rule stream closed")));
+            }
+        }
+    }
+}
+
 async fn register_rule(
     State(st): State<DbState>,
     Path(name): Path<String>,
     Query(rule_opts): Query<RuleRegisterOptions>,
-) -> Sse<impl Stream<Item=Result<Event, Infallible>>> {
+) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let (rule, task_receiver) = SimpleFixedRule::rule_with_channel(rule_opts.arity);
-    let (down_sender, mut down_receiver) = tokio::sync::mpsc::channel(1);
+    let (down_sender, mut down_receiver) = tokio::sync::mpsc::channel(16);
     let mut errored = None;
 
     if let Err(err) = st.db.register_fixed_rule(name.clone(), rule) {
@@ -579,8 +678,11 @@ async fn register_rule(
     } else {
         let rule_senders = st.rule_senders.clone();
         let rule_counter = st.rule_counter.clone();
+        let rule_name = name.clone();
 
-        rayon::spawn(move || {
+        // Dedicated OS thread: this loop lives as long as the rule is registered,
+        // so it must not occupy a rayon worker (used by the query engine) nor a tokio thread.
+        std::thread::spawn(move || {
             for (inputs, options, sender) in task_receiver {
                 let id = rule_counter.fetch_add(1, Ordering::AcqRel);
                 let inputs: serde_json::Value =
@@ -592,23 +694,26 @@ async fn register_rule(
                 if down_sender.blocking_send((id, inputs, options)).is_err() {
                     let _ = sender.send(Err(miette!("cannot send request to downstream")));
                 } else {
-                    rule_senders.lock().unwrap().insert(id, sender);
+                    rule_senders
+                        .lock()
+                        .unwrap()
+                        .insert(id, (rule_name.clone(), sender));
                 }
             }
         });
     }
 
-    struct Guard {
-        name: String,
-        db: DbInstance,
-    }
-
-    impl Drop for Guard {
-        fn drop(&mut self) {
-            info!("dropping rules SSE {}", self.name);
-            let _ = self.db.unregister_fixed_rule(&self.name);
-        }
-    }
+    // Created before the stream so the rule is cleaned up even if the client
+    // disconnects before the stream is first polled.
+    let guard = if errored.is_none() {
+        Some(RuleGuard {
+            name: name.clone(),
+            db: st.db.clone(),
+            rule_senders: st.rule_senders.clone(),
+        })
+    } else {
+        None
+    };
 
     let stream = async_stream::stream! {
         if let Some(err) = errored {
@@ -616,7 +721,7 @@ async fn register_rule(
             yield Ok(Event::default().json_data(item).unwrap());
         } else {
             info!("starting rule SSE {}", name);
-            let _guard = Guard {db: st.db, name};
+            let _guard = guard;
             while let Some((id, inputs, options)) = down_receiver.recv().await {
                 let item = json!({"type": "request", "id": id, "inputs": inputs, "options": options});
                 yield Ok(Event::default().json_data(item).unwrap());
@@ -626,33 +731,45 @@ async fn register_rule(
     Sse::new(stream).keep_alive(KeepAlive::default())
 }
 
+struct ChangesGuard {
+    id: u32,
+    db: DbInstance,
+    relation: String,
+}
+
+impl Drop for ChangesGuard {
+    fn drop(&mut self) {
+        info!("dropping changes SSE {}: {}", self.relation, self.id);
+        self.db.unregister_callback(self.id);
+    }
+}
+
 async fn observe_changes(
     State(st): State<DbState>,
     Path(relation): Path<String>,
-) -> Sse<impl Stream<Item=Result<Event, Infallible>>> {
+) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let (id, recv) = st.db.register_callback(&relation, None);
-    let (sender, mut receiver) = tokio::sync::mpsc::channel(1);
-    struct Guard {
-        id: u32,
-        db: DbInstance,
-        relation: String,
-    }
+    // Bigger buffer: the engine's callback blocks writers when this channel is full.
+    let (sender, mut receiver) = tokio::sync::mpsc::channel(256);
 
-    impl Drop for Guard {
-        fn drop(&mut self) {
-            info!("dropping changes SSE {}: {}", self.relation, self.id);
-            self.db.unregister_callback(self.id);
-        }
-    }
+    // Created before the stream: unregisters the callback even if the stream is never polled.
+    let guard = ChangesGuard {
+        id,
+        db: st.db.clone(),
+        relation: relation.clone(),
+    };
 
     spawn_blocking(move || {
         for data in recv {
-            sender.blocking_send(data).unwrap();
+            // the client is gone: stop instead of panicking
+            if sender.blocking_send(data).is_err() {
+                break;
+            }
         }
     });
     let stream = async_stream::stream! {
         info!("starting changes SSE {}: {}", relation, id);
-        let _guard = Guard {id, db: st.db, relation};
+        let _guard = guard;
         while let Some((op, new, old)) = receiver.recv().await {
             let item = json!({"op": op.to_string(), "new_rows": new.into_json(), "old_rows": old.into_json()});
             yield Ok(Event::default().json_data(item).unwrap());
@@ -666,8 +783,8 @@ async fn root() -> Html<&'static str> {
 }
 
 fn internal_error<E>(err: E) -> (StatusCode, Json<serde_json::Value>)
-    where
-        E: std::error::Error,
+where
+    E: std::error::Error,
 {
     (
         StatusCode::INTERNAL_SERVER_ERROR,

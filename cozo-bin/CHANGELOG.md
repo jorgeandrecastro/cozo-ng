@@ -5,7 +5,51 @@ Cozo-NG fork, not an official CozoDB upstream release. Crate versions do not
 necessarily correspond to downloadable standalone binary releases or to Docker
 image tags.
 
-## 0.13.2 (unreleased)
+## 0.14.0 (unreleased)
+
+Server hardening and robustness release. The engine dependency stays at
+Cozo-NG `0.12.2`. The HTTP routes and request/response formats are unchanged;
+see "Changed" for the few behaviour differences.
+
+### Added
+
+- New `server` option `--tx-timeout <SECONDS>` (default `300`): multi-statement
+  transactions that stay idle for longer than this are aborted by a background
+  task, so abandoned transactions no longer stay in memory forever.
+- New `server` option `--max-body-mb <MIB>` (default `512`): maximum size of a
+  request body.
+- New `server` option `--no-compress` to disable HTTP response compression.
+- Added `tests/smoke.sh`, a `curl`-based smoke test of the HTTP API (token
+  authentication, queries, immutable mode, export, transaction commit, abort and
+  timeout).
+
+### Fixed
+
+- Fixed the authentication logic: a valid `Authorization: Bearer` token from the
+  token table was rejected whenever the request had a query string. The
+  `x-cozo-auth` header, the `auth` query parameter and the Bearer token are now
+  checked independently.
+- Fixed a panic in `GET /changes/{relation}` when the SSE client disconnected.
+- Fixed the SSE callback (`/changes`) and the fixed rule (`/rules`) staying
+  registered when the client disconnected before the stream was first polled.
+- Fixed requests waiting on a disconnected `/rules` client staying in memory;
+  they now fail with an error when the stream is closed.
+
+### Changed
+
+- Authentication tokens are compared in constant time.
+- Blocking work (token table lookup, starting, committing and aborting
+  transactions, JSON conversion of query parameters and imports) now runs in the
+  blocking thread pool instead of the async worker threads.
+- `/rules` now runs its dispatch loop on a dedicated thread instead of a rayon
+  worker, which is also used by the query engine.
+- The `/changes` event buffer grew from 1 to 256 events, so slow SSE clients are
+  less likely to stall writers.
+- Request bodies are now limited to 512 MiB by default (they were unlimited).
+  Use `--max-body-mb` to change the limit.
+- Transaction ids returned by `POST /transact` are now 64-bit integers.
+
+## 0.13.2
 
 ### Changed
 

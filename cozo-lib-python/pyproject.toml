@@ -1,18 +1,31 @@
 [build-system]
-requires = ["maturin>=1.5,<2.0"]
+requires = ["maturin>=1.4,<2.0"]
 build-backend = "maturin"
 
 [project]
 name = "cozo-ng"
-version = "0.12.2"
 description = "The Embedded Graph + Vector Database for AI Agents & GraphRAG in Python"
-requires-python = ">=3.7"
-classifiers = [
-    "Topic :: Database",
-    "Programming Language :: Rust",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MPL-2.0" }
+authors = [
+    { name = "Jorge André Castro" },
+    { name = "Ziyang Hu" },
 ]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+    "Topic :: Database",
+    "Typing :: Typed",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/jorgeandrecastro/cozo-ng"
+Changelog = "https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-python/CHANGELOG.md"
 
 [tool.maturin]
 module-name = "cozo_embedded"

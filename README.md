@@ -232,22 +232,27 @@ community-maintained surfaces: their presence in this repository does not imply
 release parity or a support commitment. Community contributions to any binding
 are welcome.
 
-| Target / Environment                                     | Platform support                                                                                                        | Storage |
-|----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|---------|
-| [Rust (`cozo-ng`)](https://docs.rs/cozo-ng/)             | Source only, usable on any [platform](https://doc.rust-lang.org/nightly/rustc/platform-support.html) with `std` support | MQRST   |
-| [Standalone HTTP server](./cozo-bin) / [Docker image](#Run-with-Docker) | Linux (x86_64, ARM64), Mac (ARM64, x86_64), Windows (x86_64); Docker image for Linux containers | MQRST   |
-| [CLI (`cozo-ng-cli`)](./cozo-cli)                       | Linux, macOS, Windows (Rust-supported targets)                                                                             | MQR     |
-| [C/C++/FFI (`cozo-lib-c`)](./cozo-lib-c)                 | Linux (x86_64, ARM64), Mac (ARM64, x86_64), Windows (x86_64)                                                            | MQR     |
-| [WebAssembly (`cozo-lib-wasm`)](./cozo-lib-wasm)         | Modern browsers supporting [WebAssembly](https://developer.mozilla.org/en-US/docs/WebAssembly#browser_compatibility)    | M       |
-| [NodeJS (`cozo-lib-nodejs`)](./cozo-lib-nodejs)          | Linux (x86_64, ARM64), Mac (ARM64, x86_64), Windows (x86_64)                                                            | MQR     |
+| Target / Environment | Platform support | Storage |
+|---|---|---|
+| [Rust (`cozo-ng`)](https://docs.rs/cozo-ng/) | Source only, usable on any [platform](https://doc.rust-lang.org/nightly/rustc/platform-support.html) with `std` support | MQRST |
+| [Standalone HTTP server](./cozo-bin) / [Docker image](#Run-with-Docker) | Linux (x86_64, ARM64), macOS (ARM64, x86_64), Windows (x86_64); Docker image for Linux containers | MQRST |
+| [CLI (`cozo-ng-cli`)](./cozo-cli) | Linux, macOS, Windows (Rust-supported targets) | MQR |
+| [Python (`cozo-ng` on PyPI)](./cozo-lib-python) | Python 3.9+; Linux, macOS and Windows wheels | MQR |
+| [C/C++/FFI (`cozo-lib-c`)](./cozo-lib-c) | Linux (x86_64, ARM64), macOS (ARM64, x86_64), Windows (x86_64) | MQR |
+| [WebAssembly (`cozo-lib-wasm`)](./cozo-lib-wasm) | Modern browsers supporting [WebAssembly](https://developer.mozilla.org/en-US/docs/WebAssembly#browser_compatibility) | M |
+| [Node.js (`cozo-lib-nodejs`)](./cozo-lib-nodejs) | Linux (x86_64, ARM64), macOS (ARM64, x86_64), Windows (x86_64) | MQR |
 
 Python, Java, Swift, Node.js, WebAssembly, C, and other non-Rust bindings are not current core-maintenance priorities. The original upstream packages may not contain Cozo-NG changes. Please coordinate with the project if you would like to contribute or take responsibility for one of these bindings. In the meantime, the [Docker image](#Run-with-Docker) gives any language access to the engine over HTTP.
 
-The [Python binding](./cozo-lib-python/README.md) is configured as the
-`cozo-ng` PyPI distribution with the `cozo_embedded` module. Its
+The [Python binding](./cozo-lib-python/README.md) is crate `cozo-ng-python`
+(`0.13.0`) and targets the Cozo-NG `0.12.2` engine. Its PyPI distribution is
+named `cozo-ng`, while its importable module remains `cozo_embedded`; install it
+with `python -m pip install cozo-ng`. Python 3.9+ is supported, and the package
+includes type stubs and a `py.typed` marker. The
 [PyPI workflow](./.github/workflows/pypi.yaml) builds Linux, Windows and macOS
-artifacts and uploads them on tag refs; see the binding README for setup and
-publication details. Availability depends on a successful release.
+artifacts and uploads them on tag refs. Do not install it alongside the
+upstream `cozo_embedded` package, since both provide the same Python module.
+See the binding README for API, build and publication details.
 
 Storage legend:
 * **M**: In-memory, non-persistent backend
@@ -320,6 +325,13 @@ To customize safely, run your database once, copy `data/OPTIONS-XXXXXX` from you
 The Docker image packages `cozo-bin`, the standalone Cozo-NG server, with the RocksDB storage engine. It exposes the database over HTTP on port `9070`.
 
 The image is named `cozo-bin` on purpose: it contains the standalone server executable, not the Rust library. The embedded library is distributed as the `cozo-ng` crate on crates.io.
+
+The unreleased `cozo-ng-bin` `0.14.0` crate hardens server operation without
+changing the HTTP routes: it fixes token-authentication and disconnected SSE
+handling, expires idle multi-statement transactions after 300 seconds by
+default, and limits request bodies to 512 MiB by default. The timeout and body
+limit are configurable, and response compression can be disabled. See the
+[server changelog](./cozo-bin/CHANGELOG.md) for details.
 
 ### What is it for?
 
@@ -428,6 +440,18 @@ cozo-ng/
 │       └── storage/           # Memory and persistent storage backends
 ├── cozorocks/                 # RocksDB adapter (Rust/C++ bridge and vendored RocksDB)
 ├── cozo-bin/                  # Optional standalone HTTP server and REPL
+│   ├── src/
+│   │   ├── main.rs            # Executable entry point
+│   │   ├── server.rs          # HTTP API and server startup
+│   │   ├── client.rs          # Client-side query helpers
+│   │   ├── repl.rs            # Interactive terminal interface
+│   │   ├── index.html         # Browser query client
+│   │   └── security.txt       # Server security contact resource
+│   ├── tests/
+│   │   └── smoke.sh           # curl-based HTTP API smoke test
+│   ├── Cargo.toml
+│   ├── README.md
+│   └── CHANGELOG.md
 ├── cozo-cleaner/              # Data cleaning and preparation pipelines
 ├── cozo-cli/                  # Command-line client for embedded and remote databases
 ├── cozo-core-examples/        # Internal Rust examples and tools
@@ -435,6 +459,14 @@ cozo-ng/
 ├── cozo-lib-java/             # Community-driven Java/JNI binding
 ├── cozo-lib-nodejs/           # Community-driven Node.js binding
 ├── cozo-lib-python/           # Community-driven Python binding
+│   ├── src/lib.rs             # PyO3 module implementation
+│   ├── cozo_embedded.pyi      # Python API type stubs
+│   ├── py.typed               # PEP 561 typing marker
+│   ├── pyproject.toml         # Maturin/PyPI package configuration
+│   ├── build.sh
+│   ├── Cargo.toml
+│   ├── README.md
+│   └── CHANGELOG.md
 ├── cozo-lib-swift/            # Community-driven Swift binding
 ├── cozo-lib-wasm/             # Community-driven WebAssembly binding
 ├── .github/workflows/         # CI: build.yml (tests), Docker.yaml (image to ghcr.io)
