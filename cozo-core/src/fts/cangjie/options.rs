@@ -1,3 +1,5 @@
+// cozo-core/src/fts/cangjie/options.rs
+
 /// Tokenizer Option
 #[derive(Debug, Clone)]
 pub(crate) enum TokenizerOption {

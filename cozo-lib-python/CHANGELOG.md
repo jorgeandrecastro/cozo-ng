@@ -6,6 +6,14 @@ PyPI distribution.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.14.0] - 2026-11-19
+
+The engine dependency is Cozo-NG `0.13.0`. The engine optimizes
+stored-relation writes and fixes stale FTS/LSH index cleanup,
+`:rm`/`:delete` with `force_collect` on temporary relations, and `:update` on
+corrupted values (now an error instead of a panic). No Python binding API
+changes.
+
 ## [0.13.0] - 2026-11-17
 
 The engine dependency stays at Cozo-NG `0.12.2`.

@@ -13,12 +13,13 @@ binding is a community integration surface. The npm package linked below is
 the original upstream distribution, not a Cozo-NG release. Contributions to
 build, test, document, or maintain a Cozo-NG-compatible binding are welcome.
 
-The `0.12.2` patch accompanies the engine's query-module refactoring
-and compilation fixes, without changing the Node.js binding API.
-
-The `cozo-ng-node` crate is version `0.12.2` and targets the Cozo-NG 0.12.2
-engine. The npm package `cozo-node` linked below remains an upstream
-distribution, not a Cozo-NG release. See the [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-nodejs/CHANGELOG.md).
+The `cozo-ng-node` crate is version `0.13.0` and targets the Cozo-NG `0.13.0`
+engine. The engine optimizes stored-relation writes and fixes stale FTS/LSH
+index cleanup, `:rm`/`:delete` with `force_collect` on temporary relations, and
+`:update` on corrupted values (now an error instead of a panic); the Node.js
+binding API is unchanged. The npm package `cozo-node` linked below remains an
+upstream distribution, not a Cozo-NG release. See the
+[crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-nodejs/CHANGELOG.md).
 
 This document describes how to set up the Cozo module for use in NodeJS.
 To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).

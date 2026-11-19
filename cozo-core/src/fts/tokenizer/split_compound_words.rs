@@ -1,3 +1,5 @@
+// cozo-core/src/fts/tokenizer/split_compound_words.rs
+
 use super::{BoxTokenStream, Token, TokenFilter, TokenStream};
 use aho_corasick::{AhoCorasick, AhoCorasickBuilder, MatchKind};
 use miette::{IntoDiagnostic, Result};

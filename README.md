@@ -36,13 +36,32 @@
 8. [Links](#Links)
 9. [Licensing and contributing](#Licensing-and-contributing)
 
-## 🚀 Roadmap: v0.12 (Current Focus)
+## 🚀 Roadmap: v0.13 (Current Focus)
 
-Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name. Version `0.12.2` continues this independent maintenance with a Rust-first focus on the embedded engine and its use as a data layer for AI agents and GraphRAG.
+Cozo-NG resumes maintenance from the upstream `v0.7.6` codebase. Version `0.8.0` refreshed the Rust workspace and moved it to edition 2024 while retaining the `cozo` library name. Version `0.13.0` continues this independent maintenance with a Rust-first focus on the embedded engine and its use as a data layer for AI agents and GraphRAG.
 
-The `0.12.2` engine version reorganizes relational algebra and stored
-relation query execution into focused modules and fixes related compilation
-issues. See the [changelog](CHANGELOG.md) for the workspace release notes.
+The `0.13.0` engine optimizes stored-relation writes (`:put`, `:insert`,
+`:update`, `:rm`, and `:delete`) and adds a stored-write benchmark. It fixes
+stale FTS/LSH index entries on `:put`, `:rm`/`:delete` with `force_collect` on
+temporary relations, and `:update` on corrupted values, which now returns an
+error instead of panicking. There are no public engine API or storage-format
+changes. See the [engine changelog](cozo-core/CHANGELOG.md) for details.
+
+The versions in this workspace are:
+
+| Component | Crate | Version |
+|---|---|---|
+| Engine | `cozo-ng` | `0.13.0` |
+| CLI | `cozo-ng-cli` | `0.3.0` |
+| Standalone server | `cozo-ng-bin` | `0.15.0` |
+| Cleaner | `cozo-ng-cleaner` | `0.1.2` |
+| RocksDB adapter | `cozo-ng-rocks` | `0.6.0` |
+| Python binding | `cozo-ng-python` | `0.14.0` |
+| C, Java, Node.js, Swift, WebAssembly bindings | `cozo-ng-c`, `cozo-ng-java`, `cozo-ng-node`, `cozo-ng-swift`, `cozo-ng-wasm` | `0.13.0` each |
+| Internal examples | `cozo-core-examples` | `0.2.1` |
+
+These are workspace crate versions; they do not imply that matching packages,
+prebuilt binaries, or Docker images have already been published.
 
 The focus is a high-performance, transactional, embedded Rust database that brings together relational storage, Datalog-powered knowledge graphs, and HNSW vector search. It is designed to give Rust AI agents and GraphRAG applications a local, in-process data layer.
 
@@ -54,7 +73,7 @@ Why Cozo-NG for AI and local-first applications?
 * **A dedicated CLI:** Query embedded or remote databases, import and export data, use vector and graph commands, or explore a database in the REPL.
 * **Data preparation for GraphRAG:** Clean, validate, deduplicate and chunk source data with the standalone `cozo-ng-cleaner` crate or the CLI before importing it.
 
-The v0.12 roadmap:
+The v0.13 roadmap:
 * [x] **Fork initialization:** Establish the independent project, licensing, crate namespace, and repository structure.
 * [ ] **Dependency modernization:** Finish validating updated dependencies across supported Rust toolchains, storage features, and platforms.
 * [x] **Rust-first scope:** Focus official maintenance on the Rust database engine and its Rust APIs. Keep `cozo` as the library name for migration compatibility.
@@ -64,7 +83,7 @@ The v0.12 roadmap:
 * [ ] **Storage safety:** Treat on-disk formats and migration behavior as compatibility-sensitive; test backend changes and document migrations.
 * **Community bindings:** Python, Node.js, WASM, Java, Swift, C, and other non-Rust bindings are welcome community efforts. Collaborations and pull requests to build, test, document, or maintain them are warmly welcome, but they are not currently part of the core maintenance commitment.
 
-See the [0.12.2 changelog](CHANGELOG.md) and [maintenance and contribution guidelines](CONTRIBUTING.md).
+See the [engine changelog](cozo-core/CHANGELOG.md), [workspace changelog](CHANGELOG.md), and [maintenance and contribution guidelines](CONTRIBUTING.md).
 
 ---
 
@@ -216,8 +235,12 @@ Add `cozo-ng` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.12.2" }
+cozo = { package = "cozo-ng", version = "0.13.0" }
 ```
+
+This dependency resolves from crates.io once `0.13.0` is published. To use
+this workspace checkout before publication, add
+`path = "/path/to/cozo-ng/cozo-core"` to the dependency.
 
 Because `cozo-ng` preserves the internal library name `cozo`, your Rust imports remain unchanged:
 
@@ -245,10 +268,11 @@ are welcome.
 Python, Java, Swift, Node.js, WebAssembly, C, and other non-Rust bindings are not current core-maintenance priorities. The original upstream packages may not contain Cozo-NG changes. Please coordinate with the project if you would like to contribute or take responsibility for one of these bindings. In the meantime, the [Docker image](#Run-with-Docker) gives any language access to the engine over HTTP.
 
 The [Python binding](./cozo-lib-python/README.md) is crate `cozo-ng-python`
-(`0.13.0`) and targets the Cozo-NG `0.12.2` engine. Its PyPI distribution is
+(`0.14.0`) and targets the Cozo-NG `0.13.0` engine. Its PyPI distribution is
 named `cozo-ng`, while its importable module remains `cozo_embedded`; install it
-with `python -m pip install cozo-ng`. Python 3.9+ is supported, and the package
-includes type stubs and a `py.typed` marker. The
+with `python -m pip install cozo-ng`. That command installs the version
+available on PyPI, which may not yet match the workspace. Python 3.9+ is
+supported, and the package includes type stubs and a `py.typed` marker. The
 [PyPI workflow](./.github/workflows/pypi.yaml) builds Linux, Windows and macOS
 artifacts and uploads them on tag refs. Do not install it alongside the
 upstream `cozo_embedded` package, since both provide the same Python module.
@@ -268,6 +292,10 @@ Install the `cozo-ng` command-line tool from crates.io:
 ```sh
 cargo install cozo-ng-cli
 ```
+
+This installs the version available on crates.io, which may not yet be the
+workspace's `0.3.0`. To install the workspace version from a checkout, run
+`cargo install --path cozo-cli` from the repository root.
 
 By default, the CLI includes SQLite, graph algorithms, and the data cleaner. It can use in-memory,
 SQLite, or (with the `rocksdb` feature) RocksDB databases, as well as a remote
@@ -308,7 +336,7 @@ database as a Rust library:
 
 ```toml
 [dependencies]
-cozo-ng-cleaner = "0.1"
+cozo-ng-cleaner = "0.1.2"
 ```
 
 See the [cleaner guide](./cozo-cleaner/README.md) for all pipeline steps and
@@ -326,12 +354,14 @@ The Docker image packages `cozo-bin`, the standalone Cozo-NG server, with the Ro
 
 The image is named `cozo-bin` on purpose: it contains the standalone server executable, not the Rust library. The embedded library is distributed as the `cozo-ng` crate on crates.io.
 
-The unreleased `cozo-ng-bin` `0.14.0` crate hardens server operation without
-changing the HTTP routes: it fixes token-authentication and disconnected SSE
-handling, expires idle multi-statement transactions after 300 seconds by
-default, and limits request bodies to 512 MiB by default. The timeout and body
-limit are configurable, and response compression can be disabled. See the
-[server changelog](./cozo-bin/CHANGELOG.md) for details.
+The workspace's `cozo-ng-bin` `0.15.0` targets the `0.13.0` engine. Server
+version `0.14.0` hardened operation without changing HTTP routes: it fixed
+token authentication and disconnected SSE handling, expires idle multi-statement
+transactions after 300 seconds by default, and limits request bodies to 512 MiB
+by default. The timeout and body limit are configurable, and response
+compression can be disabled. An image's version depends on its published tag,
+not the workspace version; see the [server changelog](./cozo-bin/CHANGELOG.md)
+for details.
 
 ### What is it for?
 
@@ -398,7 +428,7 @@ The first build takes a while because RocksDB is compiled from source.
 ### Good to know
 
 * **Security:** inside the container the server listens on `0.0.0.0` so that port publishing works, which is why it requires the `x-cozo-auth` token. This token is only a last line of defence: publish the port on `127.0.0.1` as shown above, or put the server behind a reverse proxy with proper authentication, before exposing it to a network. Run `cozo-bin server --help` for the available options.
-* **Tags:** images are published to `ghcr.io` by GitHub Actions on pushes to `main` and on version tags (`v*`). Pushing the tag `v0.12.2` publishes the tags `0.12.2` and `0.12`. Use a version or SHA tag for reproducible deployments rather than `main`.
+* **Tags:** images are published to `ghcr.io` by GitHub Actions on pushes to `main` and on version tags (`v*`). For example, pushing `v0.13.0` would publish `0.13.0` and `0.13`; it does not imply these tags have already been published. Use a version or SHA tag for reproducible deployments rather than `main`.
 * **Custom options:** the arguments after the image name replace the default command, for example `docker run ... ghcr.io/jorgeandrecastro/cozo-bin:main server --help`.
 * **Data and upgrades:** the on-disk format is compatibility-sensitive. Back up the volume before upgrading across minor versions and read the [changelog](CHANGELOG.md).
 

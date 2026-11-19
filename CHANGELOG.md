@@ -2,7 +2,32 @@
 
 Notable changes to Cozo-NG are documented here. Cozo-NG is an independent community continuation of CozoDB; upstream release history is not the release history of this fork.
 
-## 0.12.2 (unreleased)
+## 0.13.0
+
+### Changed
+
+- Optimized stored-relation writes (`:put`, `:insert`, `:update`, `:rm`, and
+  `:delete`), reducing unnecessary reads, row copies, and trigger conversions.
+- Updated the workspace to engine `cozo-ng 0.13.0`, CLI `cozo-ng-cli 0.3.0`,
+  server `cozo-ng-bin 0.15.0`, RocksDB adapter `cozo-ng-rocks 0.6.0`, Python
+  binding `cozo-ng-python 0.14.0`, and C, Java, Node.js, Swift, and WebAssembly
+  binding crates `0.13.0`.
+- No public engine API or storage-format changes.
+
+### Fixed
+
+- Removed stale full-text and LSH index entries when `:put` replaces an
+  existing row, even without a regular index.
+- Corrected `:rm`/`:delete` with `force_collect` on temporary relations to
+  read previous values from the temporary store.
+- Return an error instead of panicking when `:update` reads a corrupted value.
+
+### Added
+
+- Added the `stored_write` benchmark for stored-relation and index writes; see
+  the [engine changelog](cozo-core/CHANGELOG.md) for details.
+
+## 0.12.2
 
 ### Changed
 

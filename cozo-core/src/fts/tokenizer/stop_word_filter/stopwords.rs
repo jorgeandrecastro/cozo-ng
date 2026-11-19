@@ -1,6 +1,7 @@
 /*
 These stop word lists are from the stopwords-iso project (https://github.com/stopwords-iso/stopwords-iso/) which carries the MIT license.
 */
+// cozo-core/src/fts/tokenizer/stop_word_filter/stopwords.rs
 
 pub(crate) const AF: &[&str] = &[
     r#"'n"#,

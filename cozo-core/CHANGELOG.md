@@ -5,7 +5,43 @@ community-maintained fork of CozoDB; these are Cozo-NG releases, not upstream
 CozoDB releases. The package is `cozo-ng`, while the Rust library remains
 `cozo`.
 
-## 0.12.2 (unreleased)
+## 0.13.0
+
+### Changed
+
+- Optimized the stored-relation write path (`:put`, `:insert`, `:update`, `:rm`,
+  `:delete`) in `query/stored/`:
+  - Added a shared `WriteFlags` helper (`query/stored/flags.rs`) so the access
+    check and the index/trigger/callback flags are computed in one place.
+  - `:insert` no longer reads the existing row (the key is known to be absent).
+  - `:delete` performs a single store read instead of `exists` followed by `get`.
+  - `:update` only builds the previous row when indices, triggers or callbacks
+    need it, and no longer clones untouched columns (for example large
+    embeddings) otherwise.
+  - Rows are now built with pre-sized buffers, and `:rm`/`:delete` keep their
+    collected tuples as `Vec<Tuple>` instead of wrapping them in
+    `DataValue::List`.
+  - Trigger inputs for `:rm`/`:delete` are converted once instead of once per
+    trigger.
+- Moved the `Replace` error types in `query/stored.rs` to module level.
+- Reading a corrupted value during `:update` now returns an error instead of
+  panicking.
+- No public API or storage-format changes.
+
+### Fixed
+
+- `:put` over an existing key now removes stale full-text (FTS) and LSH index
+  entries even when the relation has no regular index.
+- `:rm`/`:delete` on a temporary relation with `force_collect` now reads the
+  previous values from the temporary store.
+
+### Added
+
+- New benchmark `benches/stored_write.rs` covering `:put`, `:update`, `:rm`,
+  FTS and HNSW write paths. Run it with
+  `cargo +nightly bench -p cozo-ng --features nightly-benchmarks --bench stored_write`.
+
+## 0.12.2 
 
 ### Changed
 

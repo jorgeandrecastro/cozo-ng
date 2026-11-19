@@ -4,12 +4,13 @@ All notable changes to `cozo-ng-cleaner` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/) (below `1.0`, minor releases may contain breaking changes).
 
-## 0.1.2 (unreleased)
+## 0.1.3 
 
 ### Changed
 
-- Prepared a patch release alongside the Cozo-NG `0.12.2` query-module
-  refactoring. The standalone cleaner has no engine dependency or API changes.
+- Prepared a patch release alongside Cozo-NG `0.13.0`. The standalone cleaner
+  has no engine dependency, so the engine's stored-relation write changes do
+  not affect its behavior or API.
 
 ## 0.1.1 - 2026-11-16
 

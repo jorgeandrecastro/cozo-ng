@@ -1,3 +1,5 @@
+# cozo-core/src/fts/tokenizer/stop_word_filter/gen_stopwords.py
+
 import requests
 
 resp = requests.get("https://raw.githubusercontent.com/stopwords-iso/stopwords-iso/master/stopwords-iso.json")

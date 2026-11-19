@@ -1,6 +1,6 @@
 [package]
 name = "cozo-ng-python"
-version = "0.13.0"
+version = "0.14.0"
 edition = "2024"
 rust-version = "1.85"
 description = "The Embedded Graph + Vector Database for AI Agents & GraphRAG in Python"
@@ -27,7 +27,7 @@ jemalloc = ["cozo/jemalloc"]
 io-uring = ["cozo/io-uring"]
 
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.12.2", path = "../cozo-core", default-features = false }
+cozo = { package = "cozo-ng", version = "0.13", path = "../cozo-core", default-features = false }
 pyo3 = { version = "0.22.6", features = ["extension-module", "abi3", "abi3-py39", "gil-refs"] }
 miette = "7.6"
 serde_json = "1.0"

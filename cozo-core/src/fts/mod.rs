@@ -5,6 +5,7 @@
  * If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+// cozo-core/src/fts/mod.rs
 
 use crate::data::memcmp::MemCmpEncoder;
 use crate::fts::cangjie::tokenizer::CangJieTokenizer;

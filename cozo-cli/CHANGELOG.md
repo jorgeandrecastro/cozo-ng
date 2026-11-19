@@ -3,13 +3,16 @@
 All notable changes to `cozo-ng-cli` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## 0.2.2 (unreleased)
+## 0.3.0 
 
 ### Changed
 
-- Prepared the CLI for the Cozo-NG `0.12.2` query-module refactoring and
-  compilation fixes. No CLI API changes.
+- Updated the engine dependency to Cozo-NG `0.13.0`. The engine optimizes
+  stored-relation writes and fixes stale FTS/LSH index cleanup,
+  `:rm`/`:delete` with `force_collect` on temporary relations, and `:update`
+  on corrupted values (now an error instead of a panic).
 - Updated the optional cleaner dependency to `cozo-ng-cleaner 0.1.2`.
+- No CLI command or output-format changes.
 
 ## 0.2.1
 

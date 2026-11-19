@@ -4,6 +4,13 @@ Release notes for the `cozo-ng-rocks` crate. This crate is part of the
 independently maintained Cozo-NG fork and is not an official CozoDB upstream
 release.
 
+## 0.6.0 
+
+### Changed
+
+- Aligned the adapter release with Cozo-NG `0.13.0`. The engine's stored-write
+  optimizations and fixes do not change the adapter API or storage behavior.
+
 ## 0.5.2 (unreleased)
 
 ### Changed

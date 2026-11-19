@@ -5,6 +5,7 @@
  * If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+// cozo-core/src/query/stored.rs
 
 use std::collections::BTreeSet;
 
@@ -25,6 +26,7 @@ use crate::Db;
 
 mod assertions;
 mod extractors;
+mod flags;
 mod indexes;
 mod remove;
 mod triggers;
@@ -34,6 +36,16 @@ mod write;
 #[error("attempting to write into relation {0} of arity {1} with data of arity {2}")]
 #[diagnostic(code(eval::relation_arity_mismatch))]
 struct RelationArityMismatch(String, usize, usize);
+
+#[derive(Debug, Error, Diagnostic)]
+#[error("replace op in trigger is not allowed: {0}")]
+#[diagnostic(code(eval::replace_in_trigger))]
+struct ReplaceInTrigger(String);
+
+#[derive(Debug, Error, Diagnostic)]
+#[error("cannot replace relation {0} since it has indices")]
+#[diagnostic(code(eval::replace_rel_with_indices))]
+struct ReplaceRelationWithIndices(String);
 
 impl<'a> SessionTx<'a> {
     pub(crate) fn execute_relation<'s, S: Storage<'s>>(
@@ -53,18 +65,10 @@ impl<'a> SessionTx<'a> {
         let mut replaced_old_triggers = None;
         if op == RelationOp::Replace {
             if !propagate_triggers {
-                #[derive(Debug, Error, Diagnostic)]
-                #[error("replace op in trigger is not allowed: {0}")]
-                #[diagnostic(code(eval::replace_in_trigger))]
-                struct ReplaceInTrigger(String);
                 bail!(ReplaceInTrigger(meta.name.to_string()))
             }
             if let Ok(old_handle) = self.get_relation(&meta.name, true) {
                 if !old_handle.indices.is_empty() {
-                    #[derive(Debug, Error, Diagnostic)]
-                    #[error("cannot replace relation {0} since it has indices")]
-                    #[diagnostic(code(eval::replace_rel_with_indices))]
-                    struct ReplaceRelationWithIndices(String);
                     bail!(ReplaceRelationWithIndices(old_handle.name.to_string()))
                 }
                 if old_handle.access_level < AccessLevel::Normal {

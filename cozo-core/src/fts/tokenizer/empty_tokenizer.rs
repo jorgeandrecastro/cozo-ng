@@ -1,3 +1,5 @@
+// cozo-core/src/fts/tokenizer/empty_tokenizer.rs
+
 use crate::fts::tokenizer::{BoxTokenStream, Token, TokenStream, Tokenizer};
 
 #[derive(Clone)]

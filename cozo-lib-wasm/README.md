@@ -10,12 +10,13 @@ npm package linked below is an upstream distribution, not a Cozo-NG release.
 Contributions to build, test, document, or maintain a Cozo-NG WebAssembly
 integration are welcome.
 
-The `0.12.2` patch accompanies the engine's query-module refactoring
-and compilation fixes, without changing the WebAssembly binding API.
-
-The `cozo-ng-wasm` crate is version `0.12.2` and targets the Cozo-NG 0.12.2
-engine. The npm package linked below remains an upstream distribution, not a
-Cozo-NG release. See the [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-wasm/CHANGELOG.md).
+The `cozo-ng-wasm` crate is version `0.13.0` and targets the Cozo-NG `0.13.0`
+engine. The engine optimizes stored-relation writes and fixes stale FTS/LSH
+index cleanup, `:rm`/`:delete` with `force_collect` on temporary relations, and
+`:update` on corrupted values (now an error instead of a panic); the
+WebAssembly binding API is unchanged. The npm package linked below remains an
+upstream distribution, not a Cozo-NG release. See the
+[crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-wasm/CHANGELOG.md).
 
 This crate provides Cozo web assembly modules for browsers.
 If you are targeting NodeJS, use [this](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-nodejs/README.md) instead: 

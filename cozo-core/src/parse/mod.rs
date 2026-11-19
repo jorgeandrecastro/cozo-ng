@@ -5,6 +5,7 @@
  * If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+// cozo-core/src/parse/mod.rs
 //! AST for Cozo scripts, for generating Cozo scripts programmatically.
 //!
 //! NOTE! This is unstable, the AST structure and method signatures may change in any release. Use at your own risk.

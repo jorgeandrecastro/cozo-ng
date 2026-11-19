@@ -1,3 +1,5 @@
+// cozo-core/src/fts/tokenizer/whitespace_tokenizer.rs
+
 use std::str::CharIndices;
 
 use super::{BoxTokenStream, Token, TokenStream, Tokenizer};

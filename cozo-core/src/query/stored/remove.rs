@@ -5,6 +5,7 @@
  * If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+// cozo-core/src/query/stored/remove.rs
 
 use std::collections::BTreeSet;
 
@@ -18,14 +19,13 @@ use crate::data::tuple::Tuple;
 use crate::data::value::{DataValue, ValidityTs};
 use crate::parse::parse_script;
 use crate::runtime::callback::{CallbackCollector, CallbackOp};
-use crate::runtime::relation::{
-    extend_tuple_from_v, AccessLevel, InsufficientAccessLevel, RelationHandle,
-};
+use crate::runtime::relation::{extend_tuple_from_v, RelationHandle};
 use crate::runtime::transact::SessionTx;
 use crate::storage::Storage;
 use crate::{Db, NamedRows, SourceSpan, StoreTx};
 
 use super::extractors::make_extractors;
+use super::flags::WriteFlags;
 use super::triggers::make_const_rule;
 use super::TransactAssertionFailure;
 
@@ -47,16 +47,15 @@ impl<'a> SessionTx<'a> {
         force_collect: &str,
         span: SourceSpan,
     ) -> Result<()> {
-        let is_callback_target =
-            callback_targets.contains(&relation_store.name) || force_collect == relation_store.name;
+        let f = WriteFlags::new(
+            relation_store,
+            callback_targets,
+            force_collect,
+            propagate_triggers,
+            !relation_store.rm_triggers.is_empty(),
+            "row removal",
+        )?;
 
-        if relation_store.access_level < AccessLevel::Protected {
-            bail!(InsufficientAccessLevel(
-                relation_store.name.to_string(),
-                "row removal".to_string(),
-                relation_store.access_level
-            ));
-        }
         let key_extractors = make_extractors(
             &relation_store.metadata.keys,
             &metadata.keys,
@@ -64,27 +63,34 @@ impl<'a> SessionTx<'a> {
             headers,
         )?;
 
-        let need_to_collect = !force_collect.is_empty()
-            || (!relation_store.is_temp
-                && (is_callback_target
-                    || (propagate_triggers && !relation_store.rm_triggers.is_empty())));
-        let has_indices = !relation_store.indices.is_empty();
-        let has_hnsw_indices = !relation_store.hnsw_indices.is_empty();
-        let has_fts_indices = !relation_store.fts_indices.is_empty();
-        let has_lsh_indices = !relation_store.lsh_indices.is_empty();
         let fts_processors = self.make_fts_lsh_processors(relation_store)?;
-        let mut new_tuples: Vec<DataValue> = vec![];
-        let mut old_tuples: Vec<DataValue> = vec![];
+        let mut new_tuples: Vec<Tuple> = vec![];
+        let mut old_tuples: Vec<Tuple> = vec![];
         let mut stack = vec![];
+        let n_keys = key_extractors.len();
 
         for tuple in res_iter {
-            let extracted: Vec<DataValue> = key_extractors
-                .iter()
-                .map(|ex| ex.extract_data(&tuple, cur_vld))
-                .try_collect()?;
+            let mut extracted: Vec<DataValue> = Vec::with_capacity(n_keys);
+            for ex in &key_extractors {
+                extracted.push(ex.extract_data(&tuple, cur_vld)?);
+            }
             let key = relation_store.encode_key_for_store(&extracted, span)?;
+
+            // Une seule lecture quand on a besoin de la valeur existante.
+            let existing = if f.needs_lookup {
+                if relation_store.is_temp {
+                    self.temp_store_tx.get(&key, false)?
+                } else {
+                    self.store_tx.get(&key, false)?
+                }
+            } else {
+                None
+            };
+
             if check_exists {
-                let exists = if relation_store.is_temp {
+                let exists = if f.needs_lookup {
+                    existing.is_some()
+                } else if relation_store.is_temp {
                     self.temp_store_tx.exists(&key, false)?
                 } else {
                     self.store_tx.exists(&key, false)?
@@ -97,18 +103,14 @@ impl<'a> SessionTx<'a> {
                     });
                 }
             }
-            if need_to_collect
-                || has_indices
-                || has_hnsw_indices
-                || has_fts_indices
-                || has_lsh_indices
-            {
-                if let Some(existing) = self.store_tx.get(&key, false)? {
+
+            if f.needs_lookup {
+                if let Some(existing) = existing {
                     let mut tup = extracted.clone();
                     extend_tuple_from_v(&mut tup, &existing);
                     self.del_in_fts(relation_store, &mut stack, &fts_processors, &tup)?;
                     self.del_in_lsh(relation_store, &tup)?;
-                    if has_indices {
+                    if f.has_indices {
                         for (idx_rel, extractor) in relation_store.indices.values() {
                             let idx_tup = extractor.iter().map(|i| tup[*i].clone()).collect_vec();
                             let encoded =
@@ -116,19 +118,21 @@ impl<'a> SessionTx<'a> {
                             self.store_tx.del(&encoded)?;
                         }
                     }
-                    if has_hnsw_indices {
+                    if f.has_hnsw {
                         for (idx_handle, _) in relation_store.hnsw_indices.values() {
                             self.hnsw_remove(relation_store, idx_handle, &extracted)?;
                         }
                     }
-                    if need_to_collect {
-                        old_tuples.push(DataValue::List(tup));
+                    if f.need_to_collect {
+                        old_tuples.push(tup);
                     }
                 }
-                if need_to_collect {
-                    new_tuples.push(DataValue::List(extracted.clone()));
+                if f.need_to_collect {
+                    // move : plus de clone ici
+                    new_tuples.push(extracted);
                 }
             }
+
             if relation_store.is_temp {
                 self.temp_store_tx.del(&key)?;
             } else {
@@ -136,8 +140,8 @@ impl<'a> SessionTx<'a> {
             }
         }
 
-        // triggers and callbacks
-        if need_to_collect && !new_tuples.is_empty() {
+        // triggers et callbacks
+        if f.need_to_collect && !new_tuples.is_empty() {
             let k_bindings = relation_store
                 .metadata
                 .keys
@@ -154,7 +158,19 @@ impl<'a> SessionTx<'a> {
             kv_bindings.extend(v_bindings);
             let kv_bindings = kv_bindings;
 
-            if propagate_triggers {
+            if propagate_triggers && !relation_store.rm_triggers.is_empty() {
+                // Conversion faite une seule fois, pas une fois par trigger.
+                let new_values: Vec<DataValue> = new_tuples
+                    .iter()
+                    .cloned()
+                    .map(DataValue::List)
+                    .collect();
+                let old_values: Vec<DataValue> = old_tuples
+                    .iter()
+                    .cloned()
+                    .map(DataValue::List)
+                    .collect();
+
                 for trigger in &relation_store.rm_triggers {
                     let mut program = parse_script(
                         trigger,
@@ -164,14 +180,8 @@ impl<'a> SessionTx<'a> {
                     )?
                     .get_single_program()?;
 
-                    make_const_rule(&mut program, "_new", k_bindings.clone(), new_tuples.clone());
-
-                    make_const_rule(
-                        &mut program,
-                        "_old",
-                        kv_bindings.clone(),
-                        old_tuples.clone(),
-                    );
+                    make_const_rule(&mut program, "_new", k_bindings.clone(), new_values.clone());
+                    make_const_rule(&mut program, "_old", kv_bindings.clone(), old_values.clone());
 
                     let (_, cleanups) = db
                         .run_query(
@@ -193,7 +203,7 @@ impl<'a> SessionTx<'a> {
                 }
             }
 
-            if is_callback_target {
+            if f.is_callback_target {
                 let target_collector = callback_collector
                     .entry(relation_store.name.clone())
                     .or_default();
@@ -204,26 +214,14 @@ impl<'a> SessionTx<'a> {
                             .into_iter()
                             .map(|k| k.name.to_string())
                             .collect_vec(),
-                        new_tuples
-                            .into_iter()
-                            .map(|v| match v {
-                                DataValue::List(l) => l,
-                                _ => unreachable!(),
-                            })
-                            .collect_vec(),
+                        new_tuples,
                     ),
                     NamedRows::new(
                         kv_bindings
                             .into_iter()
                             .map(|k| k.name.to_string())
                             .collect_vec(),
-                        old_tuples
-                            .into_iter()
-                            .map(|v| match v {
-                                DataValue::List(l) => l,
-                                _ => unreachable!(),
-                            })
-                            .collect_vec(),
+                        old_tuples,
                     ),
                 ))
             }

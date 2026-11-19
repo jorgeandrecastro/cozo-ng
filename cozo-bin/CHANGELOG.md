@@ -5,7 +5,17 @@ Cozo-NG fork, not an official CozoDB upstream release. Crate versions do not
 necessarily correspond to downloadable standalone binary releases or to Docker
 image tags.
 
-## 0.14.0 (unreleased)
+## 0.15.0 
+
+### Changed
+
+- Updated the engine dependency to Cozo-NG `0.13.0`. The engine optimizes
+  stored-relation writes and fixes stale FTS/LSH index cleanup,
+  `:rm`/`:delete` with `force_collect` on temporary relations, and `:update`
+  on corrupted values (now an error instead of a panic).
+- No HTTP route, request/response format, or engine storage-format changes.
+
+## 0.14.0
 
 Server hardening and robustness release. The engine dependency stays at
 Cozo-NG `0.12.2`. The HTTP routes and request/response formats are unchanged;

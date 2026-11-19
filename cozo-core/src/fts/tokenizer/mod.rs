@@ -3,6 +3,7 @@
  * https://github.com/quickwit-oss/tantivy/tree/0.19.2/src/tokenizer
  * All code here are licensed under the MIT license, as in the original project.
  */
+// cozo-core/src/fts/tokenizer/mod.rs
 
 //! Tokenizer are in charge of chopping text into a stream of tokens
 //! ready for indexing.

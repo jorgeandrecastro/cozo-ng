@@ -4,9 +4,9 @@
 [![docs.rs](https://img.shields.io/docsrs/cozo-ng-cleaner?label=docs.rs)](https://docs.rs/cozo-ng-cleaner)
 
 Data cleaning and preparation pipelines for [Cozo-NG](https://github.com/jorgeandrecastro/cozo-ng), AI agents and GraphRAG.
-The `cozo-ng-cleaner` crate version is `0.1.2`. This patch accompanies the
-Cozo-NG `0.12.2` query-module refactoring; the standalone cleaner does not
-depend on the engine.
+The `cozo-ng-cleaner` crate version is `0.1.3`. Cozo-NG `0.13.0` improves
+stored-relation writes, but the standalone cleaner does not depend on the
+engine, so those changes do not affect its behavior or API.
 See the [changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-cleaner/CHANGELOG.md) for release notes.
 
 Real-world data arrives with stray whitespace, `N/A` strings, numbers stored as text, duplicates, HTML and documents too long

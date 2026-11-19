@@ -20,7 +20,11 @@ The standalone server is an optional way to run Cozo-NG. The project's primary
 maintenance target is the embedded Rust engine; the server is a Rust application
 built on that engine.
 
-The `cozo-ng-bin` crate is version `0.14.0` and targets the Cozo-NG 0.12.2 engine.
+The `cozo-ng-bin` crate is version `0.15.0` and targets the Cozo-NG `0.13.0`
+engine. The engine optimizes stored-relation writes and fixes stale FTS/LSH
+index cleanup, `:rm`/`:delete` with `force_collect` on temporary relations, and
+`:update` on corrupted values (now an error instead of a panic). These changes
+do not alter the server's HTTP interface or the engine storage format.
 
 The `0.14.0` release hardens the HTTP server: fixed token authentication,
 no more panic when an SSE client disconnects, blocking work moved off the async

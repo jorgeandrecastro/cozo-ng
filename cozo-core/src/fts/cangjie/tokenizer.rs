@@ -1,3 +1,5 @@
+// cozo-core/src/fts/cangjie/tokenizer.rs
+
 use super::{options::TokenizerOption, stream::CangjieTokenStream};
 use jieba_rs::Jieba;
 use log::trace;

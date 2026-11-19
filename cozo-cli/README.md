@@ -4,12 +4,11 @@
 
 The command-line tool for [Cozo-NG](https://github.com/jorgeandrecastro/cozo-ng): one binary to query, import, export,
 back up and explore a database, **embedded or remote**, with the same commands.
-Version `0.2.2` targets the Cozo-NG `0.12.2` engine and includes the latest core
-engine improvements; data cleaning is provided
+Version `0.3.0` targets the Cozo-NG `0.13.0` engine, including optimized
+stored-relation writes and fixes for stale FTS/LSH entries,
+`:rm`/`:delete` with `force_collect` on temporary relations, and `:update` on
+corrupted values (now an error instead of a panic); data cleaning is provided
 through `cozo-ng-cleaner`. See the [CLI changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-cli/CHANGELOG.md).
-
-The `0.2.2` patch accompanies the Cozo-NG `0.12.2` query-module
-refactoring and compilation fixes.
 
 ```text
 cozo-ng -d sqlite:./app.db  query "?[count(id)] := *doc{id}"

@@ -5,6 +5,7 @@
  * If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+// cozo-core/src/lib.rs
 
 //! This crate provides the core functionalities of [CozoDB](https://cozodb.org).
 //! It may be used to embed CozoDB in your application.

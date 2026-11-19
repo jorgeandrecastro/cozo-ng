@@ -1,9 +1,9 @@
 [package]
 name = "cozo-ng"
-version = "0.12.2"
+version = "0.13.0"
 edition = "2024"
 description = "A general-purpose, transactional, relational database that uses Datalog and focuses on graph data and algorithms"
-authors = ["Ziyang Hu"]
+authors = ["Ziyang Hu", "Jorge andre Castro"]
 license = "MPL-2.0"
 homepage = "https://github.com/jorgeandrecastro/cozo-ng"
 repository = "https://github.com/jorgeandrecastro/cozo-ng"
@@ -140,7 +140,7 @@ document-features = "0.2"
 rayon = "1.12"
 minreq = { version = "3.0", features = ["https-rustls"], optional = true }
 tikv-jemallocator-global = { version = "0.7", optional = true }
-cozorocks = { package = "cozo-ng-rocks", path = "../cozorocks", version = "0.5.2", optional = true }
+cozorocks = { package = "cozo-ng-rocks", path = "../cozorocks", version = "0.6", optional = true }
 rocksdb = { version = "0.25", optional = true }
 sled = { version = "0.34", optional = true }
 tikv-client = { version = "0.4", optional = true }

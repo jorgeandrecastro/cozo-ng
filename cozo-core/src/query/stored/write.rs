@@ -5,6 +5,7 @@
  * If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+// cozo-core/src/query/stored/write.rs
 
 use std::collections::BTreeSet;
 
@@ -17,14 +18,13 @@ use crate::data::symb::Symbol;
 use crate::data::tuple::{Tuple, ENCODED_KEY_MIN_LEN};
 use crate::data::value::{DataValue, ValidityTs};
 use crate::runtime::callback::CallbackCollector;
-use crate::runtime::relation::{
-    extend_tuple_from_v, AccessLevel, InsufficientAccessLevel, RelationHandle,
-};
+use crate::runtime::relation::{extend_tuple_from_v, RelationHandle};
 use crate::runtime::transact::SessionTx;
 use crate::storage::Storage;
 use crate::{Db, SourceSpan, StoreTx};
 
 use super::extractors::{make_extractors, make_update_extractors};
+use super::flags::WriteFlags;
 use super::TransactAssertionFailure;
 
 impl<'a> SessionTx<'a> {
@@ -46,16 +46,14 @@ impl<'a> SessionTx<'a> {
         force_collect: &str,
         span: SourceSpan,
     ) -> Result<()> {
-        let is_callback_target =
-            callback_targets.contains(&relation_store.name) || force_collect == relation_store.name;
-
-        if relation_store.access_level < AccessLevel::Protected {
-            bail!(InsufficientAccessLevel(
-                relation_store.name.to_string(),
-                "row insertion".to_string(),
-                relation_store.access_level
-            ));
-        }
+        let f = WriteFlags::new(
+            relation_store,
+            callback_targets,
+            force_collect,
+            propagate_triggers,
+            !relation_store.put_triggers.is_empty(),
+            "row insertion",
+        )?;
 
         let mut key_extractors = make_extractors(
             &relation_store.metadata.keys,
@@ -64,14 +62,6 @@ impl<'a> SessionTx<'a> {
             headers,
         )?;
 
-        let need_to_collect = !force_collect.is_empty()
-            || (!relation_store.is_temp
-                && (is_callback_target
-                    || (propagate_triggers && !relation_store.put_triggers.is_empty())));
-        let has_indices = !relation_store.indices.is_empty();
-        let has_hnsw_indices = !relation_store.hnsw_indices.is_empty();
-        let has_fts_indices = !relation_store.fts_indices.is_empty();
-        let has_lsh_indices = !relation_store.lsh_indices.is_empty();
         let mut new_tuples: Vec<DataValue> = vec![];
         let mut old_tuples: Vec<DataValue> = vec![];
 
@@ -91,16 +81,17 @@ impl<'a> SessionTx<'a> {
             )?
         };
         key_extractors.extend(val_extractors);
+        let arity = key_extractors.len();
         let mut stack = vec![];
         let hnsw_filters = Self::make_hnsw_filters(relation_store)?;
         let fts_lsh_processors = self.make_fts_lsh_processors(relation_store)?;
         let lsh_perms = self.make_lsh_hash_perms(relation_store);
 
         for tuple in res_iter {
-            let extracted: Vec<DataValue> = key_extractors
-                .iter()
-                .map(|ex| ex.extract_data(&tuple, cur_vld))
-                .try_collect()?;
+            let mut extracted: Vec<DataValue> = Vec::with_capacity(arity);
+            for ex in &key_extractors {
+                extracted.push(ex.extract_data(&tuple, cur_vld)?);
+            }
 
             let key = relation_store.encode_key_for_store(&extracted, span)?;
 
@@ -122,25 +113,32 @@ impl<'a> SessionTx<'a> {
 
             let val = relation_store.encode_val_for_store(&extracted, span)?;
 
-            if need_to_collect
-                || has_indices
-                || has_hnsw_indices
-                || has_fts_indices
-                || has_lsh_indices
-            {
-                if let Some(existing) = self.store_tx.get(&key, false)? {
+            if f.needs_lookup {
+                // En mode insert, la clé est absente par construction : on évite un `get`.
+                let existing = if is_insert {
+                    None
+                } else {
+                    self.store_tx.get(&key, false)?
+                };
+
+                if let Some(existing) = existing {
                     let mut tup = extracted[0..relation_store.metadata.keys.len()].to_vec();
                     extend_tuple_from_v(&mut tup, &existing);
-                    if has_indices && extracted != tup {
-                        self.update_in_index(relation_store, &extracted, &tup)?;
+                    // CORRECTIF PROBABLE : la suppression FTS/LSH ne doit pas dépendre
+                    // de `has_indices` (une relation peut n'avoir qu'un index FTS/LSH).
+                    // À valider avec un test avant de merger (voir notes).
+                    if extracted != tup {
+                        if f.has_indices {
+                            self.update_in_index(relation_store, &extracted, &tup)?;
+                        }
                         self.del_in_fts(relation_store, &mut stack, &fts_lsh_processors, &tup)?;
                         self.del_in_lsh(relation_store, &tup)?;
                     }
 
-                    if need_to_collect {
+                    if f.need_to_collect {
                         old_tuples.push(DataValue::List(tup));
                     }
-                } else if has_indices {
+                } else if f.has_indices {
                     for (idx_rel, extractor) in relation_store.indices.values() {
                         let idx_tup_new = extractor
                             .iter()
@@ -162,7 +160,7 @@ impl<'a> SessionTx<'a> {
                     &lsh_perms,
                 )?;
 
-                if need_to_collect {
+                if f.need_to_collect {
                     new_tuples.push(DataValue::List(extracted));
                 }
             }
@@ -174,7 +172,7 @@ impl<'a> SessionTx<'a> {
             }
         }
 
-        if need_to_collect && !new_tuples.is_empty() {
+        if f.need_to_collect && !new_tuples.is_empty() {
             self.collect_mutations(
                 db,
                 cur_vld,
@@ -183,7 +181,7 @@ impl<'a> SessionTx<'a> {
                 propagate_triggers,
                 to_clear,
                 relation_store,
-                is_callback_target,
+                f.is_callback_target,
                 new_tuples,
                 old_tuples,
             )?;
@@ -209,16 +207,14 @@ impl<'a> SessionTx<'a> {
         force_collect: &str,
         span: SourceSpan,
     ) -> Result<()> {
-        let is_callback_target =
-            callback_targets.contains(&relation_store.name) || force_collect == relation_store.name;
-
-        if relation_store.access_level < AccessLevel::Protected {
-            bail!(InsufficientAccessLevel(
-                relation_store.name.to_string(),
-                "row update".to_string(),
-                relation_store.access_level
-            ));
-        }
+        let f = WriteFlags::new(
+            relation_store,
+            callback_targets,
+            force_collect,
+            propagate_triggers,
+            !relation_store.put_triggers.is_empty(),
+            "row update",
+        )?;
 
         let key_extractors = make_extractors(
             &relation_store.metadata.keys,
@@ -227,14 +223,6 @@ impl<'a> SessionTx<'a> {
             headers,
         )?;
 
-        let need_to_collect = !force_collect.is_empty()
-            || (!relation_store.is_temp
-                && (is_callback_target
-                    || (propagate_triggers && !relation_store.put_triggers.is_empty())));
-        let has_indices = !relation_store.indices.is_empty();
-        let has_hnsw_indices = !relation_store.hnsw_indices.is_empty();
-        let has_fts_indices = !relation_store.fts_indices.is_empty();
-        let has_lsh_indices = !relation_store.lsh_indices.is_empty();
         let mut new_tuples: Vec<DataValue> = vec![];
         let mut old_tuples: Vec<DataValue> = vec![];
 
@@ -249,12 +237,13 @@ impl<'a> SessionTx<'a> {
         let hnsw_filters = Self::make_hnsw_filters(relation_store)?;
         let fts_lsh_processors = self.make_fts_lsh_processors(relation_store)?;
         let lsh_perms = self.make_lsh_hash_perms(relation_store);
+        let arity = relation_store.arity();
 
         for tuple in res_iter {
-            let mut new_kv: Vec<DataValue> = key_extractors
-                .iter()
-                .map(|ex| ex.extract_data(&tuple, cur_vld))
-                .try_collect()?;
+            let mut new_kv: Vec<DataValue> = Vec::with_capacity(arity);
+            for ex in &key_extractors {
+                new_kv.push(ex.extract_data(&tuple, cur_vld)?);
+            }
 
             let key = relation_store.encode_key_for_store(&new_kv, span)?;
             let original_val_bytes = if relation_store.is_temp {
@@ -262,7 +251,7 @@ impl<'a> SessionTx<'a> {
             } else {
                 self.store_tx.get(&key, true)?
             };
-            let original_val: Tuple = match original_val_bytes {
+            let mut original_val: Tuple = match original_val_bytes {
                 None => {
                     bail!(TransactAssertionFailure {
                         relation: relation_store.name.to_string(),
@@ -270,36 +259,38 @@ impl<'a> SessionTx<'a> {
                         notice: "key to update does not exist".to_string()
                     })
                 }
-                Some(v) => rmp_serde::from_slice(&v[ENCODED_KEY_MIN_LEN..]).unwrap(),
+                Some(v) => rmp_serde::from_slice(&v[ENCODED_KEY_MIN_LEN..]).map_err(|e| {
+                    miette::miette!("corrupted value in relation {}: {e}", relation_store.name)
+                })?,
             };
-            let mut old_kv = Vec::with_capacity(relation_store.arity());
-            old_kv.extend_from_slice(&new_kv);
-            old_kv.extend_from_slice(&original_val);
-            new_kv.reserve_exact(relation_store.arity());
+
+            // old_kv n'est construit que si index / trigger / callback en ont besoin.
+            let old_kv: Option<Vec<DataValue>> = if f.needs_lookup {
+                let mut v = Vec::with_capacity(arity);
+                v.extend_from_slice(&new_kv);
+                v.extend_from_slice(&original_val);
+                Some(v)
+            } else {
+                None
+            };
+
             for (i, extractor) in val_extractors.iter().enumerate() {
-                match extractor {
-                    None => {
-                        new_kv.push(original_val[i].clone());
-                    }
-                    Some(ex) => {
-                        let val = ex.extract_data(&tuple, cur_vld)?;
-                        new_kv.push(val);
-                    }
-                }
+                let v = match extractor {
+                    None if old_kv.is_some() => original_val[i].clone(),
+                    // pas de clone (ex. gros embedding) quand old_kv n'est pas utilisé
+                    None => std::mem::replace(&mut original_val[i], DataValue::Null),
+                    Some(ex) => ex.extract_data(&tuple, cur_vld)?,
+                };
+                new_kv.push(v);
             }
             let new_val = relation_store.encode_val_for_store(&new_kv, span)?;
 
-            if need_to_collect
-                || has_indices
-                || has_hnsw_indices
-                || has_fts_indices
-                || has_lsh_indices
-            {
+            if let Some(old_kv) = old_kv {
                 self.del_in_fts(relation_store, &mut stack, &fts_lsh_processors, &old_kv)?;
                 self.del_in_lsh(relation_store, &old_kv)?;
                 self.update_in_index(relation_store, &new_kv, &old_kv)?;
 
-                if need_to_collect {
+                if f.need_to_collect {
                     old_tuples.push(DataValue::List(old_kv));
                 }
 
@@ -313,7 +304,7 @@ impl<'a> SessionTx<'a> {
                     &lsh_perms,
                 )?;
 
-                if need_to_collect {
+                if f.need_to_collect {
                     new_tuples.push(DataValue::List(new_kv));
                 }
             }
@@ -325,7 +316,7 @@ impl<'a> SessionTx<'a> {
             }
         }
 
-        if need_to_collect && !new_tuples.is_empty() {
+        if f.need_to_collect && !new_tuples.is_empty() {
             self.collect_mutations(
                 db,
                 cur_vld,
@@ -334,7 +325,7 @@ impl<'a> SessionTx<'a> {
                 propagate_triggers,
                 to_clear,
                 relation_store,
-                is_callback_target,
+                f.is_callback_target,
                 new_tuples,
                 old_tuples,
             )?;

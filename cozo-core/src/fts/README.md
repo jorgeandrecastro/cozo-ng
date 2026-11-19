@@ -1,3 +1,4 @@
+<!-- cozo-core/src/fts/README.md -->
 
 Stop words:
 

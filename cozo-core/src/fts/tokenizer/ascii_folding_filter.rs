@@ -1,3 +1,5 @@
+// cozo-core/src/fts/tokenizer/ascii_folding_filter.rs
+
 use std::mem;
 
 use super::{BoxTokenStream, Token, TokenFilter, TokenStream};
