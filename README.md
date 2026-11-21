@@ -51,13 +51,13 @@ The versions in this workspace are:
 
 | Component | Crate | Version |
 |---|---|---|
-| Engine | `cozo-ng` | `0.13.0` |
+| Engine | `cozo-ng` | `0.13.1` |
 | CLI | `cozo-ng-cli` | `0.3.0` |
-| Standalone server | `cozo-ng-bin` | `0.15.0` |
-| Cleaner | `cozo-ng-cleaner` | `0.1.2` |
-| RocksDB adapter | `cozo-ng-rocks` | `0.6.0` |
-| Python binding | `cozo-ng-python` | `0.14.0` |
-| C, Java, Node.js, Swift, WebAssembly bindings | `cozo-ng-c`, `cozo-ng-java`, `cozo-ng-node`, `cozo-ng-swift`, `cozo-ng-wasm` | `0.13.0` each |
+| Standalone server | `cozo-ng-bin` | `0.15.1` |
+| Cleaner | `cozo-ng-cleaner` | `0.1.3` |
+| RocksDB adapter | `cozo-ng-rocks` | `0.6.1` |
+| Python binding | `cozo-ng-python` | `0.14.1` |
+| C, Java, Node.js, Swift, WebAssembly bindings | `cozo-ng-c`, `cozo-ng-java`, `cozo-ng-node`, `cozo-ng-swift`, `cozo-ng-wasm` | `0.13.1` each |
 | Internal examples | `cozo-core-examples` | `0.2.1` |
 
 These are workspace crate versions; they do not imply that matching packages,
@@ -268,7 +268,7 @@ are welcome.
 Python, Java, Swift, Node.js, WebAssembly, C, and other non-Rust bindings are not current core-maintenance priorities. The original upstream packages may not contain Cozo-NG changes. Please coordinate with the project if you would like to contribute or take responsibility for one of these bindings. In the meantime, the [Docker image](#Run-with-Docker) gives any language access to the engine over HTTP.
 
 The [Python binding](./cozo-lib-python/README.md) is crate `cozo-ng-python`
-(`0.14.0`) and targets the Cozo-NG `0.13.0` engine. Its PyPI distribution is
+(`0.14.1`) and targets the Cozo-NG `0.13.1` engine. Its PyPI distribution is
 named `cozo-ng`, while its importable module remains `cozo_embedded`; install it
 with `python -m pip install cozo-ng`. That command installs the version
 available on PyPI, which may not yet match the workspace. Python 3.9+ is
@@ -540,6 +540,7 @@ Bug reports, dependency updates, and pull requests are actively welcomed.
 * [Rust API Docs (`docs.rs`)](https://docs.rs/cozo-ng/)
 * [Crates.io CLI (`cozo-ng-cli`)](https://crates.io/crates/cozo-ng-cli)
 * [CLI guide](./cozo-cli/README.md)
+* Language binding guides: [C](./cozo-lib-c/README.md), [Java/JNI](./cozo-lib-java/README.md), [Node.js](./cozo-lib-nodejs/README.md), [Python](./cozo-lib-python/README.md), [Swift](./cozo-lib-swift/README.md), and [WebAssembly](./cozo-lib-wasm/README.md)
 * [Docker image (`ghcr.io`)](https://github.com/jorgeandrecastro/cozo-ng/pkgs/container/cozo-bin)
 * [Changelog](CHANGELOG.md)
 * [Upstream Documentation (CozoDB v0.7)](https://docs.cozodb.org/en/latest/)

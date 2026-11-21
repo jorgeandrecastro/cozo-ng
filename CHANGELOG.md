@@ -1,6 +1,18 @@
 # Changelog
 
-Notable changes to Cozo-NG are documented here. Cozo-NG is an independent community continuation of CozoDB; upstream release history is not the release history of this fork.
+Notable changes to Cozo-NG are documented here. Cozo-NG is an independent
+community continuation of CozoDB; upstream release history is not Cozo-NG
+release history.
+
+## 0.13.1
+
+### Changed
+
+- Aligned the engine and workspace crates for the Cozo-NG `0.13.1` patch
+  release. No public engine API or storage-format changes.
+- Updated the RocksDB adapter to `cozo-ng-rocks 0.6.1`, the Python binding to
+  `cozo-ng-python 0.14.1`, the standalone server to `cozo-ng-bin 0.15.1`, and
+  the C, Java, Node.js, Swift, and WebAssembly bindings to `0.13.1`.
 
 ## 0.13.0
 

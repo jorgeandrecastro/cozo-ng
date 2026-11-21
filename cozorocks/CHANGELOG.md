@@ -1,22 +1,29 @@
 # Changelog
 
 Release notes for the `cozo-ng-rocks` crate. This crate is part of the
-independently maintained Cozo-NG fork and is not an official CozoDB upstream
+independently maintained Cozo-NG project and is not an official CozoDB upstream
 release.
 
-## 0.6.0 
+## 0.6.1
 
 ### Changed
 
-- Aligned the adapter release with Cozo-NG `0.13.0`. The engine's stored-write
-  optimizations and fixes do not change the adapter API or storage behavior.
+- Aligned the adapter release with Cozo-NG `0.13.1`. No adapter API or storage
+  behavior changes.
 
-## 0.5.2 (unreleased)
+## 0.6.0
 
 ### Changed
 
-- Prepared the adapter patch release alongside the Cozo-NG `0.12.2`
-  query-module refactoring. No adapter API or storage behavior changes.
+- Aligned the adapter release with Cozo-NG `0.13.0`. No adapter API or storage
+  behavior changes.
+
+## 0.5.2
+
+### Changed
+
+- Published the adapter patch alongside the Cozo-NG `0.12.2` query-module
+  refactoring. No adapter API or storage behavior changes.
 
 ## 0.5.1
 

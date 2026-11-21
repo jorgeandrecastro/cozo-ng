@@ -1,9 +1,14 @@
 # Changelog
 
 Release notes for the `cozo-ng` engine crate. Cozo-NG is an independent,
-community-maintained fork of CozoDB; these are Cozo-NG releases, not upstream
-CozoDB releases. The package is `cozo-ng`, while the Rust library remains
-`cozo`.
+community-maintained continuation of CozoDB; these are Cozo-NG releases, not
+upstream CozoDB releases. The package is `cozo-ng`, while the Rust library
+remains `cozo`.
+
+## 0.13.1
+
+- Patch release aligned with the workspace bindings and RocksDB adapter.
+- No engine API, behavior, or storage-format changes.
 
 ## 0.13.0
 

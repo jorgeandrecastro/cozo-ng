@@ -1,9 +1,14 @@
 # Changelog
 
 Release notes for the `cozo-ng-bin` Rust crate. This is part of the independent
-Cozo-NG fork, not an official CozoDB upstream release. Crate versions do not
+Cozo-NG project, not an official CozoDB upstream release. Crate versions do not
 necessarily correspond to downloadable standalone binary releases or to Docker
 image tags.
+
+## 0.15.1
+
+- Updated the engine dependency to Cozo-NG `0.13.1`.
+- No HTTP route, request/response format, or engine storage-format changes.
 
 ## 0.15.0 
 

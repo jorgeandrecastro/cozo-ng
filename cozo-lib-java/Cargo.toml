@@ -1,12 +1,13 @@
 [package]
 name = "cozo-ng-java"
-version = "0.13.0"
+version = "0.13.1"
 edition = "2024"
 license = "MPL-2.0"
-homepage = "https://www.cozodb.org"
+homepage = "https://github.com/jorgeandrecastro/cozo-ng"
 repository = "https://github.com/jorgeandrecastro/cozo-ng"
-documentation = "https://docs.cozodb.org"
-description = "Java bindings for CozoDB"
+documentation = "https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-java/README.md"
+readme = "README.md"
+description = "Java JNI bindings for Cozo-NG"
 
 [lib]
 name = "cozo_java"

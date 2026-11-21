@@ -1,19 +1,19 @@
-# Cozo for Swift on Apple Hardware
+# Cozo-NG Swift bindings for Apple platforms
 
 [![pod](https://img.shields.io/cocoapods/v/CozoSwiftBridge)](https://cocoapods.org/pods/CozoSwiftBridge)
 
-> The CocoaPods package and prebuilt Swift archive described below are upstream distributions, not Cozo-NG releases. They may not contain changes from this fork.
+> The CocoaPods package and prebuilt Swift archive described below are upstream distributions, not Cozo-NG releases.
 
-Cozo-NG is an independent fork and community-maintained continuation of
-[CozoDB](https://github.com/cozodb/cozo), not an official upstream release. It
-sets its own Rust-first direction: an embedded data layer for AI agents and
+Cozo-NG is an independent, community-maintained continuation of
+[CozoDB](https://github.com/cozodb/cozo). It sets its own Rust-first direction:
+an embedded data layer for AI agents and
 GraphRAG combining relational data, Datalog knowledge graphs, and vector
 search. Maintenance focuses on the embedded Rust engine; Swift support is
 community-driven, with no guaranteed release or compatibility schedule.
 Contributions to build, test, document, or maintain a Swift integration are
 welcome.
 
-The `cozo-ng-swift` crate is version `0.13.0` and targets the Cozo-NG `0.13.0`
+The `cozo-ng-swift` crate is version `0.13.1` and targets the Cozo-NG `0.13.1`
 engine. The engine optimizes stored-relation writes and fixes stale FTS/LSH
 index cleanup, `:rm`/`:delete` with `force_collect` on temporary relations, and
 `:update` on corrupted values (now an error instead of a panic); the Swift
@@ -21,8 +21,9 @@ binding API is unchanged. The CocoaPods package and prebuilt archives
 described below remain upstream distributions, not Cozo-NG releases. See the
 [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-swift/CHANGELOG.md).
 
-This document describes how to set up the Cozo module for use in Swift on Apple hardware.
-To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
+This document describes how to build the Cozo-NG binding for Swift on Apple
+hardware. For CozoScript syntax, consult the
+[CozoDB v0.7 language documentation](https://docs.cozodb.org/en/latest/index.html).
 
 This package can be used for MacOS (both Apple ARM and Intel) and iOS (iPad, iPhone and simulators).
 
@@ -30,7 +31,10 @@ Only the `storage-sqlite` persistent engine is enabled for the Swift prebuilt bi
 other storage engines on desktop or mobile does not make too much sense. If you disagree,
 see the Building section below.
 
-## Installation
+## Existing upstream distributions (not Cozo-NG)
+
+The following CocoaPods and archive instructions install upstream releases,
+not the Cozo-NG binding. To build Cozo-NG, use the build instructions below.
 
 ### CocoaPods
 
@@ -45,7 +49,7 @@ end
 ### Swift Package Manager (SPM)
 
 The upstream package is published as an archive containing a Swift package.
-Its releases are not Cozo-NG releases; check the [Cozo-NG release page](https://github.com/jorgeandrecastro/cozo-ng/releases) for fork builds.
+Its releases are not Cozo-NG releases; check the [Cozo-NG release page](https://github.com/jorgeandrecastro/cozo-ng/releases) for Cozo-NG builds.
 Uncompress.
 
 In XCode of your project, select from the menu `File > Add Packages`,
@@ -160,7 +164,8 @@ public class CozoDB {
 }
 ```
 
-More information are [here](https://docs.cozodb.org/en/latest/nonscript.html).
+For the upstream query-interface reference, see
+[CozoDB v0.7 documentation](https://docs.cozodb.org/en/latest/nonscript.html).
 
 ## Building the Swift Package
 

@@ -1,32 +1,36 @@
-# Cozo-lib-java
+# Cozo-NG Java/JNI bindings
 
 This crate provides the JNI bindings for using Cozo in Java/JVM languages/Android.
 
-Cozo-NG is an independent fork and community-maintained continuation of
-[CozoDB](https://github.com/cozodb/cozo), not an official upstream release. It
-sets its own Rust-first direction: an embedded data layer for AI agents and
+Cozo-NG is an independent, community-maintained continuation of
+[CozoDB](https://github.com/cozodb/cozo). It sets its own Rust-first direction:
+an embedded data layer for AI agents and
 GraphRAG combining relational data, Datalog knowledge graphs, and vector
 search. Maintenance focuses on the embedded Rust engine; this JNI binding is
 a community integration surface and may not have release parity with the Rust
 crate. Contributions to build, test, document, or maintain it are welcome.
 
-The `cozo-ng-java` crate is version `0.13.0` and targets the Cozo-NG `0.13.0`
+The `cozo-ng-java` crate is version `0.13.1` and targets the Cozo-NG `0.13.1`
 engine. The engine optimizes stored-relation writes and fixes stale FTS/LSH
 index cleanup, `:rm`/`:delete` with `force_collect` on temporary relations, and
 `:update` on corrupted values (now an error instead of a panic); the Java
-binding API is unchanged. Java/JVM packages and binaries linked below remain
-upstream distributions, not Cozo-NG releases. See the
+binding API is unchanged. Java/JVM packages and binaries linked below are
+separate upstream distributions, not Cozo-NG releases. See the
 [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-java/CHANGELOG.md).
 
-You do not use this crate directly. Instead, use:
+## Using Cozo-NG from the JVM
 
-* [Cozo Java](https://github.com/cozodb/cozo-lib-java) for Java or other JVM languages
-* [Cozo Clojure](https://github.com/cozodb/cozo-clj) for Clojure on JVM (you can also use the Java library, but this one is nicer)
-* [Cozo Android](https://github.com/cozodb/cozo-lib-android) for Android
+This repository contains the Cozo-NG JNI native bridge, but does not publish a
+Cozo-NG Java artifact or a supported public Java wrapper. The Java, Clojure,
+and Android projects below are separate upstream projects and do not use this
+crate or provide Cozo-NG builds:
 
-These are upstream projects and binaries, not Cozo-NG releases. Keep reading
-if you want to build this repository's JNI binding against the Cozo-NG Rust
-engine or contribute to its maintenance.
+* [Cozo Java](https://github.com/cozodb/cozo-lib-java)
+* [Cozo Clojure](https://github.com/cozodb/cozo-clj)
+* [Cozo Android](https://github.com/cozodb/cozo-lib-android)
+
+Use the build instructions below to build the native bridge from this
+repository, or contribute a maintained JVM wrapper.
 
 ## Building for JDK
 

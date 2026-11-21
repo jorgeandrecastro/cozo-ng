@@ -1,10 +1,14 @@
 # Changelog
 
 Release notes for the `cozo-ng-python` Rust crate. Cozo-NG is an independent
-fork of CozoDB. This crate release does not publish or update the upstream
+continuation of CozoDB. This crate release does not publish or update the upstream
 PyPI distribution.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [0.14.1] - 2026-11-21
+
+The engine dependency is Cozo-NG `0.13.1`. No Python binding API changes.
 
 ## [0.14.0] - 2026-11-19
 

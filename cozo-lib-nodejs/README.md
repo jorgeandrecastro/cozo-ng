@@ -1,41 +1,37 @@
-# `cozo-node`
+# Cozo-NG Node.js bindings
 
-[![cozo-node](https://img.shields.io/npm/v/cozo-node)](https://www.npmjs.com/package/cozo-node)
+This directory contains the Cozo-NG Rust binding for Node.js.
 
-Embedded [CozoDB](https://www.cozodb.org) for NodeJS.
-
-Cozo-NG is an independent fork and community-maintained continuation of
-[CozoDB](https://github.com/cozodb/cozo), not an official upstream release. It
-sets its own Rust-first direction: an embedded data layer for AI agents and
+Cozo-NG is an independent, community-maintained continuation of
+[CozoDB](https://github.com/cozodb/cozo). It sets its own Rust-first direction:
+an embedded data layer for AI agents and
 GraphRAG combining relational data, Datalog knowledge graphs, and vector
 search. The Rust engine is the primary maintenance target; this Node.js
-binding is a community integration surface. The npm package linked below is
-the original upstream distribution, not a Cozo-NG release. Contributions to
-build, test, document, or maintain a Cozo-NG-compatible binding are welcome.
+binding is a community integration surface. Contributions to build, document,
+or maintain it are welcome.
 
-The `cozo-ng-node` crate is version `0.13.0` and targets the Cozo-NG `0.13.0`
+The `cozo-ng-node` crate is version `0.13.1` and targets the Cozo-NG `0.13.1`
 engine. The engine optimizes stored-relation writes and fixes stale FTS/LSH
 index cleanup, `:rm`/`:delete` with `force_collect` on temporary relations, and
 `:update` on corrupted values (now an error instead of a panic); the Node.js
-binding API is unchanged. The npm package `cozo-node` linked below remains an
-upstream distribution, not a Cozo-NG release. See the
+binding API is unchanged. See the
 [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-nodejs/CHANGELOG.md).
 
 This document describes how to set up the Cozo module for use in NodeJS.
-To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
+For CozoScript syntax, consult the [CozoDB v0.7 language documentation](https://docs.cozodb.org/en/latest/index.html); this is language-reference material, not Cozo-NG binding documentation.
 
 ## Installation
 
-> `cozo-node` on npm is the original upstream package, not a Cozo-NG release. It may not contain changes from this fork.
+There is currently no Cozo-NG Node.js package published on npm. The npm
+package [`cozo-node`](https://www.npmjs.com/package/cozo-node) is a separate
+upstream distribution; installing it does not install this binding. Build the
+Cozo-NG native library from this repository using the instructions below.
 
-```bash
-npm install --save cozo-node
-```
+## Compatible wrapper API
 
-If that doesn't work because there are no precompiled binaries for your platform,
-scroll below to the building section.
-
-## Usage
+The following examples document the wrapper API implemented by this crate.
+They assume a Node.js wrapper has been packaged locally; no Cozo-NG npm
+package is currently published.
 
 ```javascript
 const {CozoDb} = require('cozo-node')
@@ -129,7 +125,8 @@ class CozoDb {
 }
 ```
 
-More information are [here](https://docs.cozodb.org/en/latest/nonscript.html).
+For the upstream query-interface reference, see
+[CozoDB v0.7 documentation](https://docs.cozodb.org/en/latest/nonscript.html).
 
 ### Advanced API
 
@@ -139,7 +136,8 @@ look at this [example](https://github.com/jorgeandrecastro/cozo-ng/blob/main/coz
 
 ## Building
 
-Building `cozo-node` requires a [Rust toolchain](https://rustup.rs). Run
+Building the Cozo-NG native library requires a
+[Rust toolchain](https://rustup.rs). Run
 
 ```bash
 cargo build --release -p cozo-ng-node -F compact -F storage-rocksdb

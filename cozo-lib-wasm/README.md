@@ -1,49 +1,45 @@
-# Cozo in web assembly
+# Cozo-NG WebAssembly bindings
 
-Cozo-NG is an independent fork and community-maintained continuation of
-[CozoDB](https://github.com/cozodb/cozo), not an official upstream release. It
-sets its own Rust-first direction: an embedded data layer for AI agents and
+Cozo-NG is an independent, community-maintained continuation of
+[CozoDB](https://github.com/cozodb/cozo). It sets its own Rust-first direction:
+an embedded data layer for AI agents and
 GraphRAG combining relational data, Datalog knowledge graphs, and vector
 search. Maintenance focuses on the embedded Rust engine; this WebAssembly
-binding is a community integration surface, not a primary support target. The
-npm package linked below is an upstream distribution, not a Cozo-NG release.
+binding is a community integration surface, not a primary support target.
 Contributions to build, test, document, or maintain a Cozo-NG WebAssembly
 integration are welcome.
 
-The `cozo-ng-wasm` crate is version `0.13.0` and targets the Cozo-NG `0.13.0`
+The `cozo-ng-wasm` crate is version `0.13.1` and targets the Cozo-NG `0.13.1`
 engine. The engine optimizes stored-relation writes and fixes stale FTS/LSH
 index cleanup, `:rm`/`:delete` with `force_collect` on temporary relations, and
 `:update` on corrupted values (now an error instead of a panic); the
-WebAssembly binding API is unchanged. The npm package linked below remains an
-upstream distribution, not a Cozo-NG release. See the
+WebAssembly binding API is unchanged. See the
 [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-wasm/CHANGELOG.md).
 
-This crate provides Cozo web assembly modules for browsers.
-If you are targeting NodeJS, use [this](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-nodejs/README.md) instead: 
+This crate provides Cozo-NG WebAssembly modules for browsers. If you are
+targeting NodeJS, use the [Cozo-NG Node.js binding guide](../cozo-lib-nodejs/README.md):
 native code is still _much_ faster than WASM.
 
-This document describes how to set up the Cozo WASM module for use.
-To learn how to use CozoDB (CozoScript), read the [docs](https://docs.cozodb.org/en/latest/index.html).
+This document describes how to build and use the Cozo-NG WASM module.
+For CozoScript syntax, consult the
+[CozoDB v0.7 language documentation](https://docs.cozodb.org/en/latest/index.html).
 
 ## Installation
 
-> `cozo-lib-wasm` on npm is the original upstream package, not a Cozo-NG release. It may not contain changes from this fork.
-
-```
-npm install cozo-lib-wasm
-```
-
-Alternatively, you can build the WASM package from this fork and include the generated
-JS and WASM files directly in your project: see the `index.html` example
+There is currently no Cozo-NG WebAssembly package published on npm. The
+[`cozo-lib-wasm`](https://www.npmjs.com/package/cozo-lib-wasm) npm package is
+a separate upstream distribution; installing it does not install this crate.
+Build the package from this repository and include the generated JS and WASM
+files directly in your project: see the `index.html` example
 [here](https://rustwasm.github.io/docs/wasm-bindgen/examples/without-a-bundler.html) for
 what is required in your code.
 
 ## Usage
 
-See the code [here](wasm-react-demo/src/App.js). Basically, you write
+After building the crate, import the generated module from `pkg/`:
 
 ```js
-import init, {CozoDb} from "cozo-lib-wasm";
+import init, {CozoDb} from "./pkg/cozo_lib_wasm.js";
 ```
 
 and call
@@ -64,7 +60,7 @@ export class CozoDb {
 
     static new(): CozoDb;
 
-    run(script: string, params: string): string;
+    run(script: string, params: string, immutable: boolean): string;
 
     export_relations(data: string): string;
 
@@ -87,7 +83,7 @@ The next section contains some pointers for how to alleviate this, but expect a 
 You will need to install [Rust](https://rustup.rs/), [NodeJS with npm](https://nodejs.org/),
 and [wasm-pack](https://github.com/rustwasm/wasm-pack) first.
 
-The published module was built with
+Build from this directory with
 
 ```bash
 wasm-pack build --target web --release
