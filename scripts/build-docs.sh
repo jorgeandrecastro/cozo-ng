@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-VERSION=$(cat ./VERSION)
-
-cargo doc -p cozo --no-default-features
-
-mv target/doc ~/cozodb_site/$VERSION/docs.rs
+# Build documentation locally in the same lightweight configuration used on
+# docs.rs. Native RocksDB and optional heavy features are not needed for API docs.
+export DOCS_RS=1
+cargo doc --workspace --no-deps

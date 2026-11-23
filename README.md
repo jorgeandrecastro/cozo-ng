@@ -51,14 +51,14 @@ The versions in this workspace are:
 
 | Component | Crate | Version |
 |---|---|---|
-| Engine | `cozo-ng` | `0.13.1` |
-| CLI | `cozo-ng-cli` | `0.3.0` |
-| Standalone server | `cozo-ng-bin` | `0.15.1` |
-| Cleaner | `cozo-ng-cleaner` | `0.1.3` |
-| RocksDB adapter | `cozo-ng-rocks` | `0.6.1` |
-| Python binding | `cozo-ng-python` | `0.14.1` |
-| C, Java, Node.js, Swift, WebAssembly bindings | `cozo-ng-c`, `cozo-ng-java`, `cozo-ng-node`, `cozo-ng-swift`, `cozo-ng-wasm` | `0.13.1` each |
-| Internal examples | `cozo-core-examples` | `0.2.1` |
+| Engine | `cozo-ng` | `0.13.2` |
+| CLI | `cozo-ng-cli` | `0.3.1` |
+| Standalone server | `cozo-ng-bin` | `0.15.2` |
+| Cleaner | `cozo-ng-cleaner` | `0.1.4` |
+| RocksDB adapter | `cozo-ng-rocks` | `0.6.2` |
+| Python binding | `cozo-ng-python` | `0.14.2` |
+| C, Java, Node.js, Swift, WebAssembly bindings | `cozo-ng-c`, `cozo-ng-java`, `cozo-ng-node`, `cozo-ng-swift`, `cozo-ng-wasm` | `0.13.2` each |
+| Internal examples | `cozo-core-examples` | `0.2.2` |
 
 These are workspace crate versions; they do not imply that matching packages,
 prebuilt binaries, or Docker images have already been published.
@@ -235,10 +235,10 @@ Add `cozo-ng` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-cozo = { package = "cozo-ng", version = "0.13.0" }
+cozo = { package = "cozo-ng", version = "0.13.2" }
 ```
 
-This dependency resolves from crates.io once `0.13.0` is published. To use
+This dependency resolves from crates.io once `0.13.2` is published. To use
 this workspace checkout before publication, add
 `path = "/path/to/cozo-ng/cozo-core"` to the dependency.
 
@@ -268,7 +268,7 @@ are welcome.
 Python, Java, Swift, Node.js, WebAssembly, C, and other non-Rust bindings are not current core-maintenance priorities. The original upstream packages may not contain Cozo-NG changes. Please coordinate with the project if you would like to contribute or take responsibility for one of these bindings. In the meantime, the [Docker image](#Run-with-Docker) gives any language access to the engine over HTTP.
 
 The [Python binding](./cozo-lib-python/README.md) is crate `cozo-ng-python`
-(`0.14.1`) and targets the Cozo-NG `0.13.1` engine. Its PyPI distribution is
+(`0.14.2`) and targets the Cozo-NG `0.13.2` engine. Its PyPI distribution is
 named `cozo-ng`, while its importable module remains `cozo_embedded`; install it
 with `python -m pip install cozo-ng`. That command installs the version
 available on PyPI, which may not yet match the workspace. Python 3.9+ is
@@ -294,7 +294,7 @@ cargo install cozo-ng-cli
 ```
 
 This installs the version available on crates.io, which may not yet be the
-workspace's `0.3.0`. To install the workspace version from a checkout, run
+workspace's `0.3.1`. To install the workspace version from a checkout, run
 `cargo install --path cozo-cli` from the repository root.
 
 By default, the CLI includes SQLite, graph algorithms, and the data cleaner. It can use in-memory,
@@ -336,7 +336,7 @@ database as a Rust library:
 
 ```toml
 [dependencies]
-cozo-ng-cleaner = "0.1.2"
+cozo-ng-cleaner = "0.1.4"
 ```
 
 See the [cleaner guide](./cozo-cleaner/README.md) for all pipeline steps and
@@ -354,7 +354,7 @@ The Docker image packages `cozo-bin`, the standalone Cozo-NG server, with the Ro
 
 The image is named `cozo-bin` on purpose: it contains the standalone server executable, not the Rust library. The embedded library is distributed as the `cozo-ng` crate on crates.io.
 
-The workspace's `cozo-ng-bin` `0.15.0` targets the `0.13.0` engine. Server
+The workspace's `cozo-ng-bin` `0.15.2` targets the `0.13.2` engine. Server
 version `0.14.0` hardened operation without changing HTTP routes: it fixed
 token authentication and disconnected SSE handling, expires idle multi-statement
 transactions after 300 seconds by default, and limits request bodies to 512 MiB

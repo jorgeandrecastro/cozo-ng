@@ -1,6 +1,6 @@
 [package]
 name = "cozo-ng-python"
-version = "0.14.1"
+version = "0.14.2"
 edition = "2024"
 rust-version = "1.85"
 description = "The Embedded Graph + Vector Database for AI Agents & GraphRAG in Python"
@@ -8,8 +8,12 @@ authors = ["Jorge André Castro", "Ziyang Hu"]
 license = "MPL-2.0"
 homepage = "https://github.com/jorgeandrecastro/cozo-ng"
 repository = "https://github.com/jorgeandrecastro/cozo-ng"
-documentation = "https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-python/README.md"
+documentation = "https://docs.rs/cozo-ng-python"
 readme = "README.md"
+
+[package.metadata.docs.rs]
+no-default-features = true
+no-deps = true
 
 [lib]
 name = "cozo_embedded"

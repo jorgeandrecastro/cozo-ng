@@ -5,6 +5,10 @@
  * If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+//! Swift bindings for the Cozo-NG embedded database.
+//!
+//! The crates.io package is `cozo-ng-swift` and the native Rust library name
+//! is `cozo_swift`. Use the Swift package described in the crate README.
 
 use cozo::*;
 

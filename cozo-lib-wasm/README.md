@@ -9,7 +9,7 @@ binding is a community integration surface, not a primary support target.
 Contributions to build, test, document, or maintain a Cozo-NG WebAssembly
 integration are welcome.
 
-The `cozo-ng-wasm` crate is version `0.13.1` and targets the Cozo-NG `0.13.1`
+The `cozo-ng-wasm` crate is version `0.13.2` and targets the Cozo-NG `0.13.2`
 engine. The engine optimizes stored-relation writes and fixes stale FTS/LSH
 index cleanup, `:rm`/`:delete` with `force_collect` on temporary relations, and
 `:update` on corrupted values (now an error instead of a panic); the

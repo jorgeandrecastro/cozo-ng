@@ -1,6 +1,6 @@
 [package]
 name = "cozo-ng"
-version = "0.13.1"
+version = "0.13.2"
 edition = "2024"
 description = "A general-purpose, transactional, relational database that uses Datalog and focuses on graph data and algorithms"
 authors = ["Ziyang Hu", "Jorge andre Castro"]
@@ -8,9 +8,14 @@ license = "MPL-2.0"
 homepage = "https://github.com/jorgeandrecastro/cozo-ng"
 repository = "https://github.com/jorgeandrecastro/cozo-ng"
 documentation = "https://docs.rs/cozo-ng"
+readme = "README.md"
 exclude = [
     "tests/*",
 ]
+
+[package.metadata.docs.rs]
+no-default-features = true
+no-deps = true
 
 [lib]
 name = "cozo"

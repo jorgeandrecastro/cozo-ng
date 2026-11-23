@@ -5,6 +5,12 @@
  * If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+//! JNI bindings for the Cozo-NG embedded database.
+//!
+//! The crates.io package is `cozo-ng-java` and its native library name is
+//! `cozo_java`. Java callers use `CozoJavaBridge` from this crate's bridge
+//! package. See the crate README for setup and usage.
+
 use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicI32, Ordering};
 use std::sync::Mutex;

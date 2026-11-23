@@ -5,6 +5,12 @@ community-maintained continuation of CozoDB; these are Cozo-NG releases, not
 upstream CozoDB releases. The package is `cozo-ng`, while the Rust library
 remains `cozo`.
 
+## 0.13.2
+
+- Patch release for publication and documentation.
+- Added docs.rs metadata and a crate README. No engine API, behavior, or
+  storage-format changes.
+
 ## 0.13.1
 
 - Patch release aligned with the workspace bindings and RocksDB adapter.

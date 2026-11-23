@@ -22,11 +22,11 @@ crate is maintained as a Rust engine component within that project.
 > Cozo query API, or a standalone database. It is an implementation component
 > of the Rust engine; its API and storage behavior may change as Cozo-NG is maintained.
 >
-> This is the Cozo-NG `0.6.1` version, aligned with the Cozo-NG `0.13.1`
+> This is the Cozo-NG `0.6.2` version, aligned with the Cozo-NG `0.13.2`
 > engine. It is not an upstream CozoDB release.
 > See the crate's [changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozorocks/CHANGELOG.md) for release notes.
 
-The Cozo-NG `0.13.1` engine optimizes stored-relation writes and fixes stale
+The Cozo-NG `0.13.2` engine optimizes stored-relation writes and fixes stale
 FTS/LSH index cleanup, `:rm`/`:delete` with `force_collect` on temporary
 relations, and `:update` on corrupted values (now an error instead of a
 panic). These changes do not alter the adapter API or storage behavior.

@@ -4,6 +4,11 @@ Release notes for the `cozo-ng-wasm` Rust crate. Cozo-NG is an independent conti
 of CozoDB. This crate release does not publish or update the upstream npm
 package `cozo-lib-wasm`.
 
+## 0.13.2
+
+- Updated the engine dependency to Cozo-NG `0.13.2`.
+- Added docs.rs metadata and rustdoc landing documentation.
+- No WebAssembly binding API changes.
 
 ## 0.13.1
 

@@ -1,14 +1,18 @@
 [package]
 name = "cozo-ng-swift"
-version = "0.13.1"
+version = "0.13.2"
 edition = "2024"
 description = "Cozo-NG database binding for Swift"
 authors = ["Ziyang Hu"]
 license = "MPL-2.0"
 homepage = "https://github.com/jorgeandrecastro/cozo-ng"
 repository = "https://github.com/jorgeandrecastro/cozo-ng"
-documentation = "https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-swift/README.md"
+documentation = "https://docs.rs/cozo-ng-swift"
 readme = "README.md"
+
+[package.metadata.docs.rs]
+no-default-features = true
+no-deps = true
 
 [lib]
 name = "cozo_swift"

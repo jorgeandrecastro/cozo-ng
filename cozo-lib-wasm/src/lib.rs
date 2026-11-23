@@ -5,6 +5,11 @@
  * If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+//! WebAssembly bindings for the Cozo-NG embedded database.
+//!
+//! The crates.io package is `cozo-ng-wasm` and the Rust library name is
+//! `cozo_lib_wasm`. [`CozoDb`] exposes an in-memory database to JavaScript
+//! applications.
 
 use wasm_bindgen::prelude::*;
 

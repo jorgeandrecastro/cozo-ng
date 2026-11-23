@@ -11,6 +11,14 @@ use std::path::{Path, PathBuf};
 use std::{env, fs, process::Command};
 
 fn main() {
+    // rustdoc does not need the native RocksDB library. Skipping the native
+    // build keeps docs.rs builds small and avoids compiling vendored C++ for
+    // documentation-only builds.
+    if env::var_os("DOCS_RS").is_some() {
+        println!("cargo:rerun-if-env-changed=DOCS_RS");
+        return;
+    }
+
     let target = env::var("TARGET").unwrap();
 
     cxx_build::CFG.include_prefix = "cozorocks";

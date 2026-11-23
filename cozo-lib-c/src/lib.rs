@@ -5,6 +5,13 @@
  * If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+//! C bindings for the Cozo-NG embedded database.
+//!
+//! The package name is `cozo-ng-c`; it exports native `cozo_c` symbols.
+//! Use [`cozo_open_db`], [`cozo_close_db`], [`cozo_run_query`],
+//! [`cozo_import_relations`], [`cozo_export_relations`], and [`cozo_free_str`]
+//! from the generated C API.
+
 #![warn(rust_2018_idioms, future_incompatible)]
 #![allow(clippy::missing_safety_doc)]
 

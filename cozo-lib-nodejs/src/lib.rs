@@ -5,6 +5,11 @@
  * If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+//! Node.js bindings for the Cozo-NG embedded database.
+//!
+//! The crates.io package is `cozo-ng-node` and the native Neon module is
+//! `cozo_node`. JavaScript usage and build instructions are in the crate README.
+
 use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Arc, Mutex};

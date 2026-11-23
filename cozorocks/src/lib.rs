@@ -6,6 +6,13 @@
  * You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+//! Low-level RocksDB storage adapter for Cozo-NG.
+//!
+//! The crate exposes the RocksDB database, transaction, iterator, snapshot,
+//! and status types used by [`cozo-ng`](https://crates.io/crates/cozo-ng).
+//! Most applications should depend on `cozo-ng` instead of this implementation
+//! crate. The published package is `cozo-ng-rocks`; the Rust library name is
+//! `cozorocks`.
 #![warn(rust_2018_idioms, future_incompatible)]
 #![allow(clippy::type_complexity)]
 

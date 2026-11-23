@@ -3,6 +3,14 @@
 All notable changes to `cozo-ng-cli` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 0.3.1
+
+### Changed
+
+- Added docs.rs metadata and updated dependencies for the Cozo-NG `0.13.2`
+  release. The CLI depends on `cozo-ng-cleaner 0.1.4`.
+- No CLI command or output-format changes.
+
 ## 0.3.0 
 
 ### Changed

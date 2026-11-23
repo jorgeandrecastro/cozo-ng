@@ -4,6 +4,14 @@ Release notes for the `cozo-ng-rocks` crate. This crate is part of the
 independently maintained Cozo-NG project and is not an official CozoDB upstream
 release.
 
+## 0.6.2
+
+### Changed
+
+- Added docs.rs metadata and rustdoc landing documentation.
+- Added a `DOCS_RS` build guard so documentation builds do not compile
+  vendored C++/RocksDB sources. No adapter API or storage behavior changes.
+
 ## 0.6.1
 
 ### Changed

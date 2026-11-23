@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.13.2
+
+### Changed
+
+- Aligned the workspace release for crates.io: engine `cozo-ng 0.13.2`,
+  RocksDB adapter `cozo-ng-rocks 0.6.2`, cleaner `cozo-ng-cleaner 0.1.4`,
+  CLI `cozo-ng-cli 0.3.1`, standalone server `cozo-ng-bin 0.15.2`, Python
+  binding `cozo-ng-python 0.14.2`, and C/Java/Node.js/Swift/WASM bindings
+  `0.13.2`.
+- Added docs.rs metadata and rustdoc landing pages to the publishable crates.
+- Added a docs.rs-safe build path for `cozo-ng-rocks` that avoids compiling
+  vendored native RocksDB sources during documentation builds.
+
 Notable changes to Cozo-NG are documented here. Cozo-NG is an independent
 community continuation of CozoDB; upstream release history is not Cozo-NG
 release history.

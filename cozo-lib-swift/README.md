@@ -13,7 +13,7 @@ community-driven, with no guaranteed release or compatibility schedule.
 Contributions to build, test, document, or maintain a Swift integration are
 welcome.
 
-The `cozo-ng-swift` crate is version `0.13.1` and targets the Cozo-NG `0.13.1`
+The `cozo-ng-swift` crate is version `0.13.2` and targets the Cozo-NG `0.13.2`
 engine. The engine optimizes stored-relation writes and fixes stale FTS/LSH
 index cleanup, `:rm`/`:delete` with `force_collect` on temporary relations, and
 `:update` on corrupted values (now an error instead of a panic); the Swift

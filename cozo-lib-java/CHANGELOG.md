@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.2
+
+- Updated the engine dependency to Cozo-NG `0.13.2`.
+- Added docs.rs metadata and rustdoc landing documentation.
+- No Java/JNI API changes.
+
 Release notes for the `cozo-ng-java` JNI Rust crate. Cozo-NG is an independent
 continuation of CozoDB. This crate release does not publish or update the upstream
 Java, Android, or other JVM packages listed in the README.

@@ -4,7 +4,7 @@
 
 The command-line tool for [Cozo-NG](https://github.com/jorgeandrecastro/cozo-ng): one binary to query, import, export,
 back up and explore a database, **embedded or remote**, with the same commands.
-Version `0.3.0` targets the Cozo-NG `0.13.0` engine, including optimized
+Version `0.3.1` targets the Cozo-NG `0.13.2` engine, including optimized
 stored-relation writes and fixes for stale FTS/LSH entries,
 `:rm`/`:delete` with `force_collect` on temporary relations, and `:update` on
 corrupted values (now an error instead of a panic); data cleaning is provided

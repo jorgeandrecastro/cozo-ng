@@ -1,15 +1,19 @@
 [package]
 name = "cozo-ng-node"
-version = "0.13.1"
+version = "0.13.2"
 description = "Cozo-NG database binding for Node.js"
 authors = ["Ziyang Hu"]
 license = "MPL-2.0"
 homepage = "https://github.com/jorgeandrecastro/cozo-ng"
 repository = "https://github.com/jorgeandrecastro/cozo-ng"
-documentation = "https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-nodejs/README.md"
+documentation = "https://docs.rs/cozo-ng-node"
 readme = "README.md"
 edition = "2024"
 exclude = ["index.node"]
+
+[package.metadata.docs.rs]
+no-default-features = true
+no-deps = true
 
 [lib]
 name = "cozo_node"
