@@ -2,9 +2,6 @@ name: PyPI Release
 
 on:
   push:
-    # branches:
-    #   - main
-    #   - master
     tags:
       - 'v*'
   workflow_dispatch:
@@ -53,6 +50,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Install build tools
+        run: brew install cmake
       - uses: messense/maturin-action@v1
         with:
           working-directory: cozo-lib-python
@@ -71,8 +70,7 @@ jobs:
     permissions:
       id-token: write
     if: startsWith(github.ref, 'refs/tags/')
-    # On garde uniquement linux dans les besoins puisque windows et macos sont commentés ci-dessus
-    needs: [linux]
+    needs: [linux, windows, macos]
     steps:
       - name: Download all workflow artifacts
         uses: actions/download-artifact@v4
