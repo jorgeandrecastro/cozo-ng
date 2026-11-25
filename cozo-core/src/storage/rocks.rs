@@ -26,6 +26,21 @@ use crate::Db;
 const KEY_PREFIX_LEN: usize = 9;
 const CURRENT_STORAGE_VERSION: u64 = 3;
 
+/// Default size of the RocksDB block cache, in MiB.
+/// Can be overridden with the `COZO_ROCKSDB_CACHE_MB` environment variable.
+const DEFAULT_BLOCK_CACHE_MB: usize = 512;
+
+/// Approximate size at which `batch_put` flushes its pending write batch (16 MiB).
+const BATCH_FLUSH_BYTES: usize = 16 * 1024 * 1024;
+
+fn block_cache_bytes() -> usize {
+    let mb = std::env::var("COZO_ROCKSDB_CACHE_MB")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .unwrap_or(DEFAULT_BLOCK_CACHE_MB);
+    mb.saturating_mul(1024 * 1024)
+}
+
 /// Creates a RocksDB database object.
 /// This is currently the fastest persistent storage and it can
 /// sustain huge concurrency.
@@ -101,6 +116,7 @@ pub fn new_cozo_rocksdb(path: impl AsRef<Path>) -> Result<Db<RocksDbStorage>> {
         .create_if_missing(is_new)
         .use_capped_prefix_extractor(true, KEY_PREFIX_LEN)
         .use_bloom_filter(true, 9.9, true)
+        .block_cache_size(block_cache_bytes())
         .path(store_path)
         .options_path(options_path);
 
@@ -143,9 +159,19 @@ impl Storage<'_> for RocksDbStorage {
         &'a self,
         data: Box<dyn Iterator<Item = Result<(Vec<u8>, Vec<u8>)>> + 'a>,
     ) -> Result<()> {
+        // Group puts into atomic RocksDB write batches, flushed every BATCH_FLUSH_BYTES.
+        // Each flush is atomic; the whole call is not (same as the previous per-key puts).
+        // If the input iterator yields an error, the pending (unflushed) batch is dropped.
+        let mut batch = self.db.new_write_batch();
         for result in data {
             let (key, val) = result?;
-            self.db.raw_put(&key, &val)?;
+            batch.put(&key, &val)?;
+            if batch.size_in_bytes() >= BATCH_FLUSH_BYTES {
+                self.db.write(&mut batch)?;
+            }
+        }
+        if !batch.is_empty() {
+            self.db.write(&mut batch)?;
         }
         Ok(())
     }
@@ -188,7 +214,13 @@ impl<'s> StoreTx<'s> for RocksDbTx {
     }
 
     fn del_range_from_persisted(&mut self, lower: &[u8], upper: &[u8]) -> Result<()> {
-        let mut inner = self.db_tx.iterator().upper_bound(upper).start();
+        // One-shot scan: do not pollute the block cache.
+        let mut inner = self
+            .db_tx
+            .iterator()
+            .upper_bound(upper)
+            .fill_cache(false)
+            .start();
         inner.seek(lower);
         while let Some(key) = inner.key()? {
             if key >= upper {
@@ -262,7 +294,13 @@ impl<'s> StoreTx<'s> for RocksDbTx {
     where
         's: 'a,
     {
-        let mut inner = self.db_tx.iterator().upper_bound(upper).start();
+        // One-shot scan: do not pollute the block cache.
+        let mut inner = self
+            .db_tx
+            .iterator()
+            .upper_bound(upper)
+            .fill_cache(false)
+            .start();
         inner.seek(lower);
         let mut count = 0;
         while let Some(k) = inner.key()? {

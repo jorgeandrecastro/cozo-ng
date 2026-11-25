@@ -14,43 +14,77 @@
 #include "tx.h"
 #include "slice.h"
 
-struct SnapshotBridge {
+struct SnapshotBridge
+{
     const Snapshot *snapshot;
     DB *db;
 
     explicit SnapshotBridge(const Snapshot *snapshot_, DB *db_) : snapshot(snapshot_), db(db_) {}
 
-    ~SnapshotBridge() {
+    ~SnapshotBridge()
+    {
         db->ReleaseSnapshot(snapshot);
-//        printf("released snapshot\n");
+        //        printf("released snapshot\n");
     }
 };
 
-struct SstFileWriterBridge {
+struct SstFileWriterBridge
+{
     SstFileWriter inner;
 
-    SstFileWriterBridge(EnvOptions eopts, Options opts) : inner(eopts, opts) {
+    SstFileWriterBridge(EnvOptions eopts, Options opts) : inner(eopts, opts)
+    {
     }
 
-    inline void finish(RocksDbStatus &status) {
+    inline void finish(RocksDbStatus &status)
+    {
         write_status(inner.Finish(), status);
     }
 
-    inline void put(RustBytes key, RustBytes val, RocksDbStatus &status) {
+    inline void put(RustBytes key, RustBytes val, RocksDbStatus &status)
+    {
+        write_status(inner.Put(convert_slice(key), convert_slice(val)), status);
+    }
+};
+
+// Accumulates puts in memory so that they can be written to the database
+// in a single atomic write (one WAL append, one memtable pass).
+struct WriteBatchBridge
+{
+    WriteBatch inner;
+
+    inline void put(RustBytes key, RustBytes val, RocksDbStatus &status)
+    {
         write_status(inner.Put(convert_slice(key), convert_slice(val)), status);
     }
 
+    [[nodiscard]] inline size_t size_in_bytes() const
+    {
+        return inner.GetDataSize();
+    }
+
+    [[nodiscard]] inline size_t count() const
+    {
+        return static_cast<size_t>(inner.Count());
+    }
+
+    inline void clear()
+    {
+        inner.Clear();
+    }
 };
 
 static WriteOptions DEFAULT_WRITE_OPTIONS = WriteOptions();
 
-struct RocksDbBridge {
+struct RocksDbBridge
+{
     unique_ptr<TransactionDB> db;
 
     bool destroy_on_exit;
     string db_path;
 
-    inline unique_ptr<SstFileWriterBridge> get_sst_writer(rust::Str path, RocksDbStatus &status) const {
+    inline unique_ptr<SstFileWriterBridge> get_sst_writer(rust::Str path, RocksDbStatus &status) const
+    {
         DB *db_ = get_base_db();
         auto cf = db->DefaultColumnFamily();
         Options options_ = db_->GetOptions(cf);
@@ -61,7 +95,8 @@ struct RocksDbBridge {
         return sst_file_writer;
     }
 
-    inline void ingest_sst(rust::Str path, RocksDbStatus &status) const {
+    inline void ingest_sst(rust::Str path, RocksDbStatus &status) const
+    {
         IngestExternalFileOptions ifo;
         DB *db_ = get_base_db();
         string path_(path);
@@ -69,21 +104,24 @@ struct RocksDbBridge {
         write_status(db_->IngestExternalFile(cf, {std::move(path_)}, ifo), status);
     }
 
-    [[nodiscard]] inline const string &get_db_path() const {
+    [[nodiscard]] inline const string &get_db_path() const
+    {
         return db_path;
     }
 
-
-    [[nodiscard]] inline unique_ptr<TxBridge> transact() const {
+    [[nodiscard]] inline unique_ptr<TxBridge> transact() const
+    {
         auto ret = make_unique<TxBridge>(&*this->db, db->DefaultColumnFamily());
         return ret;
     }
 
-    inline void del_range(RustBytes start, RustBytes end, RocksDbStatus &status) const {
+    inline void del_range(RustBytes start, RustBytes end, RocksDbStatus &status) const
+    {
         WriteBatch batch;
         auto cf = db->DefaultColumnFamily();
         auto s = batch.DeleteRange(cf, convert_slice(start), convert_slice(end));
-        if (!s.ok()) {
+        if (!s.ok())
+        {
             write_status(s, status);
             return;
         }
@@ -95,13 +133,33 @@ struct RocksDbBridge {
         write_status(s2, status);
     }
 
-    inline void put(RustBytes key, RustBytes val, RocksDbStatus &status) const {
+    inline void put(RustBytes key, RustBytes val, RocksDbStatus &status) const
+    {
         auto raw_db = this->get_base_db();
         auto s = raw_db->Put(DEFAULT_WRITE_OPTIONS, convert_slice(key), convert_slice(val));
         write_status(s, status);
     }
 
-    void compact_range(RustBytes start, RustBytes end, RocksDbStatus &status) const {
+    [[nodiscard]] inline unique_ptr<WriteBatchBridge> new_write_batch() const
+    {
+        return make_unique<WriteBatchBridge>();
+    }
+
+    // Writes the whole batch atomically, with the same write path and options as `put`
+    // (base DB, default write options). The batch is cleared on success so it can be reused.
+    inline void write_batch(WriteBatchBridge &batch, RocksDbStatus &status) const
+    {
+        auto raw_db = this->get_base_db();
+        auto s = raw_db->Write(DEFAULT_WRITE_OPTIONS, &batch.inner);
+        if (s.ok())
+        {
+            batch.inner.Clear();
+        }
+        write_status(s, status);
+    }
+
+    void compact_range(RustBytes start, RustBytes end, RocksDbStatus &status) const
+    {
         CompactRangeOptions options;
         auto cf = db->DefaultColumnFamily();
         auto start_s = convert_slice(start);
@@ -110,7 +168,8 @@ struct RocksDbBridge {
         write_status(s, status);
     }
 
-    DB *get_base_db() const {
+    DB *get_base_db() const
+    {
         return db->GetBaseDB();
     }
 
@@ -120,4 +179,4 @@ struct RocksDbBridge {
 shared_ptr<RocksDbBridge>
 open_db(const DbOpts &opts, RocksDbStatus &status);
 
-#endif //COZOROCKS_DB_H
+#endif // COZOROCKS_DB_H

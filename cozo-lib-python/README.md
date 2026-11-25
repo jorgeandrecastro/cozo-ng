@@ -7,15 +7,15 @@ embedded graph and vector database.
 
 | | |
 |---|---|
-| Rust crate | `cozo-ng-python` (`0.14.2`) |
+| Rust crate | `cozo-ng-python` (`0.15.0`) |
 | Python distribution | `cozo-ng` |
 | Python module | `cozo_embedded` |
-| Engine | Cozo-NG `0.13.2` |
+| Engine | Cozo-NG `0.14.0` |
 | Python | 3.9+ (stable ABI, `abi3-py39`) |
 
 See the [crate changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozo-lib-python/CHANGELOG.md).
 
-Cozo-NG `0.13.2` includes the `0.13.0` stored-relation write optimizations and
+Cozo-NG `0.14.0` includes configurable RocksDB block cache sizing and atomic write batches plus the `0.13.0` stored-relation write optimizations and
 fixes for stale FTS/LSH index cleanup, `:rm`/`:delete` with `force_collect` on
 temporary relations, and `:update` on corrupted values (now an error instead
 of a panic); the Python binding API is unchanged.

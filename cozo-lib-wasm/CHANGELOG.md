@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.14.0
+
+- Updated the engine dependency to Cozo-NG `0.14.0`.
+- No WebAssembly binding API changes.
+
 Release notes for the `cozo-ng-wasm` Rust crate. Cozo-NG is an independent continuation
 of CozoDB. This crate release does not publish or update the upstream npm
 package `cozo-lib-wasm`.

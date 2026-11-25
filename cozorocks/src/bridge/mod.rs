@@ -128,6 +128,12 @@ pub(crate) mod ffi {
         fn transact(self: &RocksDbBridge) -> UniquePtr<TxBridge>;
         fn del_range(self: &RocksDbBridge, lower: &[u8], upper: &[u8], status: &mut RocksDbStatus);
         fn put(self: &RocksDbBridge, key: &[u8], val: &[u8], status: &mut RocksDbStatus);
+        fn new_write_batch(self: &RocksDbBridge) -> UniquePtr<WriteBatchBridge>;
+        fn write_batch(
+            self: &RocksDbBridge,
+            batch: Pin<&mut WriteBatchBridge>,
+            status: &mut RocksDbStatus,
+        );
         fn compact_range(
             self: &RocksDbBridge,
             lower: &[u8],
@@ -149,6 +155,17 @@ pub(crate) mod ffi {
             status: &mut RocksDbStatus,
         );
         fn finish(self: Pin<&mut SstFileWriterBridge>, status: &mut RocksDbStatus);
+
+        type WriteBatchBridge;
+        fn put(
+            self: Pin<&mut WriteBatchBridge>,
+            key: &[u8],
+            val: &[u8],
+            status: &mut RocksDbStatus,
+        );
+        fn size_in_bytes(self: &WriteBatchBridge) -> usize;
+        fn count(self: &WriteBatchBridge) -> usize;
+        fn clear(self: Pin<&mut WriteBatchBridge>);
 
         type TxBridge;
         // fn get_r_opts(self: Pin<&mut TxBridge>) -> Pin<&mut ReadOptions>;

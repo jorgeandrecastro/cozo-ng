@@ -6,6 +6,10 @@ PyPI distribution.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.15.0] - 2026-11-25
+
+The engine dependency is Cozo-NG `0.14.0`. No Python binding API changes.
+
 ## [0.14.2] - 2026-11-23
 
 The engine dependency is Cozo-NG `0.13.2`. Added docs.rs metadata and rustdoc

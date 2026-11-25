@@ -5,6 +5,36 @@ community-maintained continuation of CozoDB; these are Cozo-NG releases, not
 upstream CozoDB releases. The package is `cozo-ng`, while the Rust library
 remains `cozo`.
 
+## 0.14.0
+
+### Added
+
+- `DbBuilder::block_cache_size(bytes)` sets the size of the shared LRU block
+  cache. The existing `DbOpts::block_cache_size` field is now honored; `0`
+  keeps the RocksDB default cache.
+
+- `WriteBatch`, created with `RocksDb::new_write_batch()` and written with
+  `RocksDb::write(&mut batch)`. It groups many puts into a single atomic RocksDB
+  write (one WAL append instead of one per key), using the same write path and
+  options as `RocksDb::raw_put`. `WriteBatch::put`, `len`, `is_empty`,
+  `size_in_bytes` and `clear` are available.
+- `SstWriter` and `WriteBatch` are now re-exported from the crate root.
+
+### Fixed
+
+- `open_db` no longer discards the block-based table options when
+  `use_bloom_filter` is enabled. The bloom filter is now applied on top of the
+  existing table options (`block_size`, index/filter block caching and
+  pinning, `format_version`, or the settings loaded from an options file)
+  instead of replacing them with a default `BlockBasedTableOptions`.
+- The block cache size was previously hard-coded to 1 GiB and only applied
+  when an options file was loaded. It now uses the configured size and is
+  applied in every case.
+- When loading an options file, the block cache is applied to the column
+  family that is actually used, and an options file without any column family
+  or without block-based table options is handled without undefined behavior.
+
+
 ## 0.13.2
 
 - Patch release for publication and documentation.

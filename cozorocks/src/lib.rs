@@ -18,6 +18,8 @@
 
 pub use bridge::db::DbBuilder;
 pub use bridge::db::RocksDb;
+pub use bridge::db::SstWriter;
+pub use bridge::db::WriteBatch;
 pub use bridge::ffi::RocksDbStatus;
 pub use bridge::ffi::SnapshotBridge;
 pub use bridge::ffi::StatusCode;

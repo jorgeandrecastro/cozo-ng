@@ -4,6 +4,49 @@ Release notes for the `cozo-ng-rocks` crate. This crate is part of the
 independently maintained Cozo-NG project and is not an official CozoDB upstream
 release.
 
+## 0.7.0
+
+### Added
+
+- `DbBuilder::block_cache_size(bytes)` sets the size of the shared LRU block
+  cache. The existing `DbOpts::block_cache_size` field is now honored; `0`
+  keeps the RocksDB default cache.
+
+- `WriteBatch`, created with `RocksDb::new_write_batch()` and written with
+  `RocksDb::write(&mut batch)`. It groups many puts into a single atomic RocksDB
+  write (one WAL append instead of one per key), using the same write path and
+  options as `RocksDb::raw_put`. `WriteBatch::put`, `len`, `is_empty`,
+  `size_in_bytes` and `clear` are available.
+- `SstWriter` and `WriteBatch` are now re-exported from the crate root.
+
+### Fixed
+
+- `open_db` no longer discards the block-based table options when
+  `use_bloom_filter` is enabled. The bloom filter is now applied on top of the
+  existing table options (`block_size`, index/filter block caching and
+  pinning, `format_version`, or the settings loaded from an options file)
+  instead of replacing them with a default `BlockBasedTableOptions`.
+- The block cache size was previously hard-coded to 1 GiB and only applied
+  when an options file was loaded. It now uses the configured size and is
+  applied in every case.
+- When loading an options file, the block cache is applied to the column
+  family that is actually used, and an options file without any column family
+  or without block-based table options is handled without undefined behavior.
+
+### Changed
+
+- Databases opened with the bloom filter enabled now use the intended table
+  options (16 KiB blocks, pinned L0 index/filter blocks). This only affects
+  SST files written after the upgrade; existing files stay readable.
+- No other adapter API changes.
+
+### Notes
+
+- Because the effective RocksDB table options change, this release bumps the
+  minor version rather than the patch version.
+- Engine-side callers should set an explicit block cache size through
+  `block_cache_size`; Cozo-NG's RocksDB storage does so by default.
+
 ## 0.6.2
 
 ### Changed

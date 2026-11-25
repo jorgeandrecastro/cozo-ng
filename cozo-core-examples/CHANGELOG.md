@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3
+
+- Updated the engine dependency to Cozo-NG `0.14.0`.
+- No example API changes.
+
 ## 0.2.1 
 
 ### Changed

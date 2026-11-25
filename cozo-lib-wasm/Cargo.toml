@@ -1,6 +1,6 @@
 [package]
 name = "cozo-ng-wasm"
-version = "0.13.2"
+version = "0.14.0"
 edition = "2024"
 description = "Cozo-NG database binding for WebAssembly"
 authors = ["Ziyang Hu"]
@@ -23,7 +23,7 @@ default = ["console_error_panic_hook"]
 
 [dependencies]
 wasm-bindgen = "0.2.130"
-cozo = { package = "cozo-ng", version = "0.13", path = "../cozo-core", default-features = false, features = ["wasm"] }
+cozo = { package = "cozo-ng", version = "0.14", path = "../cozo-core", default-features = false, features = ["wasm"] }
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires

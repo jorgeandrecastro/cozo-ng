@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.14.0
+
+### Added
+
+- Added configurable RocksDB block cache sizing and grouped atomic write batches.
+- Added `WriteBatch` and `SstWriter` re-exports and the
+  `DbBuilder::block_cache_size` API to `cozo-ng-rocks`.
+
+### Fixed
+
+- Fixed bloom-filter table options replacing block cache and options-file
+  table settings.
+- Fixed block cache sizing and column-family selection when options files are
+  used.
+
+### Changed
+
+- Aligned the workspace release: engine `cozo-ng 0.14.0`, RocksDB adapter
+  `cozo-ng-rocks 0.7.0`, cleaner `cozo-ng-cleaner 0.1.5`, CLI
+  `cozo-ng-cli 0.4.0`, standalone server `cozo-ng-bin 0.16.0`, Python binding
+  `cozo-ng-python 0.15.0`, and C/Java/Node.js/Swift/WASM bindings `0.14.0`.
+
 ## 0.13.2
 
 ### Changed

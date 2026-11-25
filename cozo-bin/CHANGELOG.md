@@ -5,6 +5,11 @@ Cozo-NG project, not an official CozoDB upstream release. Crate versions do not
 necessarily correspond to downloadable standalone binary releases or to Docker
 image tags.
 
+## 0.16.0
+
+- Updated the engine dependency to Cozo-NG `0.14.0`.
+- No HTTP route, request/response format, or engine storage-format changes.
+
 ## 0.15.2
 
 - Updated the engine dependency to Cozo-NG `0.13.2`.

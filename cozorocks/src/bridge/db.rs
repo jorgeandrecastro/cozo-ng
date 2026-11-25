@@ -87,6 +87,11 @@ impl DbBuilder {
         self.opts.paranoid_checks = val;
         self
     }
+    /// Size in bytes of the shared LRU block cache. `0` keeps RocksDB's default cache.
+    pub fn block_cache_size(mut self, bytes: usize) -> Self {
+        self.opts.block_cache_size = bytes;
+        self
+    }
     pub fn enable_blob_files(
         mut self,
         enable: bool,
@@ -177,6 +182,26 @@ impl RocksDb {
             Err(status)
         }
     }
+    /// Creates an empty write batch bound to this database.
+    pub fn new_write_batch(&self) -> WriteBatch {
+        WriteBatch {
+            inner: self.inner.new_write_batch(),
+        }
+    }
+    /// Atomically writes all operations accumulated in `batch`, using the same write path
+    /// as [`RocksDb::raw_put`]. On success the batch is emptied and can be reused;
+    /// on failure it is left untouched.
+    #[inline]
+    pub fn write(&self, batch: &mut WriteBatch) -> Result<(), RocksDbStatus> {
+        let mut status = RocksDbStatus::default();
+        self.inner
+            .write_batch(batch.inner.pin_mut(), &mut status);
+        if status.is_ok() {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
     pub fn get_sst_writer(&self, path: &str) -> Result<SstWriter, RocksDbStatus> {
         let mut status = RocksDbStatus::default();
         let ret = self.inner.get_sst_writer(path, &mut status);
@@ -196,6 +221,45 @@ impl RocksDb {
         }
     }
 }
+
+/// A set of puts accumulated in memory and written to the database in one atomic write.
+pub struct WriteBatch {
+    inner: UniquePtr<WriteBatchBridge>,
+}
+
+impl WriteBatch {
+    #[inline]
+    pub fn put(&mut self, key: &[u8], val: &[u8]) -> Result<(), RocksDbStatus> {
+        let mut status = RocksDbStatus::default();
+        self.inner.pin_mut().put(key, val, &mut status);
+        if status.is_ok() {
+            Ok(())
+        } else {
+            Err(status)
+        }
+    }
+    /// Number of operations currently in the batch.
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.inner.count()
+    }
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+    /// Approximate size in bytes of the serialized batch.
+    #[inline]
+    pub fn size_in_bytes(&self) -> usize {
+        self.inner.size_in_bytes()
+    }
+    /// Drops every operation accumulated so far.
+    #[inline]
+    pub fn clear(&mut self) {
+        self.inner.pin_mut().clear();
+    }
+}
+
+unsafe impl Send for WriteBatch {}
 
 pub struct SstWriter {
     inner: UniquePtr<SstFileWriterBridge>,

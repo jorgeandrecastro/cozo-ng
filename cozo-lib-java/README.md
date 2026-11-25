@@ -10,7 +10,7 @@ search. Maintenance focuses on the embedded Rust engine; this JNI binding is
 a community integration surface and may not have release parity with the Rust
 crate. Contributions to build, test, document, or maintain it are welcome.
 
-The `cozo-ng-java` crate is version `0.13.2` and targets the Cozo-NG `0.13.2`
+The `cozo-ng-java` crate is version `0.14.0` and targets the Cozo-NG `0.14.0`
 engine. The engine optimizes stored-relation writes and fixes stale FTS/LSH
 index cleanup, `:rm`/`:delete` with `force_collect` on temporary relations, and
 `:update` on corrupted values (now an error instead of a panic); the Java

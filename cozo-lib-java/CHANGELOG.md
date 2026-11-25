@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.14.0
+
+- Updated the engine dependency to Cozo-NG `0.14.0`.
+- No Java/JNI API changes.
+
 ## 0.13.2
 
 - Updated the engine dependency to Cozo-NG `0.13.2`.

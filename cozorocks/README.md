@@ -22,14 +22,13 @@ crate is maintained as a Rust engine component within that project.
 > Cozo query API, or a standalone database. It is an implementation component
 > of the Rust engine; its API and storage behavior may change as Cozo-NG is maintained.
 >
-> This is the Cozo-NG `0.6.2` version, aligned with the Cozo-NG `0.13.2`
+> This is the Cozo-NG `0.7.0` version, aligned with the Cozo-NG `0.14.0`
 > engine. It is not an upstream CozoDB release.
 > See the crate's [changelog](https://github.com/jorgeandrecastro/cozo-ng/blob/main/cozorocks/CHANGELOG.md) for release notes.
 
-The Cozo-NG `0.13.2` engine optimizes stored-relation writes and fixes stale
-FTS/LSH index cleanup, `:rm`/`:delete` with `force_collect` on temporary
-relations, and `:update` on corrupted values (now an error instead of a
-panic). These changes do not alter the adapter API or storage behavior.
+The Cozo-NG `0.14.0` engine adds configurable block cache sizing and grouped
+atomic RocksDB writes. The adapter also preserves bloom-filter table options
+and applies block cache settings consistently with or without an options file.
 
 ## Crate architecture
 
@@ -61,7 +60,7 @@ The dependency key can remain `cozorocks`, matching the library name:
 
 ```toml
 [dependencies]
-cozorocks = { package = "cozo-ng-rocks", version = "0.6" }
+cozorocks = { package = "cozo-ng-rocks", version = "0.7" }
 ```
 
 In the Cozo-NG workspace, the engine already declares this dependency when its
@@ -129,7 +128,7 @@ The `io-uring` feature is optional and intended for Linux. It requires the
 `liburing` development files and a working `pkg-config` configuration:
 
 ```toml
-cozorocks = { package = "cozo-ng-rocks", version = "0.6", features = ["io-uring"] }
+cozorocks = { package = "cozo-ng-rocks", version = "0.7", features = ["io-uring"] }
 ```
 
 The `jemalloc` feature enables the optional `tikv-jemalloc-sys` dependency. It

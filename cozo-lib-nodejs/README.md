@@ -10,7 +10,7 @@ search. The Rust engine is the primary maintenance target; this Node.js
 binding is a community integration surface. Contributions to build, document,
 or maintain it are welcome.
 
-The `cozo-ng-node` crate is version `0.13.2` and targets the Cozo-NG `0.13.2`
+The `cozo-ng-node` crate is version `0.14.0` and targets the Cozo-NG `0.14.0`
 engine. The engine optimizes stored-relation writes and fixes stale FTS/LSH
 index cleanup, `:rm`/`:delete` with `force_collect` on temporary relations, and
 `:update` on corrupted values (now an error instead of a panic); the Node.js

@@ -3,6 +3,14 @@
 All notable changes to `cozo-ng-cli` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 0.4.0
+
+### Changed
+
+- Updated the engine dependency to Cozo-NG `0.14.0` and the cleaner dependency
+  to `cozo-ng-cleaner 0.1.5`.
+- No CLI command or output-format changes.
+
 ## 0.3.1
 
 ### Changed

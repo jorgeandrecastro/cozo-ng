@@ -1,14 +1,17 @@
 [package]
 name = "cozo-ng-rocks"
-version = "0.6.2"
+version = "0.7.0"
 edition = "2024"
+rust-version = "1.85"
 license = "MPL-2.0"
-authors = ["Ziyang Hu"]
+authors = ["Ziyang Hu","Jorge andre Castro"]
 description = "RocksDB storage adapter for Cozo-NG"
 homepage = "https://github.com/jorgeandrecastro/cozo-ng"
 repository = "https://github.com/jorgeandrecastro/cozo-ng"
 documentation = "https://docs.rs/cozo-ng-rocks"
 readme = "README.md"
+keywords = ["rocksdb", "storage", "database", "cozo", "ffi"]
+categories = ["database", "database-implementations"]
 exclude = ["rocksdb/docs", "rocksdb/java"]
 
 [package.metadata.docs.rs]
